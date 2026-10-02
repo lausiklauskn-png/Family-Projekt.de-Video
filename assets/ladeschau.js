@@ -33,22 +33,21 @@
   var T_INTRO = 5.2, T_APP = 4.4, T_CLIP = 5.4;
 
   var CSS = `
-html.ls-an{--bg:#070b10;--flaeche:#121a23;--linie:#2a3a4a;--text:#eef4f6;--leise:#a9bcc6;--minze:#5fe0b3;--minze-dunkel:#0e3a2d;--warn:#f2b544;--fehler:#ff7a6b;color-scheme:dark}
+html.ls-an:root{--bg:#070b10;--bg2:#101921;--karte:rgba(16,24,32,.9);--linie:rgba(255,255,255,.12);--text:#eef4f6;--leise:#a9bcc6;--akzent:#5ad3cf;--akzent2:#a78bfa;--akzent3:#7c9cff;--petrol:#1b7f87;--glanz:#8fe4ea;--auf-akzent:#04161b;--warn:#f3b54a;--fehler:#ff8f7a;--ok-grund:rgba(90,211,207,.12);--kopf-grund:rgba(10,16,22,.82);--glow:0 0 22px rgba(90,211,207,.24),0 0 52px rgba(167,139,250,.14);--schatten:0 14px 36px rgba(0,0,0,.42),0 4px 10px rgba(0,0,0,.26);--holo-text:linear-gradient(100deg,#8fe4ea,#a9f4e6,#cfe0ff,#e6d4ff,#a9f4e6,#8fe4ea);--holo-rand:conic-gradient(from var(--rot),#5ad3cf,#7c9cff,#a78bfa,#8fe4ea,#1b7f87,#5ad3cf);color-scheme:dark}
 html.ls-an body{background:#05080c}
 html.ls-an .blatt{position:relative;z-index:1}
-html.ls-an .blatt>header{text-shadow:0 2px 18px #000c}
-html.ls-an .fassung{background:color-mix(in srgb,var(--flaeche) 80%,transparent);-webkit-backdrop-filter:blur(16px) saturate(1.2);backdrop-filter:blur(16px) saturate(1.2);transition:background .6s}
+html.ls-an .einstieg{text-shadow:0 1px 3px #000,0 2px 18px #000c}
 #ls-buehne{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;opacity:0;transition:opacity 1.2s ease;background:#05080c}
 #ls-buehne.da{opacity:1}
 #ls-buehne.weg{opacity:0;transition:opacity .9s ease}
-.ls-bild{position:absolute;inset:-6%;background-size:cover;background-position:center;opacity:0;transition:opacity 2.4s ease;will-change:transform,opacity;filter:saturate(1.1)}
-.ls-bild.an{opacity:.55}
-.ls-bild.kb{animation:lsKen 16s linear forwards}
-@keyframes lsKen{from{transform:scale(1.04) translate3d(-1.5%,1%,0)}to{transform:scale(1.16) translate3d(1.5%,-1.5%,0)}}
+.ls-bild{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0;transition:opacity 2.4s ease;visibility:hidden}
+.ls-bild.an,.ls-bild.weg{visibility:visible;will-change:transform,opacity}
+.ls-bild.an{opacity:.82}
+.ls-bild.kb{animation:lsKen 24s linear forwards}
+@keyframes lsKen{from{transform:scale(1.02)}to{transform:scale(1.08)}}
 #ls-3d{position:absolute;inset:0;width:100%;height:100%;mix-blend-mode:screen}
-.ls-vignette{position:absolute;inset:0;background:radial-gradient(120% 90% at 50% 40%,transparent 35%,#05080cd9 100%),linear-gradient(180deg,#05080c99,transparent 30%,transparent 70%,#05080cb3)}
-.ls-korn{position:absolute;inset:-50%;opacity:.07;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");animation:lsKorn .6s steps(3) infinite}
-@keyframes lsKorn{0%{transform:translate(0,0)}33%{transform:translate(-3%,2%)}66%{transform:translate(2%,-3%)}}
+.ls-vignette{position:absolute;inset:0;background:radial-gradient(120% 90% at 50% 40%,transparent 50%,#05080c99 100%),linear-gradient(180deg,#05080c66,transparent 25%,transparent 75%,#05080c80)}
+.ls-korn{position:absolute;inset:0;opacity:.035;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
 .vorschau.ls-fenster{position:relative;container-type:inline-size;background:#04070a}
 .vorschau.ls-fenster>img{opacity:0;transition:opacity .5s}
 .vorschau.ls-fenster[data-ls-art="bilder"]>img{opacity:1}
@@ -104,7 +103,9 @@ html.ls-an .fassung{background:color-mix(in srgb,var(--flaeche) 80%,transparent)
   function aufbauen(fenster) {
     if (!document.getElementById("ls-css")) { var st = el("style"); st.id = "ls-css"; st.textContent = CSS; document.head.appendChild(st); }
     var buehne = el("div"); buehne.id = "ls-buehne"; buehne.setAttribute("aria-hidden", "true");
-    var bilder = BILDER.map(function (n) { var d = el("div", "ls-bild"); d.style.backgroundImage = "url(" + B + n + ".jpg)"; buehne.appendChild(d); return d; });
+    var bilder = BILDER.map(function (n) { var d = el("div", "ls-bild"); d.style.backgroundImage = "url(" + B + n + ".jpg)"; buehne.appendChild(d);
+      // vorab entschlüsseln, sonst geschieht es beim Überblenden mitten im Laden (Ruckeln)
+      var im = new Image(); im.src = B + n + ".jpg"; if (im.decode) im.decode().catch(function () {}); d._vorab = im; return d; });
     var cv = el("canvas"); cv.id = "ls-3d"; buehne.appendChild(cv);
     buehne.appendChild(el("div", "ls-vignette")); if (!RUHIG) buehne.appendChild(el("div", "ls-korn"));
     document.body.insertBefore(buehne, document.body.firstChild);
@@ -270,7 +271,7 @@ html.ls-an .fassung{background:color-mix(in srgb,var(--flaeche) 80%,transparent)
   function Mycel(cv) {
     var THREE = window.THREE; if (!THREE) return null;
     var r; try { r = new THREE.WebGLRenderer({ canvas: cv, alpha: true, antialias: true }); } catch (e) { return null; }
-    r.setPixelRatio(Math.min(devicePixelRatio || 1, 1.5));
+    r.setPixelRatio(Math.min(devicePixelRatio || 1, 1.25));
     var sc = new THREE.Scene(), cam = new THREE.PerspectiveCamera(55, 1, .1, 200); cam.position.set(0, 0, 17);
     var gruppe = new THREE.Group(); sc.add(gruppe);
     var tc = document.createElement("canvas"); tc.width = tc.height = 64; var g = tc.getContext("2d");
@@ -360,7 +361,7 @@ html.ls-an .fassung{background:color-mix(in srgb,var(--flaeche) 80%,transparent)
     }
     // Bild im Hintergrund, jedes genau einmal, das letzte bleibt
     var b = Math.min(BILDER.length - 1, Math.floor(t / S.finale * BILDER.length));
-    if (b !== S.bildNr) { if (S.bildNr >= 0) S.d.bilder[S.bildNr].classList.remove("an"); S.bildNr = b; var bb = S.d.bilder[b]; bb.classList.add("an"); if (!RUHIG) bb.classList.add("kb"); }
+    if (b !== S.bildNr) { if (S.bildNr >= 0) { var alt = S.d.bilder[S.bildNr]; alt.classList.add("weg"); alt.classList.remove("an"); setTimeout(function () { if (!alt.classList.contains("an")) alt.classList.remove("weg", "kb"); }, 2600); } S.bildNr = b; var bb = S.d.bilder[b]; bb.classList.add("an"); if (!RUHIG) bb.classList.add("kb"); }
     if (S.mycel) S.mycel.bild(S.pausiert ? 0 : S.ton.puls());
     S.raf = requestAnimationFrame(takt);
   }

@@ -104,6 +104,33 @@ Hintergründen … aber jeweils immer die gleichen Videos“*. Jede Karte trägt
   Sichttest, welche Wege bleiben.
 - Proben: `smoke` § D2 · `browser` § 2e2 · Gegenprobe `BILDER:`, `SCHAUENDE:`, `BASIS:`.
 
+### Klaus' Sichttest am Tablet (2026-10-02)
+
+*„es ruckelt an den Rändern rechts, links, oben"* (etwa ab Teil 7) · *„die
+Hintergrundbilder … sehr milchig"* · *„ich habe sogar eins, zwei, dreimal gespeichert,
+weil es nicht angezeigt wurde"*. Geändert:
+
+| | vorher | jetzt |
+|---|---|---|
+| Fenster über der Schau | im hellen Gerätethema **galten die dunklen Schau-Farben gar nicht** (`stil.css` `:root:not([data-theme=dark])` schlug `html.ls-an`), dazu falsche Token-Namen und zwei tote Selektoren (`.fassung`, `.blatt>header` gibt es nicht) — helle Karten, blasse Schrift über den Bildern | `html.ls-an:root` mit den Tokens aus `stil.css`: Karten 90 % dunkel in **beiden** Themen, Überschrift mit Schatten, **kein** Weichzeichner (nur der kleine Musik-Knopf trägt einen) |
+| Hintergrund | `inset:-6%`, Zoom 1,04→1,16 **mit** Seitwärtsschub, alle 8 Bilder mit `will-change` | `inset:0`, Zoom 1,02→1,08 ohne Schub, 24 s; Ebene nur für das sichtbare und das ausblendende Bild; Bilder vorab entschlüsselt |
+| Bilder | 1280×720, Deckkraft 0,55, Sättigungsfilter | **1920×1080** aus `family-project/werbevideo/assets/bg/`, Deckkraft 0,82, Vignette schwächer |
+| Korn | lief (0,6 s Schritte) | steht still, halb so stark |
+| Mycel | Pixeldichte bis 1,5 | bis 1,25 |
+| Speichern | jeder Tipp ein neuer Download | ein zweiter Tipp binnen 15 s lädt nicht noch einmal und sagt, dass die Datei ein paar Sekunden braucht |
+
+⚠ **Die Ursache des Ruckelns ist nicht gemessen** — headless gibt es kein Tablet.
+Weggenommen ist, was am meisten kostet (Weichzeichner über bewegtem Grund, acht
+übergroße Ebenen, laufendes Korn). Ob es reicht, sagt erst Klaus' nächster Sichttest.
+`ls/` wiegt jetzt 4,7 MB statt 2,7 MB (wird erst auf Tipp geladen).
+„Googlen" ist nicht untersucht: die Seite lädt nichts von Google (nur three.js von cdnjs).
+⚠ **Das „Milchige" war vor allem ein Farbfehler, kein Bildfehler** — gefunden an einem
+Bildschirmfoto im hellen Thema, nicht durch Nachdenken. Die Browser-Probe läuft mit
+hellem Gerätethema (Playwrights Vorgabe) und misst jetzt Überschrift (hell) und Karte
+(dunkel). Der Weichzeichner-Wächter suchte nur an `.fassung` und war blind (Gegenprobe);
+er prüft jetzt jede Regel der Ladeschau.
+Proben: `smoke` (Ladeschau-Zeilen) · `browser` (zweiter Tipp, Farben im hellen Thema) · Gegenprobe `RUCKELN:` (4), `FARBEN:` (1), `SPEICHERN:` (1).
+
 ## Prüfen
 
 ```bash

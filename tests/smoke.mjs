@@ -174,6 +174,17 @@ const lsDateien = existsSync(join(WURZEL, "assets/ls")) ? readdirSync(join(WURZE
 ok("assets/ls/ trägt Hintergrundbilder und Musik", lsDateien.some((n) => /^bg-.*\.jpg$/.test(n)) && lsDateien.includes("musik.mp3"), lsDateien.length + " Dateien");
 ok("keine .wav und keine Datei über 50 MB in assets/ls/", lsDateien.every((n) => !/\.wav$/i.test(n) && statSync(join(WURZEL, "assets/ls", n)).size < 50e6));
 ok("Ladeschau und ls/ stehen NICHT im Installations-Vorrat (erst auf Tipp)", !schaleListe.some((u) => /ladeschau|assets\/ls\//.test(u)));
+/* Klaus 2026-10-02: „ruckelt an den Rändern" · „Hintergrundbilder … milchig" */
+// Gemessen wird jede Regel, nicht eine bestimmte: die erste Fassung suchte nur an
+// `.fassung` — eine Klasse, die es auf der Seite gar nicht gibt (Gegenprobe RUCKELN, 2026-10-02).
+const weich = (lsQuelle.match(/[^{}]*\{[^}]*backdrop-filter[^}]*\}/g) || []).map((r) => r.slice(0, r.indexOf("{")).trim());
+ok("Ladeschau: kein Weichzeichner (backdrop-filter) über der laufenden Schau — nur der kleine Musik-Knopf", weich.every((sel) => sel === "#ls-musik"), JSON.stringify(weich));
+ok("Ladeschau: Hintergrund ragt nicht über den Rand (inset:0) und schiebt nicht seitlich", /\.ls-bild\{position:absolute;inset:0;/.test(lsQuelle) && !/lsKen\{[^}]*translate/.test(lsQuelle));
+ok("Ladeschau: das Korn steht still", !/\.ls-korn\{[^}]*animation/.test(lsQuelle));
+ok("Ladeschau: nur sichtbare Bilder bekommen eine eigene Ebene", /\.ls-bild\{[^}]*visibility:hidden/.test(lsQuelle) && !/\.ls-bild\{[^}]*will-change/.test(lsQuelle));
+function jpegBreite(datei) { const b = readFileSync(datei); for (let i = 2; i < b.length - 9; ) { if (b[i] !== 0xff) return 0; const m = b[i + 1], l = b.readUInt16BE(i + 2); if (m >= 0xc0 && m <= 0xc2) return b.readUInt16BE(i + 7); i += 2 + l; } return 0; }
+const bgBreiten = (lsQuelle.match(/var BILDER = \[([^\]]*)\]/) || ["", ""])[1].split(",").map((x) => x.trim().replace(/"/g, "")).filter(Boolean).map((n) => [n, existsSync(join(WURZEL, "assets/ls", n + ".jpg")) ? jpegBreite(join(WURZEL, "assets/ls", n + ".jpg")) : 0]);
+ok("Ladeschau: jedes Hintergrundbild ist mindestens 1920 px breit (scharf am Tablet)", bgBreiten.length === 8 && bgBreiten.every(([, w]) => w >= 1920), JSON.stringify(bgBreiten));
 ok("node --check assets/ladeschau.js", spawnSync(NODE, ["--check", join(WURZEL, "assets/ladeschau.js")]).status === 0);
 
 kopf("E · node --check");

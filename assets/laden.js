@@ -168,7 +168,7 @@
     window.LADESCHAU_BASIS = "assets/ls/";
     schauLaedt = new Promise(function (ok) {
       var s = document.createElement("script");
-      s.src = "assets/ladeschau.js?v=1";
+      s.src = "assets/ladeschau.js?v=2";
       s.onload = function () { ok(!!window.Ladeschau); };
       s.onerror = function () { schauLaedt = null; ok(false); };
       document.head.appendChild(s);
@@ -249,6 +249,16 @@
 
   function speichern(k) {
     if (!k.blob) return;
+    /* Zweiter Tipp kurz danach: kein zweiter Download. Der Browser braucht für eine große
+       Datei ein paar Sekunden, bis sie unter „Downloads“ erscheint (Klaus 2026-10-02). */
+    var jetzt = Date.now();
+    if (k.gespeichertUm && jetzt - k.gespeichertUm < 15000) {
+      probe.doppelGesperrt = (probe.doppelGesperrt || 0) + 1;
+      melde(k, "Schon gespeichert. Bei einer großen Datei dauert es ein paar Sekunden, bis sie unter „Downloads“ erscheint. " +
+        "Kein zweiter Download — sonst liegt die Datei doppelt da.", "warn");
+      return;
+    }
+    k.gespeichertUm = jetzt;
     var url = URL.createObjectURL(k.blob);
     var a = document.createElement("a");
     a.href = url; a.download = k.v.dateiname; a.rel = "noopener";
@@ -256,7 +266,7 @@
     setTimeout(function () { URL.revokeObjectURL(url); }, 120000);
     probe.letzterDownload = { id: k.v.id, name: k.v.dateiname, groesse: k.blob.size };
     melde(k, "Der Browser legt „" + k.v.dateiname + "“ (" + mb(k.blob.size) + ") jetzt ab — meist im Ordner „Downloads“. " +
-      "Fragt er nach, bitte bestätigen. Du kannst noch einmal speichern, solange die Seite offen ist.", "gut");
+      "Fragt er nach, bitte bestätigen. Bei einer großen Datei dauert es ein paar Sekunden, bis sie dort erscheint — bitte nicht noch einmal tippen.", "gut");
   }
 
   async function listeLaden() {
