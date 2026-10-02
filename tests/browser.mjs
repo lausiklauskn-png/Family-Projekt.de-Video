@@ -386,14 +386,16 @@ try {
     s2.stoerung.delete(teil("probe-ohne", 0));
     ok("keine Skriptfehler in der Wegwerf-Kopie", q.__fehler.length === 0, q.__fehler.join(" | "));
 
-    kopf("2e2 · drei Lade-Wege: schlicht, mit Hintergrundbildern, mit Werbeschau — derselbe Inhalt");
+    kopf("2e2 · vier Lade-Wege: schlicht, Hintergrundbilder, Werbeschau, Vorschaufilm — derselbe Inhalt");
     {
       const w = await oeffne(c2, s2.url);
-      const knopfLage = await w.$eval(karteSel("probe-b"), (el) => ["laden", "laden-bilder", "laden-schau"].map((n) => {
+      const knopfLage = await w.$eval(karteSel("probe-b"), (el) => ["laden", "laden-bilder", "laden-schau", "laden-film"].map((n) => {
         const b = el.querySelector(`[data-knopf="${n}"]`);
         return b ? { n, da: !b.hidden && b.getClientRects().length > 0, aus: b.disabled, text: b.textContent } : { n, da: false };
       }));
-      ok("drei Lade-Knöpfe stehen an jeder Karte", knopfLage.every((k) => k.da && !k.aus), JSON.stringify(knopfLage));
+      ok("vier Lade-Knöpfe stehen an einer Karte mit Vorschaufilm", knopfLage.every((k) => k.da && !k.aus), JSON.stringify(knopfLage));
+      const ohneFilm = await w.$eval(karteSel("probe-ohne"), (el) => { const b = el.querySelector('[data-knopf="laden-film"]'); return b ? { hidden: b.hidden, sicht: b.getClientRects().length } : null; });
+      ok("ohne Vorschaufilm in der Liste bleibt „Laden mit Vorschaufilm“ verborgen", !!ohneFilm && ohneFilm.hidden && ohneFilm.sicht === 0, JSON.stringify(ohneFilm));
       for (const [id, knopf, art] of [["probe-b", "laden-bilder", "bilder"], ["probe-c", "laden-schau", "werbung"]]) {
         s2.stoerung.set(teil(id, 1), { art: "warte", mal: 1, ms: 1500 });
         await klick(w, id, knopf);
@@ -429,6 +431,54 @@ try {
         const dSha = await shaDatei(await d.path());
         ok(`${knopf}: der Download ist Byte für Byte dasselbe Video`, dSha === filmSha, dSha);
         s2.stoerung.delete(teil(id, 1));
+      }
+      // Film-Weg (Klaus 2026-10-02): erst der Vorschaufilm, dann die Apps in Schleife;
+      // das Finale erst, wenn ALLE Teile geprüft sind — nie mitten im Laden.
+      {
+        const id = "probe-a", NN = N, halt = 3;
+        s2.stoerung.set(teil(id, halt), { art: "warte", mal: 1, ms: 4000 });
+        await w.evaluate(() => {
+          window.__filmLog = [];
+          window.__filmUhr = setInterval(() => {
+            const z = window.Ladeschau && window.Ladeschau._zustand();
+            if (z && z.art === "film") window.__filmLog.push({ n: z.n, finale: z.finale, film: z.film, szene: z.szene, icons: z.vorab.icons, iconsBereit: z.vorab.iconsBereit });
+          }, 40);
+        });
+        await klick(w, id, "laden-film");
+        let artW = null;
+        try {
+          await w.waitForFunction((sel) => { const v = document.querySelector(sel + ' [data-feld="vorschau"]'); return v && v.getAttribute("data-ls-art"); }, karteSel(id), { timeout: 15000 });
+          artW = await w.$eval(`${karteSel(id)} [data-feld="vorschau"]`, (v) => v.getAttribute("data-ls-art"));
+        } catch (_e) {}
+        ok("laden-film: während des Ladens läuft die Schau „film“", artW === "film", String(artW));
+        let beimHalt = null;
+        try {
+          await w.waitForFunction((h) => { const z = window.Ladeschau && window.Ladeschau._zustand(); return z && z.n === h; }, halt, { timeout: 20000 });
+          beimHalt = await w.evaluate(() => window.Ladeschau._zustand());
+        } catch (_e) {}
+        ok(`laden-film: bei Teil ${halt}/${NN} noch kein Finale`, !!beimHalt && beimHalt.finale === false, JSON.stringify(beimHalt));
+        const ersterFilm = await w.evaluate(() => (window.__filmLog[0] || {}).film);
+        ok("laden-film: der Vorschaufilm wurde übergeben (nicht „fehler“ von Anfang an)", ersterFilm === "laedt" || ersterFilm === "laeuft" || ersterFilm === "fertig", String(ersterFilm));
+        ok("laden-film: die App-Bilder werden vorab geladen", !!beimHalt && beimHalt.vorab.icons > 0, JSON.stringify(beimHalt && beimHalt.vorab));
+        let mitFinale = null;
+        try {
+          await w.waitForFunction(() => { const z = window.Ladeschau && window.Ladeschau._zustand(); return z && z.finale; }, null, { timeout: 60000 });
+          mitFinale = await w.evaluate(() => window.Ladeschau._zustand());
+        } catch (_e) {}
+        ok(`laden-film: bei Teil ${NN}/${NN} kommt das Finale`, !!mitFinale && mitFinale.n === NN, JSON.stringify(mitFinale));
+        const log = await w.evaluate(() => { clearInterval(window.__filmUhr); return window.__filmLog; });
+        const zuFrueh = log.filter((x) => x.finale && x.n < NN);
+        ok("laden-film: das Finale stand nie vor dem letzten Teil da", log.length > 5 && zuFrueh.length === 0, JSON.stringify({ proben: log.length, zuFrueh: zuFrueh.slice(0, 3) }));
+        await warteLage(w, id, ["fertig", "fehler"], 60000);
+        const l = await karteLage(w, id);
+        ok("laden-film: fertig, alle Teile geprüft", l.lage === "fertig", JSON.stringify({ lage: l.lage, meldung: l.meldung }));
+        try { await w.waitForFunction((sel) => !document.querySelector(sel + ' [data-feld="vorschau"]').hasAttribute("data-ls-art"), karteSel(id), { timeout: 10000 }); } catch (_e) {}
+        const nachF = await w.$eval(`${karteSel(id)} [data-feld="vorschau"]`, (v) => v.getAttribute("data-ls-art"));
+        ok("laden-film: nach dem Finale schließt die Schau", nachF === null, String(nachF));
+        const [d] = await Promise.all([w.waitForEvent("download", { timeout: 30000 }), klick(w, id, "speichern")]);
+        const dSha = await shaDatei(await d.path());
+        ok("laden-film: der Download ist Byte für Byte dasselbe Video", dSha === filmSha, dSha);
+        s2.stoerung.delete(teil(id, halt));
       }
       ok("keine Skriptfehler bei den Lade-Wegen", w.__fehler.length === 0, w.__fehler.join(" | "));
       await w.close();

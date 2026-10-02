@@ -64,6 +64,13 @@
       /^[0-9a-f]{64}$/.test(String(v.sha256)) && typeof v.dateiname === "string" && /\.mp4$/i.test(v.dateiname);
   }
 
+  /* Der Vorschaufilm: nur ein Pfad unter videos/<kennung>/, mit Größe und SHA-256 aus dem Werkzeug. */
+  function filmGueltig(v) {
+    var f = v && v.vorschauFilm;
+    return !!(f && typeof f === "object" && f.pfad === "videos/" + v.id + "/vorschau.mp4" &&
+      Number.isInteger(f.groesse) && f.groesse > 0 && f.groesse <= 14000000 && /^[0-9a-f]{64}$/.test(String(f.sha256)));
+  }
+
   function melde(k, text, art) {
     k.felder.meldung.textContent = text;
     if (art) k.felder.meldung.setAttribute("data-art", art); else k.felder.meldung.removeAttribute("data-art");
@@ -77,11 +84,16 @@
     el.querySelectorAll("[data-feld]").forEach(function (n) { f[n.getAttribute("data-feld")] = n; });
     f.laden = el.querySelector('[data-knopf="laden"]');
     f.speichern = el.querySelector('[data-knopf="speichern"]');
-    /* Drei Wege, derselbe Inhalt: schlicht · mit Hintergrundbildern · mit Werbeschau.
-       Die Teile, die Prüfung und die gespeicherte Datei sind in allen drei gleich. */
-    f.arten = [["laden-bilder", "bilder"], ["laden-schau", "werbung"]]
+    /* Vier Wege, derselbe Inhalt: schlicht · mit Hintergrundbildern · mit Werbeschau ·
+       mit Vorschaufilm. Die Teile, die Prüfung und die gespeicherte Datei sind in allen gleich.
+       Der Film-Knopf steht nur da, wenn die Liste einen gültigen Vorschaufilm nennt —
+       sonst bleibt er verborgen und wird nie freigegeben (er steht nicht in f.arten). */
+    var mitFilm = filmGueltig(v);
+    f.arten = [["laden-bilder", "bilder"], ["laden-schau", "werbung"], ["laden-film", "film"]]
       .map(function (a) { return { knopf: el.querySelector('[data-knopf="' + a[0] + '"]'), art: a[1] }; })
-      .filter(function (a) { return a.knopf; });
+      .filter(function (a) { return a.knopf && (a.art !== "film" || mitFilm); });
+    var filmKnopf = el.querySelector('[data-knopf="laden-film"]');
+    if (filmKnopf) filmKnopf.hidden = !mitFilm;
 
     f.titel.textContent = v.titel;
     f.beschreibung.textContent = v.beschreibung || "";
@@ -168,25 +180,27 @@
     window.LADESCHAU_BASIS = "assets/ls/";
     schauLaedt = new Promise(function (ok) {
       var s = document.createElement("script");
-      s.src = "assets/ladeschau.js?v=2";
+      s.src = "assets/ladeschau.js?v=3";
       s.onload = function () { ok(!!window.Ladeschau); };
       s.onerror = function () { schauLaedt = null; ok(false); };
       document.head.appendChild(s);
     });
     return schauLaedt;
   }
-  function schau(k, was, a, b) {
+  function schau(k, was, a, b, c) {
     if (!k.schau || !window.Ladeschau) return;
-    try { window.Ladeschau[was](a, b); } catch (e) {}
+    try { window.Ladeschau[was](a, b, c); } catch (e) {}
   }
+
+  function filmAdresse(k) { return k.schau === "film" && filmGueltig(k.v) ? k.v.vorschauFilm.pfad : null; }
 
   async function laden(k, mitSchau) {
     if (laeuft) return;
     if (mitSchau && !k.schau) {
-      if (await holeSchau()) { k.schau = mitSchau; schau(k, "start", k.felder.vorschau, mitSchau); }
+      if (await holeSchau()) { k.schau = mitSchau; schau(k, "start", k.felder.vorschau, mitSchau, filmAdresse(k)); }
       else melde(k, "Die Schau ließ sich nicht laden. Das Video wird trotzdem geladen und geprüft.", "warn");
       if (laeuft) return;   /* während des Holens hat ein anderes Video begonnen */
-    } else if (k.schau) schau(k, "start", k.felder.vorschau, k.schau);   /* „Weiter laden“: die Schau läuft weiter */
+    } else if (k.schau) schau(k, "start", k.felder.vorschau, k.schau, filmAdresse(k));   /* „Weiter laden“: die Schau läuft weiter */
     if (!window.crypto || !crypto.subtle) {
       melde(k, "Dieser Browser kann hier nicht prüfen (kein crypto.subtle — die Seite muss über https geöffnet sein).", "fehler");
       return;

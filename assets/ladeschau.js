@@ -3,7 +3,10 @@
    darunter acht Bilder aus dem Film, je einmal. Im Vorschau-Fenster der Karte:
    jede App genau einmal, zwei echte Aufnahmen. Musik: der Titel aus dem Werbefilm in Schleife, Start mit dem Tipp.
    Art „bilder“ (start(fenster, "bilder")): nur Hintergrundbilder und Mycel, ohne App-Szenen und ohne Musik.
-   API: Ladeschau.start(fensterElement[, art]) · .teil(n, N) · .pause() · .ende() */
+   Art „film“ (start(fenster, "film", filmAdresse)): erst der Vorschaufilm (stumm), dann die App-Szenen
+   in Schleife, bis alle Teile geprüft sind; erst dann das Finale. Icons und Clips werden vorab geladen,
+   eine Szene, deren Bild noch nicht bereit ist, wird übersprungen statt schwarz gezeigt.
+   API: Ladeschau.start(fensterElement[, art[, film]]) · .teil(n, N) · .pause() · .ende() */
 (function () {
   "use strict";
   var B = window.LADESCHAU_BASIS || "ls/";
@@ -88,6 +91,21 @@ html.ls-an .einstieg{text-shadow:0 1px 3px #000,0 2px 18px #000c}
 @keyframes lsEq{from{height:20%}to{height:100%}}
 #ls-musik.weg{opacity:0;pointer-events:none}
 #ls-musik:focus-visible{outline:3px solid #f2b544;outline-offset:3px}
+.ls-film{position:absolute;inset:0;z-index:1;background:#04070a}
+.ls-film video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.ls-film .ls-marke{position:absolute;left:2.4cqw;top:2cqw;margin:0;padding:.5cqw 1.4cqw;border-radius:99px;background:#04070acc}
+.ls-scan{position:absolute;z-index:2;pointer-events:none;opacity:0;background:linear-gradient(90deg,transparent,var(--ak,#5fe0b3),#fff,var(--ak,#5fe0b3),transparent);box-shadow:0 0 18px var(--ak,#5fe0b3);mix-blend-mode:screen}
+.ls-scan.quer{left:0;right:0;height:3px;top:0}
+.ls-scan.hoch{top:0;bottom:0;width:3px;left:0;background:linear-gradient(180deg,transparent,var(--ak,#5fe0b3),#fff,var(--ak,#5fe0b3),transparent)}
+.ls-scan.ring{left:50%;top:50%;width:10px;height:10px;margin:-5px 0 0 -5px;border-radius:50%;background:none;border:2px solid #fff;box-shadow:0 0 18px var(--ak,#5fe0b3),inset 0 0 12px var(--ak,#5fe0b3)}
+.ls-scan.schraeg{left:-50%;top:50%;width:200%;height:3px;transform-origin:50% 50%}
+#ls-buehne.ls-film-art .ls-bild.an{opacity:.82}
+@keyframes lsZoomRein{from{transform:scale(1.02)}to{transform:scale(1.12)}}
+@keyframes lsZoomRaus{from{transform:scale(1.12)}to{transform:scale(1.02)}}
+@keyframes lsSchwenkL{from{transform:scale(1.1) translateX(3%)}to{transform:scale(1.1) translateX(-3%)}}
+@keyframes lsSchwenkR{from{transform:scale(1.1) translateX(-3%)}to{transform:scale(1.1) translateX(3%)}}
+@keyframes lsDreh{from{transform:scale(1.12) rotate(-1.2deg)}to{transform:scale(1.12) rotate(1.2deg)}}
+@keyframes lsHeben{from{transform:scale(1.1) translateY(2.5%)}to{transform:scale(1.1) translateY(-2.5%)}}
 @media (prefers-reduced-motion:reduce){.ls-bild.kb,.ls-korn,#ls-musik .eq i{animation:none!important}}
 `;
 
@@ -341,6 +359,141 @@ html.ls-an .einstieg{text-shadow:0 1px 3px #000,0 2px 18px #000c}
     });
   }
 
+  // ---------- Vorschaufilm: vorab laden, Film-Szene, Aufdeck-Arten, wechselnde Hintergründe ----------
+  var AUFDECK = ["runter", "rechts", "links", "kreis", "schraeg", "blende"];
+  var BEWEGUNG = ["lsZoomRein", "lsSchwenkL", "lsZoomRaus", "lsDreh", "lsSchwenkR", "lsHeben"];
+  var UEBERGANG = ["blende", "wisch", "kreis"];
+  var T_BILD = 7.5;
+
+  function vorabLaden() {
+    var ico = {}, clip = {};
+    APPS.forEach(function (a) {
+      if (a[0].indexOf("clip:") === 0) {
+        var name = a[0].slice(5); if (clip[name]) return;
+        var v = document.createElement("video");
+        v.muted = true; v.playsInline = true; v.setAttribute("playsinline", ""); v.loop = true; v.preload = "auto";
+        v.src = B + "clip-" + name + ".mp4"; try { v.load(); } catch (e) {}
+        clip[name] = v;
+      } else if (!ico[a[0]]) {
+        var im = el("img", "ls-ico"); im.alt = ""; im.width = 192; im.height = 192; im.decoding = "sync"; im.src = B + a[0] + ".webp";
+        im._bereit = false; var fertig = function () { im._bereit = !!im.naturalWidth; };
+        if (im.decode) im.decode().then(fertig, function () {}); else im.onload = fertig;
+        ico[a[0]] = im;
+      }
+    });
+    return { ico: ico, clip: clip };
+  }
+  // bereit = Bild entschlüsselt bzw. erstes Videobild da; sonst wird die Szene übersprungen
+  function bereit(a) {
+    if (!S || !S.vorab) return false;
+    if (a[0].indexOf("clip:") === 0) { var v = S.vorab.clip[a[0].slice(5)]; return !!v && v.readyState >= 2; }
+    var im = S.vorab.ico[a[0]]; return !!im && im._bereit;
+  }
+  function szeneFilm(kino, adresse, poster) {
+    var sz = el("div", "ls-film"), v = el("video");
+    v.muted = true; v.playsInline = true; v.setAttribute("playsinline", ""); v.preload = "auto";
+    if (poster) v.poster = poster;
+    v.src = adresse;
+    sz.appendChild(v); sz.appendChild(el("p", "ls-marke", ["Vorschaufilm · stumm"]));
+    kino.style.setProperty("--ak", "#5fe0b3"); kino.insertBefore(sz, kino.lastChild);
+    var meins = S;
+    v.addEventListener("playing", function () { if (meins.filmLage === "laedt") meins.filmLage = "laeuft"; });
+    v.addEventListener("ended", function () { meins.filmLage = "fertig"; });
+    v.addEventListener("error", function () { meins.filmLage = "fehler"; });
+    var p = v.play(); if (p && p.catch) p.catch(function () {});
+    S.filmVideo = v;
+    return sz;
+  }
+  // App-Szene im Film-Modus: dieselbe Gestalt, aber mit vorab geladenem Symbol bzw. Clip
+  function szeneAppVorab(kino, a, idx, art) {
+    kino.style.setProperty("--ak", a[3]);
+    var clip = a[0].indexOf("clip:") === 0, sz;
+    if (clip) {
+      sz = el("div", "ls-szene clip");
+      var tel = el("div", "ls-telefon"), v = S.vorab.clip[a[0].slice(5)];
+      try { v.currentTime = 0; } catch (e) {}
+      tel.appendChild(v); sz.appendChild(tel);
+      var tx = el("div", "", [el("p", "ls-marke", ["Aus der App"]), buchstaben(a[1]), el("p", "ls-zeile", [a[2]]), el("div", "ls-linie")]);
+      sz.appendChild(tx); kino.insertBefore(sz, kino.lastChild);
+      var p = v.play(); if (p && p.catch) p.catch(function () {});
+      eintreten(tx, idx);
+    } else {
+      sz = el("div", "ls-szene ls-app");
+      var emb = el("div", "ls-emb"), glow = el("div", "ls-glow"), ico = S.vorab.ico[a[0]];
+      ico.getAnimations().forEach(function (x) { x.cancel(); });
+      emb.appendChild(glow); emb.appendChild(ico); sz.appendChild(emb);
+      var marke = el("p", "ls-marke", ["App · family-projekt.de"]), name = el("h3", "ls-name", [a[1]]), zeile = el("p", "ls-zeile", [a[2]]);
+      sz.appendChild(marke); sz.appendChild(name); sz.appendChild(zeile);
+      kino.insertBefore(sz, kino.lastChild);
+      ani(glow, [{ opacity: 0, transform: "scale(.3)" }, { opacity: .55, transform: "scale(1)" }], { duration: 600 });
+      ani(marke, [{ opacity: 0, letterSpacing: ".5em" }, { opacity: 1, letterSpacing: ".18em" }], { duration: 500, delay: 260 });
+      ani(name, [{ opacity: 0, transform: "translateY(40%)" }, { opacity: 1, transform: "none" }], { duration: 420, delay: 340 });
+      ani(zeile, [{ opacity: 0, transform: "translateY(30%)" }, { opacity: 1, transform: "none" }], { duration: 480, delay: 520 });
+      if (!RUHIG) blasen(sz, emb, a[0].length + idx);
+    }
+    aufdecken(kino, sz, art);
+    return sz;
+  }
+  // Aufdecken mit Scanner-Linie: ↓ → ← Kreis schräg Überblenden, reihum
+  function aufdecken(kino, sz, art) {
+    var D = RUHIG ? 400 : 900, von, bis = "inset(0 0 0 0)", scan = null, bahn = null;
+    if (RUHIG || art === "blende") { sz.animate([{ opacity: 0 }, { opacity: 1 }], { duration: D, fill: "both", easing: "ease-out" }); return; }
+    if (art === "runter") { von = "inset(0 0 100% 0)"; scan = "quer"; bahn = [{ top: "0%" }, { top: "100%" }]; }
+    else if (art === "rechts") { von = "inset(0 100% 0 0)"; scan = "hoch"; bahn = [{ left: "0%" }, { left: "100%" }]; }
+    else if (art === "links") { von = "inset(0 0 0 100%)"; scan = "hoch"; bahn = [{ left: "100%" }, { left: "0%" }]; }
+    else if (art === "kreis") { von = "circle(0% at 50% 50%)"; bis = "circle(75% at 50% 50%)"; scan = "ring"; bahn = [{ transform: "scale(0)", opacity: 1 }, { transform: "scale(" + Math.ceil((kino.clientWidth || 600) / 7) + ")", opacity: 0 }]; }
+    else { von = "polygon(0 0, 0 0, 0 0)"; bis = "polygon(0 0, 200% 0, 0 200%)"; scan = "schraeg"; bahn = [{ transform: "translate(-50%,-50%) rotate(-45deg)" }, { transform: "translate(50%,50%) rotate(-45deg)" }]; }
+    sz.animate([{ clipPath: von }, { clipPath: bis }], { duration: D, fill: "both", easing: "cubic-bezier(.45,0,.2,1)" });
+    var s = el("div", "ls-scan " + scan); kino.insertBefore(s, kino.lastChild);
+    var f = bahn.map(function (x, i) { return Object.assign({ opacity: i === 0 ? 1 : (scan === "ring" ? 0 : 1) }, x); });
+    var an = s.animate(f, { duration: D, easing: "cubic-bezier(.45,0,.2,1)" });
+    an.onfinish = function () { s.remove(); };
+  }
+  // Hintergrund im Film-Modus: Schleife über alle Bilder, wechselnde Bewegung und wechselnder Übergang
+  function filmBild(nr) {
+    var d = S.d.bilder, neu = d[nr % d.length], alt = S.bildNr >= 0 ? d[S.bildNr] : null;
+    var bew = BEWEGUNG[nr % BEWEGUNG.length], ueb = UEBERGANG[nr % UEBERGANG.length];
+    if (alt && alt !== neu) { alt.classList.add("weg"); alt.classList.remove("an"); (function (a) { setTimeout(function () { if (!a.classList.contains("an")) { a.classList.remove("weg"); a.style.animation = ""; } }, 2600); })(alt); }
+    neu.style.animation = RUHIG ? "" : bew + " " + (T_BILD + 3) + "s ease-in-out forwards";
+    neu.classList.add("an"); S.bildNr = nr % d.length; S.bildArt = bew + "/" + ueb;
+    if (!RUHIG && ueb !== "blende") {
+      var von = ueb === "wisch" ? "inset(0 100% 0 0)" : "circle(0% at 50% 50%)", bis = ueb === "wisch" ? "inset(0 0 0 0)" : "circle(75% at 50% 50%)";
+      neu.animate([{ clipPath: von }, { clipPath: bis }], { duration: 2400, easing: "ease-in-out" });
+    }
+  }
+  function filmTakt() {
+    var t = S.zeit;
+    // Hintergrund wiederholt sich, solange geladen wird
+    var b = Math.floor(t / T_BILD);
+    if (b !== S.bildZaehler) { S.bildZaehler = b; filmBild(b); }
+    if (S.alle) {
+      if (!S.finaleDa) { if (S.filmVideo) { try { S.filmVideo.pause(); } catch (e) {} } wegmit(S.szene); S.szene = szeneFinale(S.d.kino); S.szeneNr = APPS.length; S.finaleDa = true; }
+      return;
+    }
+    if (S.szeneNr === -3) {
+      // Film: weiter, wenn er endet, scheitert oder nach 12 s noch nicht läuft
+      var stockt = S.filmLage === "laedt" && t - S.szeneAb > 12;
+      if (S.filmLage === "fertig" || S.filmLage === "fehler" || stockt) { if (stockt) S.filmLage = "fehler"; naechsteApp(t); }
+      return;
+    }
+    if (t >= S.bis) naechsteApp(t);
+  }
+  function naechsteApp(t) {
+    for (var versuch = 0; versuch < APPS.length; versuch++) {
+      S.appZeiger++;
+      var i = S.appZeiger % APPS.length;
+      if (i === 0 && S.appZeiger > 0) S.runde++;
+      var a = APPS[i];
+      if (!bereit(a)) { S.uebersprungen++; continue; }
+      var art = AUFDECK[S.aufdeckZaehler++ % AUFDECK.length];
+      wegmit(S.szene); S.szeneNr = i; S.aufdeck = art;
+      S.szene = szeneAppVorab(S.d.kino, a, i, art);
+      S.bis = t + (a[0].indexOf("clip:") === 0 ? T_CLIP : T_APP);
+      return;
+    }
+    S.bis = t + 0.5;   // noch nichts bereit: kurz warten, das Bild bleibt stehen
+  }
+
   // ---------- Ablauf ----------
   function musikText() { if (!S) return; var an = S.ton.istAn(); S.d.musik.setAttribute("aria-pressed", an ? "true" : "false"); S.d.musik.querySelector(".t").textContent = an ? "Musik aus" : "Musik an"; S.d.musik.setAttribute("aria-label", an ? "Musik ausschalten" : "Musik einschalten"); }
 
@@ -352,6 +505,7 @@ html.ls-an .einstieg{text-shadow:0 1px 3px #000,0 2px 18px #000c}
     var jetzt = performance.now();
     if (!S.pausiert) S.zeit += (jetzt - S.letzt) / 1000 * S.tempo; S.letzt = jetzt;
     var t = S.zeit;
+    if (S.film) { filmTakt(); if (S.mycel) S.mycel.bild(S.pausiert ? 0 : S.ton.puls()); S.raf = requestAnimationFrame(takt); return; }
     // Szene im Fenster
     var soll = -1, acc = T_INTRO;
     if (t >= T_INTRO) { soll = APPS.length; for (var i = 0; i < APPS.length; i++) { var d = APPS[i][0].indexOf("clip:") === 0 ? T_CLIP : T_APP; if (t < acc + d) { soll = i; break; } acc += d; } }
@@ -367,13 +521,20 @@ html.ls-an .einstieg{text-shadow:0 1px 3px #000,0 2px 18px #000c}
   }
 
   window.Ladeschau = {
-    start: function (fenster, art) {
-      var nurBilder = art === "bilder";
-      if (S && !S.zu && S.d.fenster === fenster) { S.pausiert = false; S.letzt = performance.now(); if (!S.nurBilder) { S.ton.start(); musikText(); } return; }
+    start: function (fenster, art, film) {
+      var nurBilder = art === "bilder", mitFilm = art === "film" && typeof film === "string" && /^videos\/[a-z0-9-]+\/vorschau\.mp4$/.test(film);
+      if (S && !S.zu && S.d.fenster === fenster) { S.pausiert = false; S.letzt = performance.now(); if (!S.nurBilder) { S.ton.start(); musikText(); } if (S.filmVideo && S.filmLage !== "fertig" && S.filmLage !== "fehler") { var pp = S.filmVideo.play(); if (pp && pp.catch) pp.catch(function () {}); } return; }
       if (S) this.ende(true);
       var d = aufbauen(fenster);
       S = { nurBilder: nurBilder, d: d, ton: Ton(), zeit: 0, letzt: performance.now(), szene: null, szeneNr: -2, bildNr: -1, mycel: null, n: 0, N: 15, pausiert: false, zu: false, tempo: 1, finale: finaleZeit(), t0: performance.now(), zeitTeil: [] };
-      if (nurBilder) { d.musik.classList.add("weg"); d.fenster.setAttribute("data-ls-art", "bilder"); }
+      if (art === "film") {
+        S.film = true; S.vorab = vorabLaden(); S.runde = 0; S.appZeiger = -1; S.aufdeckZaehler = 0; S.uebersprungen = 0;
+        S.bildZaehler = -1; S.alle = false; S.finaleDa = false; S.bis = 0; S.szeneAb = 0;
+        d.buehne.classList.add("ls-film-art"); d.fenster.setAttribute("data-ls-art", "film"); S.ton.start(); musikText();
+        var bild = fenster.querySelector("img");
+        if (mitFilm) { S.filmLage = "laedt"; S.szeneNr = -3; S.szene = szeneFilm(d.kino, film, bild ? bild.src : ""); }
+        else { S.filmLage = "fehler"; S.szeneNr = -3; }
+      } else if (nurBilder) { d.musik.classList.add("weg"); d.fenster.setAttribute("data-ls-art", "bilder"); }
       else { d.fenster.setAttribute("data-ls-art", "werbung"); S.ton.start(); musikText(); }
       var meins = S;
       ladeThree().then(function () { if (meins.zu) return; meins.mycel = Mycel(d.cv); if (meins.mycel) meins.mycel.zuendet(Math.round(meins.n / meins.N * 15)); });
@@ -383,9 +544,10 @@ html.ls-an .einstieg{text-shadow:0 1px 3px #000,0 2px 18px #000c}
     teil: function (n, N) {
       if (!S || S.zu) return; S.n = n; S.N = N || 15;
       var p = n / S.N; S.ton.fortschritt(p);
+      if (S.film) { S.alle = n >= S.N; }
       // Tempo an die echte Ladezeit anpassen: das Finale soll mit dem letzten Teil beginnen
       var jetzt = performance.now(), vergangen = (jetzt - S.t0) / 1000;
-      if (n > 0 && n < S.N && vergangen > 0.5) {
+      if (S.film) {} else if (n > 0 && n < S.N && vergangen > 0.5) {
         var rest = (S.N - n) * (vergangen / n);
         var ziel = S.finale + 1 - S.zeit;
         S.tempo = Math.max(0.7, Math.min(3.2, ziel / Math.max(rest, 0.5)));
@@ -393,9 +555,19 @@ html.ls-an .einstieg{text-shadow:0 1px 3px #000,0 2px 18px #000c}
       S.d.zaehler.textContent = String(n).padStart(2, "0") + " / " + S.N;
       if (S.mycel) S.mycel.zuendet(Math.round(p * 15));
     },
-    pause: function () { if (!S || S.zu) return; S.pausiert = true; if (!S.nurBilder) S.ton.halt(false); },
-    ende: function (sofort) {
-      if (!S || S.zu) return; var s = S; s.zu = true; S = null;
+    pause: function () { if (!S || S.zu) return; S.pausiert = true; if (!S.nurBilder) S.ton.halt(false); if (S.filmVideo) { try { S.filmVideo.pause(); } catch (e) {} } },
+    ende: function (sofort, _nachFinale) {
+      if (!S || S.zu) return;
+      // Film-Modus: nach dem letzten Teil das Finale noch zeigen, dann erst schließen
+      if (S.film && S.alle && !sofort && !_nachFinale) {
+        if (!S.finaleDa) filmTakt();
+        var meins = S, self = this; if (meins.endeGeplant) return; meins.endeGeplant = true;
+        setTimeout(function () { if (S === meins) self.ende(false, true); }, RUHIG ? 1200 : 2800);
+        return;
+      }
+      var s = S; s.zu = true; S = null;
+      if (s.vorab) Object.keys(s.vorab.clip).forEach(function (k) { try { s.vorab.clip[k].pause(); } catch (e) {} });
+      if (s.filmVideo) { try { s.filmVideo.pause(); } catch (e) {} }
       cancelAnimationFrame(s.raf); s.ton.halt(true); s.ton.schliessen();
       s.d.buehne.classList.add("weg"); s.d.kino.classList.add("weg"); s.d.musik.classList.add("weg");
       s.d.fenster.classList.remove("ls-fenster"); s.d.fenster.removeAttribute("data-ls-art");
@@ -403,6 +575,18 @@ html.ls-an .einstieg{text-shadow:0 1px 3px #000,0 2px 18px #000c}
       setTimeout(function () { if (s.mycel) s.mycel.weg(); s.d.buehne.remove(); s.d.kino.remove(); if (!S) s.d.musik.remove(); }, sofort ? 0 : 1000);
     },
     _zeit: function (t) { if (S) { S.zeit = t; S.letzt = performance.now(); } },
-    _zustand: function () { return S ? { zeit: S.zeit, szene: S.szeneNr, bild: S.bildNr, n: S.n, mycel: !!S.mycel, musik: S.ton.istAn(), puls: +S.ton.puls().toFixed(2) } : null; }
+    _zustand: function () {
+      if (!S) return null;
+      var z = { zeit: S.zeit, szene: S.szeneNr, bild: S.bildNr, n: S.n, mycel: !!S.mycel, musik: S.ton.istAn(), puls: +S.ton.puls().toFixed(2) };
+      if (S.film) {
+        var ic = Object.keys(S.vorab.ico), cl = Object.keys(S.vorab.clip);
+        z.art = "film"; z.film = S.filmLage; z.finale = !!S.finaleDa; z.runde = S.runde; z.aufdeck = S.aufdeck || null;
+        z.bildArt = S.bildArt || null; z.bilderGezeigt = S.bildZaehler + 1; z.uebersprungen = S.uebersprungen;
+        z.vorab = { icons: ic.length, iconsBereit: ic.filter(function (k) { return S.vorab.ico[k]._bereit; }).length,
+                    clips: cl.length, clipsBereit: cl.filter(function (k) { return S.vorab.clip[k].readyState >= 2; }).length };
+        z.filmZeit = S.filmVideo ? +S.filmVideo.currentTime.toFixed(2) : null;
+      }
+      return z;
+    }
   };
 })();
