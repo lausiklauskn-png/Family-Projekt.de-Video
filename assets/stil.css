@@ -1,0 +1,373 @@
+/* Videos · family-projekt.de
+ *
+ * Farben: Minze, Blau und Violett von family-projekt.de, gemischt mit dem
+ * Petrol des Sende-Prüfers. Dunkel ist die Grundlage (wie family-projekt.de),
+ * hell kommt per Systemwahl.
+ * Knöpfe: die Glas-Knöpfe von family-projekt.de (geschliffene Kante, Schimmer,
+ * der der Maus folgt, Neigung zum Finger), nur schlanker.
+ * Bewegung: an wenigen Stellen — Hintergrund, Überschrift, Karten beim
+ * Erscheinen, Filmstreifen beim Laden, Abschluss. Bei „weniger Bewegung“ steht
+ * alles still.
+ * Nur Systemschriften — die Seite lädt nichts von fremden Rechnern. */
+@property --rot { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+
+:root {
+  --bg: #0a1016; --bg2: #101921; --karte: rgba(19, 29, 37, .66);
+  --linie: rgba(255, 255, 255, .10); --text: #e8f0f3; --leise: #97a9b4;
+  --akzent: #5ad3cf;           /* zwischen Minze #6ee7d3 und Petrol #5cc2c9 */
+  --akzent2: #a78bfa;          /* Violett, family-projekt.de */
+  --akzent3: #7c9cff;          /* Blau, family-projekt.de */
+  --petrol: #1b7f87;           /* Sende-Prüfer */
+  --glanz: #8fe4ea;            /* Sende-Prüfer */
+  --auf-akzent: #04161b;
+  --warn: #f3b54a; --fehler: #ff8f7a; --ok-grund: rgba(90, 211, 207, .12);
+  --kopf-grund: rgba(10, 16, 22, .62);
+  --glow: 0 0 22px rgba(90, 211, 207, .24), 0 0 52px rgba(167, 139, 250, .14);
+  --schatten: 0 14px 36px rgba(0, 0, 0, .42), 0 4px 10px rgba(0, 0, 0, .26);
+  --holo-text: linear-gradient(100deg, #8fe4ea, #a9f4e6, #cfe0ff, #e6d4ff, #a9f4e6, #8fe4ea);
+  --holo-rand: conic-gradient(from var(--rot), #5ad3cf, #7c9cff, #a78bfa, #8fe4ea, #1b7f87, #5ad3cf);
+  --polar-a: rgba(27, 127, 135, .30); --polar-b: rgba(124, 156, 255, .16); --polar-c: rgba(167, 139, 250, .14);
+  --f-titel: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+  --f-text: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --f-zahl: ui-monospace, "Cascadia Mono", "Roboto Mono", Menlo, monospace;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #eef3f4; --bg2: #ffffff; --karte: rgba(255, 255, 255, .78);
+    --linie: rgba(14, 60, 70, .14); --text: #13222a; --leise: #4f616b;
+    --akzent: #0e6b72; --akzent2: #6d4fd1; --akzent3: #3a5bd6; --petrol: #0e6b72; --glanz: #15838b;
+    --auf-akzent: #ffffff;
+    --warn: #8a5000; --fehler: #b3261e; --ok-grund: rgba(14, 107, 114, .08);
+    --kopf-grund: rgba(238, 243, 244, .72);
+    --glow: 0 0 18px rgba(14, 107, 114, .18), 0 0 40px rgba(109, 79, 209, .10);
+    --schatten: 0 12px 30px rgba(20, 50, 60, .14), 0 3px 8px rgba(20, 50, 60, .10);
+    --holo-text: linear-gradient(100deg, #0e6b72, #15838b, #3a5bd6, #6d4fd1, #15838b, #0e6b72);
+    --holo-rand: conic-gradient(from var(--rot), #0e6b72, #3a5bd6, #6d4fd1, #15838b, #0e6b72);
+    --polar-a: rgba(21, 131, 139, .16); --polar-b: rgba(58, 91, 214, .10); --polar-c: rgba(109, 79, 209, .09);
+    color-scheme: light;
+  }
+}
+:root[data-theme="light"] {
+  --bg: #eef3f4; --bg2: #ffffff; --karte: rgba(255, 255, 255, .78);
+  --linie: rgba(14, 60, 70, .14); --text: #13222a; --leise: #4f616b;
+  --akzent: #0e6b72; --akzent2: #6d4fd1; --akzent3: #3a5bd6; --petrol: #0e6b72; --glanz: #15838b;
+  --auf-akzent: #ffffff;
+  --warn: #8a5000; --fehler: #b3261e; --ok-grund: rgba(14, 107, 114, .08);
+  --kopf-grund: rgba(238, 243, 244, .72);
+  --glow: 0 0 18px rgba(14, 107, 114, .18), 0 0 40px rgba(109, 79, 209, .10);
+  --schatten: 0 12px 30px rgba(20, 50, 60, .14), 0 3px 8px rgba(20, 50, 60, .10);
+  --holo-text: linear-gradient(100deg, #0e6b72, #15838b, #3a5bd6, #6d4fd1, #15838b, #0e6b72);
+  --holo-rand: conic-gradient(from var(--rot), #0e6b72, #3a5bd6, #6d4fd1, #15838b, #0e6b72);
+  --polar-a: rgba(21, 131, 139, .16); --polar-b: rgba(58, 91, 214, .10); --polar-c: rgba(109, 79, 209, .09);
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font-family: var(--f-text); font-size: 17px; line-height: 1.55;
+  overflow-wrap: anywhere; overflow-x: hidden; min-height: 100vh;
+}
+a { color: var(--akzent); }
+
+/* ── Bewegung 1: das Polarlicht im Hintergrund ──
+   Drei weiche Farbflecken, die langsam wandern. Nur transform — kein Neuzeichnen. */
+body::before {
+  content: ""; position: fixed; inset: -20vmax; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(38vmax 30vmax at 20% 18%, var(--polar-a), transparent 70%),
+    radial-gradient(34vmax 28vmax at 82% 30%, var(--polar-b), transparent 70%),
+    radial-gradient(40vmax 32vmax at 55% 92%, var(--polar-c), transparent 70%);
+  animation: polar 28s ease-in-out infinite alternate;
+}
+@keyframes polar {
+  0%   { transform: translate3d(0, 0, 0) rotate(0deg) scale(1); }
+  50%  { transform: translate3d(3vmax, -2vmax, 0) rotate(6deg) scale(1.06); }
+  100% { transform: translate3d(-2vmax, 2vmax, 0) rotate(-4deg) scale(1.02); }
+}
+
+/* ── Kopfleiste: Glas ── */
+.kopf {
+  position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 10px 16px; background: var(--kopf-grund);
+  backdrop-filter: blur(16px) saturate(1.3); -webkit-backdrop-filter: blur(16px) saturate(1.3);
+  border-bottom: 1px solid var(--linie);
+}
+.marke-link { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text); min-width: 0; }
+.marke-link img { border-radius: 9px; flex: none; animation: atmen 6s ease-in-out infinite; }
+@keyframes atmen {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(90, 211, 207, 0), 0 4px 12px rgba(0, 0, 0, .3); }
+  50%      { box-shadow: 0 0 18px 2px rgba(90, 211, 207, .35), 0 4px 12px rgba(0, 0, 0, .3); }
+}
+.marke {
+  font-family: var(--f-zahl); font-size: 12px; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--leise);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.werkzeug { display: flex; gap: 8px; flex: none; }
+
+/* ── Glas-Knöpfe (aus family-projekt.de, schlanker) ──
+   --rx/--ry/--mx/--my setzt laden.js aus der Zeigerlage: der Knopf neigt sich
+   zum Finger, und der Schimmer läuft mit. --s drückt ihn beim Tippen ein. */
+.knoepfe button, .rund {
+  position: relative; isolation: isolate; overflow: hidden;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  cursor: pointer; border: 1px solid transparent; text-decoration: none;
+  transform: perspective(620px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) scale(var(--s, 1));
+  transition: transform .14s ease, box-shadow .22s ease, opacity .2s, border-color .2s, color .2s;
+  box-shadow:
+    inset 0 1.5px .5px rgba(255, 255, 255, .55),   /* heller Schliff oben */
+    inset 0 -3px 6px rgba(0, 0, 0, .40),           /* Wölbung unten */
+    inset 8px 0 12px rgba(255, 255, 255, .05),
+    inset -8px 0 14px rgba(0, 0, 0, .28),
+    inset 0 0 0 1px rgba(255, 255, 255, .10),      /* Schliffkante */
+    0 8px 18px rgba(0, 0, 0, .32), 0 2px 5px rgba(0, 0, 0, .24);
+}
+.knoepfe button::before, .rund::before {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: -1;
+  background:
+    radial-gradient(96px 64px at var(--mx, 50%) var(--my, 22%), rgba(255, 255, 255, .62), transparent 58%),
+    linear-gradient(180deg, rgba(255, 255, 255, .30), rgba(255, 255, 255, 0) 48%),
+    linear-gradient(115deg, transparent 26%,
+      color-mix(in srgb, var(--akzent3) 60%, transparent) 43%,
+      color-mix(in srgb, var(--akzent) 56%, transparent) 51%,
+      color-mix(in srgb, var(--akzent2) 60%, transparent) 60%, transparent 76%);
+  background-size: auto, auto, 240% 100%;
+  background-position: 0 0, 0 0, var(--mx, 50%) 0;
+  mix-blend-mode: screen; opacity: .38; transition: opacity .22s;
+}
+.knoepfe button::after, .rund::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: -1;
+  background: radial-gradient(60% 140% at var(--mx, 50%) -10%, rgba(255, 255, 255, .45), transparent 42%);
+  mix-blend-mode: screen; opacity: 0; transition: opacity .22s;
+}
+.knoepfe button:not(:disabled):hover::before, .rund:hover::before,
+.knoepfe button:focus-visible::before, .rund:focus-visible::before { opacity: 1; }
+.knoepfe button:not(:disabled):hover::after, .rund:hover::after,
+.knoepfe button:focus-visible::after, .rund:focus-visible::after { opacity: .8; }
+.knoepfe button:not(:disabled):active, .rund:active { --s: .96; }
+
+.knoepfe { display: flex; flex-wrap: wrap; gap: 12px; }
+.knoepfe button { font: 700 16px/1.2 var(--f-text); padding: 11px 18px; min-height: 46px; border-radius: 12px; }
+button.haupt {
+  background: linear-gradient(135deg, var(--akzent), var(--akzent3) 60%, var(--akzent2));
+  color: var(--auf-akzent);
+}
+button.zweit {
+  background: linear-gradient(180deg, rgba(140, 160, 175, .16), rgba(10, 18, 24, .22));
+  border-color: var(--linie); color: var(--text);
+}
+button.haupt:not(:disabled):hover, button.zweit:not(:disabled):hover, .rund:hover {
+  border-color: var(--akzent);
+  box-shadow:
+    inset 0 1.5px .5px rgba(255, 255, 255, .6), inset 0 -3px 6px rgba(0, 0, 0, .40),
+    inset 0 0 0 1px rgba(255, 255, 255, .14), 0 12px 24px rgba(0, 0, 0, .40), var(--glow);
+}
+.knoepfe button:disabled { opacity: .42; cursor: default; transform: none; }
+
+.rund {
+  min-height: 40px; min-width: 40px; padding: 0 13px; border-radius: 999px;
+  background: linear-gradient(180deg, rgba(140, 160, 175, .16), rgba(10, 18, 24, .22));
+  border-color: var(--linie); color: var(--text); font: 600 15px/1 var(--f-text);
+}
+.rund[data-lage="angeboten"] { border-color: color-mix(in srgb, var(--akzent) 60%, var(--linie)); color: var(--akzent); }
+#neuladen { padding: 0; font-size: 20px; }
+#neuladen > span { display: inline-block; }
+#neuladen[data-laedt] > span { animation: dreh .9s linear infinite; }
+@keyframes dreh { to { transform: rotate(360deg); } }
+@media (max-width: 420px) { .rund .t { display: none; } }
+
+button:focus-visible, a:focus-visible, summary:focus-visible { outline: 3px solid var(--warn); outline-offset: 3px; }
+
+/* ── Blatt ── */
+.blatt { max-width: 780px; margin: 0 auto; padding: 28px 16px 64px; display: grid; gap: 26px; }
+
+/* Bewegung 2: Einblenden beim Laden der Seite, Karten nacheinander (--i aus laden.js) */
+.einstieg, #liste-meldung, .video, .kleingedruckt { animation: auftauchen .7s cubic-bezier(.2, .8, .2, 1) both; }
+#liste-meldung { animation-delay: .08s; }
+.video { animation-delay: calc(.12s + var(--i, 0) * .12s); }
+@keyframes auftauchen {
+  from { opacity: 0; transform: translateY(16px) scale(.985); filter: blur(6px); }
+  to   { opacity: 1; transform: none; filter: none; }
+}
+
+h1 {
+  font-family: var(--f-titel); font-weight: 800; font-size: clamp(30px, 6.4vw, 46px);
+  line-height: 1.08; margin: 0; text-wrap: balance; letter-spacing: -.01em;
+}
+/* Bewegung 3: der Schriftzug schimmert wie bei family-projekt.de */
+h1 span {
+  background: var(--holo-text); background-size: 300% auto;
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  animation: holofluss 9s linear infinite;
+}
+@keyframes holofluss { to { background-position: 300% center; } }
+.einleitung { margin: 12px 0 0; color: var(--leise); max-width: 62ch; }
+.einleitung b { color: var(--text); }
+.liste { display: grid; gap: 40px; }
+
+/* ── Eine Video-Karte ── */
+.video {
+  position: relative; isolation: isolate;
+  display: grid; gap: 18px; padding: 18px; border-radius: 18px; min-width: 0;
+  background: var(--karte); border: 1px solid var(--linie); box-shadow: var(--schatten);
+  backdrop-filter: blur(14px) saturate(1.2); -webkit-backdrop-filter: blur(14px) saturate(1.2);
+}
+/* Bewegung 4: ein Holo-Rand läuft um die Karte — beim Darüberfahren, beim Laden, am Ende */
+.video::before {
+  content: ""; position: absolute; inset: -1px; border-radius: inherit; padding: 1.5px; pointer-events: none;
+  background: var(--holo-rand);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  opacity: 0; transition: opacity .45s;
+}
+.video:hover::before, .video:focus-within::before { opacity: .55; animation: holo-dreh 12s linear infinite; }
+.video[data-lage="laedt"]::before { opacity: 1; animation: holo-dreh 3.2s linear infinite; }
+.video[data-lage="fertig"]::before { opacity: .9; animation: holo-dreh 9s linear infinite; }
+@keyframes holo-dreh { to { --rot: 360deg; } }
+
+.video-kopf h2 { font-family: var(--f-titel); font-size: 24px; line-height: 1.2; margin: 0; }
+.beschreibung { margin: 6px 0 0; color: var(--leise); }
+.beschreibung:empty { display: none; }
+
+/* Vorschau: neigt sich leicht zum Zeiger, Glanz folgt ihm */
+.vorschau {
+  position: relative; border-radius: 13px; overflow: hidden; border: 1px solid var(--linie);
+  aspect-ratio: 16 / 9; max-width: 100%; background: #000;
+  display: grid; place-items: center; color: #8fa3ae; font-size: 14px;
+  transform: perspective(1000px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transition: transform .2s ease, box-shadow .3s;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, .35);
+}
+.vorschau img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform 6s cubic-bezier(.2, .7, .2, 1); }
+.vorschau:hover img { transform: scale(1.06); }
+.vorschau::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(42% 60% at var(--mx, 50%) var(--my, 30%), rgba(255, 255, 255, .22), transparent 65%);
+  mix-blend-mode: screen; opacity: 0; transition: opacity .3s;
+}
+.vorschau:hover::after { opacity: 1; }
+/* Bewegung 5: beim Laden fährt eine Prüf-Linie über das Bild */
+.vorschau::before {
+  content: ""; position: absolute; left: 0; right: 0; top: 0; height: 26%; z-index: 1; pointer-events: none;
+  background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--glanz) 28%, transparent) 70%, color-mix(in srgb, var(--glanz) 80%, transparent) 98%, transparent);
+  transform: translateY(-110%); opacity: 0;
+}
+.video[data-lage="laedt"] .vorschau::before { opacity: 1; animation: pruefen 2.4s cubic-bezier(.45, 0, .55, 1) infinite; }
+@keyframes pruefen { from { transform: translateY(-110%); } to { transform: translateY(420%); } }
+
+/* Die Klappe: Daten des Films wie auf einer Filmklappe */
+dl { margin: 0; }
+.klappe {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  border: 1px solid var(--linie); border-radius: 12px; overflow: hidden;
+  background: color-mix(in srgb, var(--bg) 60%, transparent);
+}
+.klappe div { padding: 10px 12px; border-right: 1px solid var(--linie); border-bottom: 1px solid var(--linie); min-width: 0; }
+.klappe dt { font-family: var(--f-zahl); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--leise); }
+.klappe dd { margin: 2px 0 0; font-family: var(--f-zahl); font-size: 15px; font-variant-numeric: tabular-nums; white-space: pre-line; }
+.klappe dd[data-leer] { color: var(--leise); font-style: italic; }
+
+/* ── Filmstreifen: jedes Feld leuchtet, wenn sein Teil geprüft ist ── */
+.streifen-kopf { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.streifen-kopf h3 { font-family: var(--f-titel); font-weight: 650; font-size: 18px; margin: 0; }
+.stand { font-family: var(--f-zahl); font-size: 13px; color: var(--leise); font-variant-numeric: tabular-nums; }
+.streifen {
+  margin-top: 10px; padding: 14px 8px; border-radius: 10px;
+  background: color-mix(in srgb, var(--bg) 70%, transparent); border: 1px solid var(--linie);
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(30px, 1fr)); gap: 5px;
+  position: relative; overflow: hidden;
+}
+.streifen::before, .streifen::after {
+  content: ""; position: absolute; left: 0; right: 0; height: 4px;
+  background: repeating-linear-gradient(90deg, var(--linie) 0 8px, transparent 8px 16px);
+}
+.streifen::before { top: 4px; } .streifen::after { bottom: 4px; }
+/* Bewegung 6: beim Laden laufen die Perforationen wie ein Film durch die Maschine */
+.video[data-lage="laedt"] .streifen::before,
+.video[data-lage="laedt"] .streifen::after { animation: transport .6s linear infinite; }
+@keyframes transport { to { background-position: 16px 0; } }
+
+.feld {
+  aspect-ratio: 3 / 4; border-radius: 4px; border: 1px solid var(--linie);
+  background: var(--bg2); display: grid; place-items: center;
+  font-family: var(--f-zahl); font-size: 11px; color: var(--leise);
+  transition: background .25s, color .25s, border-color .25s;
+}
+.feld[data-lage="laedt"] {
+  border-color: var(--akzent); color: var(--akzent);
+  background: linear-gradient(110deg, var(--bg2) 30%, color-mix(in srgb, var(--akzent) 30%, var(--bg2)) 50%, var(--bg2) 70%);
+  background-size: 250% 100%; animation: laedt 1.1s linear infinite;
+}
+@keyframes laedt { from { background-position: 125% 0; } to { background-position: -125% 0; } }
+.feld[data-lage="ok"] {
+  background: linear-gradient(160deg, var(--akzent), var(--akzent3));
+  border-color: transparent; color: var(--auf-akzent);
+  animation: sitzt .5s cubic-bezier(.3, 1.6, .5, 1) both;
+}
+@keyframes sitzt { from { transform: scale(.55); } 60% { transform: scale(1.12); } to { transform: scale(1); } }
+.feld[data-lage="fehler"] { border-color: var(--fehler); color: var(--fehler); animation: wackeln .45s ease both; }
+@keyframes wackeln {
+  0%, 100% { transform: translateX(0); } 20% { transform: translateX(-4px); } 40% { transform: translateX(4px); }
+  60% { transform: translateX(-3px); } 80% { transform: translateX(2px); }
+}
+/* Bewegung 7: alles geprüft — eine Lichtwelle läuft einmal über den Streifen */
+.video[data-lage="fertig"] .feld[data-lage="ok"] { animation: welle 1.1s ease both; animation-delay: calc(var(--i, 0) * 45ms); }
+@keyframes welle {
+  0%   { transform: none; filter: none; }
+  40%  { transform: translateY(-4px) scale(1.08); filter: brightness(1.35) drop-shadow(0 0 6px var(--glanz)); }
+  100% { transform: none; filter: none; }
+}
+/* Fertig: der Speichern-Knopf pulst sanft, bis er gedrückt wird */
+.video[data-lage="fertig"] button.haupt[data-knopf="speichern"]:not(:disabled) { animation: ruf 2.6s ease-in-out infinite; }
+@keyframes ruf {
+  0%, 100% { box-shadow: inset 0 1.5px .5px rgba(255, 255, 255, .55), inset 0 -3px 6px rgba(0, 0, 0, .40), inset 0 0 0 1px rgba(255, 255, 255, .10), 0 8px 18px rgba(0, 0, 0, .32), 0 0 0 0 color-mix(in srgb, var(--akzent) 55%, transparent); }
+  50%      { box-shadow: inset 0 1.5px .5px rgba(255, 255, 255, .55), inset 0 -3px 6px rgba(0, 0, 0, .40), inset 0 0 0 1px rgba(255, 255, 255, .10), 0 8px 18px rgba(0, 0, 0, .32), 0 0 0 9px color-mix(in srgb, var(--akzent) 0%, transparent); }
+}
+
+/* ── Meldungen ── */
+.meldung {
+  margin: 0; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--linie);
+  background: var(--karte); min-height: 48px;
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+}
+.video .meldung { background: color-mix(in srgb, var(--bg) 60%, transparent); }
+.meldung[data-art="gut"] { border-color: var(--akzent); background: var(--ok-grund); animation: aufleuchten .8s ease both; }
+.meldung[data-art="warn"] { border-color: var(--warn); }
+.meldung[data-art="fehler"] { border-color: var(--fehler); animation: wackeln .45s ease both; }
+@keyframes aufleuchten { from { box-shadow: 0 0 0 0 color-mix(in srgb, var(--akzent) 45%, transparent); } to { box-shadow: 0 0 0 12px transparent; } }
+
+.pruefung { font-size: 14px; color: var(--leise); }
+.pruefung summary { cursor: pointer; padding: 6px 0; }
+.pruefung p { margin: 4px 0; }
+.mono { font-family: var(--f-zahl); color: var(--text); }
+.pruefsumme { font-size: 12px; overflow-wrap: anywhere; }
+
+.kleingedruckt {
+  font-size: 14px; color: var(--leise); display: grid; gap: 8px;
+  border-top: 1px solid var(--linie); padding-top: 18px; animation-delay: .25s;
+}
+.kleingedruckt p { margin: 0; max-width: 68ch; }
+.kleingedruckt b { color: var(--text); }
+
+/* ── Hinweis zum Installieren ── */
+#install-meldung {
+  position: fixed; right: 12px; top: 66px; z-index: 20; max-width: min(420px, calc(100vw - 24px));
+  background: var(--karte); border: 1px solid var(--linie); border-radius: 14px;
+  backdrop-filter: blur(18px) saturate(1.3); -webkit-backdrop-filter: blur(18px) saturate(1.3);
+  padding: 12px 14px; box-shadow: var(--schatten), var(--glow); font-size: 15px; line-height: 1.45;
+  white-space: pre-line; animation: einfliegen .45s cubic-bezier(.2, .9, .3, 1.2) both;
+}
+@keyframes einfliegen { from { opacity: 0; transform: translateY(-12px) scale(.96); } to { opacity: 1; transform: none; } }
+#install-meldung .rund { float: right; margin: -4px -4px 4px 8px; }
+
+/* Wer weniger Bewegung wünscht, bekommt eine ruhige Seite. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .knoepfe button, .rund, .vorschau { transform: none !important; }
+  .vorschau:hover img { transform: none; }
+}

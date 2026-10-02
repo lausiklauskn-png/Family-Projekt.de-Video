@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>family-projekt.de Videos</title>
+<meta name="description" content="Große Videos von family-projekt.de in voller Qualität herunterladen. Jeder Teil wird mit seiner Prüfsumme verglichen.">
+<meta name="theme-color" content="#0a1016">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png?v=1">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=1">
+<link rel="stylesheet" href="assets/stil.css?v=2">
+</head>
+<body>
+<header class="kopf">
+  <a class="marke-link" href="./" aria-label="Videos von family-projekt.de — Startseite">
+    <img src="icons/icon-192.png?v=1" alt="" width="36" height="36">
+    <span class="marke">Videos · family-projekt.de</span>
+  </a>
+  <div class="werkzeug">
+    <button type="button" class="rund" id="installieren" data-lage="nicht-angeboten" title="Als App installieren"><span aria-hidden="true">⬇</span><span class="t"> Installieren</span></button>
+    <button type="button" class="rund" id="neuladen" aria-label="Neue Version laden (Vorrat leeren und neu laden)" title="Neue Version laden (Vorrat leeren und neu laden)"><span aria-hidden="true">⟳</span></button>
+  </div>
+</header>
+
+<main class="blatt">
+  <section class="einstieg">
+    <h1>Große Videos <span>zum Herunterladen</span></h1>
+    <p class="einleitung">Hier liegen Videos in voller Qualität, die für Chat und E-Mail zu groß sind. Jedes Video kommt in Teilen. Die Seite lädt sie, vergleicht jeden Teil mit seiner Prüfsumme und speichert am Ende <b>eine</b> Videodatei auf dein Gerät.</p>
+  </section>
+
+  <p class="meldung" id="liste-meldung" role="status" aria-live="polite">Die Liste wird geladen …</p>
+  <noscript><p class="meldung" data-art="warn">Diese Seite braucht JavaScript: sie setzt die Teile zusammen und prüft sie.</p></noscript>
+
+  <div id="liste" class="liste"></div>
+
+  <footer class="kleingedruckt">
+    <p><b>So funktioniert es.</b> Jeder Teil wird nach dem Laden mit seiner SHA-256-Prüfsumme verglichen. Kommt ein Teil nicht richtig an, wird er bis zu dreimal neu geholt; danach geht es mit „Weiter laden“ genau an dieser Stelle weiter. Gespeichert wird nur, wenn alle Teile stimmen.</p>
+    <p><b>Arbeitsspeicher.</b> Beim Zusammensetzen braucht das Gerät kurz so viel freien Speicher, wie das Video groß ist. Es wird immer nur ein Video zugleich im Speicher gehalten.</p>
+    <p><b>Als App.</b> Über „Installieren“ (oder Chrome ⋮ → „App installieren“) liegt die Seite als eigene App auf dem Startbildschirm bzw. Desktop. Die Videos selbst werden dabei nicht mitgespeichert, sie kommen erst beim Laden aus dem Netz.</p>
+    <p><a href="https://family-projekt.de/" rel="noopener">family-projekt.de</a> · <a href="https://family-projekt.de/impressum.html" rel="noopener">Impressum &amp; Datenschutz</a></p>
+  </footer>
+</main>
+
+<template id="karte-vorlage">
+  <article class="video">
+    <header class="video-kopf">
+      <h2 data-feld="titel"></h2>
+      <p class="beschreibung" data-feld="beschreibung"></p>
+    </header>
+    <div class="vorschau" data-feld="vorschau"></div>
+    <dl class="klappe" aria-label="Daten des Videos">
+      <div><dt>Bild</dt><dd data-feld="bild"></dd></div>
+      <div><dt>Länge</dt><dd data-feld="laenge"></dd></div>
+      <div><dt>Video</dt><dd data-feld="video"></dd></div>
+      <div><dt>Ton</dt><dd data-feld="ton"></dd></div>
+      <div><dt>Datei</dt><dd data-feld="datei"></dd></div>
+    </dl>
+    <section class="streifen-teil">
+      <div class="streifen-kopf">
+        <h3 data-feld="teile-titel"></h3>
+        <span class="stand" data-feld="stand">noch nicht geladen</span>
+      </div>
+      <div class="streifen" role="list" data-feld="streifen"></div>
+    </section>
+    <div class="knoepfe">
+      <button type="button" class="haupt" data-knopf="laden">Video laden und prüfen</button>
+      <button type="button" class="zweit" data-knopf="speichern" disabled>Video speichern</button>
+    </div>
+    <p class="meldung" role="status" aria-live="polite" data-feld="meldung">Erst laden, dann speichern.</p>
+    <details class="pruefung">
+      <summary>Prüfsumme und Dateiname</summary>
+      <p>Dateiname beim Speichern: <span class="mono" data-feld="dateiname"></span></p>
+      <p>Größe: <span class="mono" data-feld="bytes"></span> Bytes</p>
+      <p>SHA-256 der ganzen Datei:</p>
+      <p class="mono pruefsumme" data-feld="sha256"></p>
+    </details>
+  </article>
+</template>
+
+<script src="assets/laden.js?v=3"></script>
+</body>
+</html>

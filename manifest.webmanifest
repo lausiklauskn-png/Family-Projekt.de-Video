@@ -1,0 +1,17 @@
+{
+  "name": "family-projekt.de Videos",
+  "short_name": "FP Videos",
+  "description": "Große Videos von family-projekt.de in voller Qualität herunterladen — jeder Teil mit Prüfsumme.",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0a1016",
+  "theme_color": "#0a1016",
+  "lang": "de",
+  "icons": [
+    { "src": "icons/icon-192.png?v=1", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png?v=1", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/maskable-512.png?v=1", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
