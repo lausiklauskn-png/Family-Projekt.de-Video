@@ -77,7 +77,7 @@ einen Download und stolperte — Vorrat, offline und ⟳ blieben ungemessen.
 Gespeichert wird jetzt nur, wenn die Karte wirklich fertig ist; sonst zwei rote
 Zeilen mit Grund, und die Probe läuft weiter.
 
-## ⬇ Drei Lade-Wege, derselbe Inhalt (Klaus 2026-10-02)
+## ⬇ Drei Lade-Wege, derselbe Inhalt (Klaus 2026-10-02) — seit dem Abend vier, siehe unten
 
 Klaus: *„verschiedene Möglichkeiten des Herunterladens … mit verschiedenen
 Hintergründen … aber jeweils immer die gleichen Videos“*. Jede Karte trägt:
@@ -130,6 +130,41 @@ hellem Gerätethema (Playwrights Vorgabe) und misst jetzt Überschrift (hell) un
 (dunkel). Der Weichzeichner-Wächter suchte nur an `.fassung` und war blind (Gegenprobe);
 er prüft jetzt jede Regel der Ladeschau.
 Proben: `smoke` (Ladeschau-Zeilen) · `browser` (zweiter Tipp, Farben im hellen Thema) · Gegenprobe `RUCKELN:` (4), `FARBEN:` (1), `SPEICHERN:` (1).
+
+## 🎬 Der vierte Weg: Laden mit Vorschaufilm (Klaus 2026-10-02)
+
+Knopf **„Laden mit Vorschaufilm"** (`laden-film`, Art `film`). Hintergrundbilder und
+Werbeschau bleiben unverändert. Geladen und geprüft wird wie in den anderen drei Wegen.
+
+| | |
+|---|---|
+| Ablauf | erst der Vorschaufilm (stumm), dann die App-Szenen in Schleife, bis alle Teile geprüft sind; **erst dann** das Finale |
+| vorab | alle Symbole und Clips werden beim Start geladen und entschlüsselt (`_zustand().vorab`) — kein schwarzer Handyrahmen, kein spätes Icon; eine Szene, deren Bild nicht bereit ist, wird übersprungen und gezählt |
+| Abwechslung | Aufdeck-Arten reihum (`AUFDECK`: runter · rechts · links · kreis · schraeg · blende), Hintergründe reihum, je mit wechselnder Bewegung und Überblendung (blende · wisch · kreis) |
+| Finale | `ende()` wartet im Film-Modus 2,8 s (bei „weniger Bewegung" 1,2 s), damit das Finale sichtbar bleibt |
+| Film fehlt / lädt nicht | nach 12 s „laedt" gilt er als `fehler`, es geht mit den App-Szenen weiter — geladen wird trotzdem |
+
+- **Das Werkzeug legt `videos/<kennung>/vorschau.mp4` an** (960×540, H.264, ohne Ton,
+  ≤ 14 MB, Bitrate aus der Länge) und trägt `vorschauFilm {pfad, groesse, sha256}` in
+  `videos.json` ein. Für ein vorhandenes Video: `node tools/video-aufnehmen.mjs --film-nachtragen <kennung>`.
+- **Der Knopf steht nur da, wenn die Liste einen gültigen Film nennt** (`filmGueltig` in
+  `laden.js`: Pfad genau `videos/<id>/vorschau.mp4`, Größe 1…14 000 000, SHA-256 aus 64 Hex).
+  `ladeschau.js` prüft den Pfad beim Start noch einmal. Der Film steht **nicht** im Vorrat.
+- Cache: `fp-videos-v6`, `laden.js?v=6`, `ladeschau.js?v=3`.
+
+⚠ **DER TEST-BROWSER SPIELT KEIN H.264 — gemessen: `canPlayType("avc1")` ist leer.** In der
+ersten Fassung der Probe landete der echte Film deshalb immer in `fehler`, und der Film-Weg war
+**ungemessen**, obwohl alles grün war (die Probe ließ „laedt" als ersten Zustand gelten). Seitdem
+liegt für probe-a ein **VP9-Stellvertreter** an derselben Adresse; gemessen werden `laeuft`,
+`fertig` und die App-Szenen danach. Aus demselben Grund laufen die zwei Clips der App-Szenen
+(H.264) in der Probe nie (`clipsBereit: 0`) — die Szenen fallen dort auf die Symbole zurück.
+
+⚠ **Nicht gemessen:** Film und Clips am Tablet (Chrome auf Android spielt H.264), Ruckeln,
+Akku; echte github.io-Auslieferung.
+
+Proben: `smoke` (`filmGueltig` an gestellten Einträgen, beide Richtungen) · `browser` § 2e2
+(vier Knöpfe, Film läuft und endet, Finale nie vor dem letzten Teil, Download Byte für Byte) ·
+Gegenprobe `FILM:` (6 Fälle). Gemessen 2026-10-02: `browser` 117 grün · 0 ROT, `smoke` grün, Gegenprobe in einer Wegwerf-Kopie **6 gefangen · 0 blind · 0 aus falschem Grund · 0 tote Anker**.
 
 ## Prüfen
 
