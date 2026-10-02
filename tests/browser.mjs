@@ -277,6 +277,17 @@ try {
     lj.videos.push({ id: "kaputt-eintrag", titel: "Unvollständig", teile: [], groesse: 0, sha256: "x", dateiname: "x.mp4" });
     writeFileSync(join(kopie, "videos.json"), JSON.stringify(lj, null, 2) + "\n");
     const va = lj.videos.find((v) => v.id === "probe-a");
+    // Der Test-Browser spielt KEIN H.264 (gemessen: canPlayType("avc1") = "") — der echte Vorschaufilm
+    // landete hier immer in „fehler“, und der Film-Weg war ungemessen. Für probe-a liegt deshalb ein
+    // VP9-Stellvertreter an derselben Adresse; Größe und SHA-256 in der Liste werden nachgezogen.
+    {
+      const webm = join(tmp, "film.webm");
+      execFileSync("ffmpeg", ["-v", "error", "-y", "-f", "lavfi", "-i", "testsrc2=size=320x180:rate=25", "-t", "2", "-c:v", "libvpx-vp9", "-b:v", "300k", "-an", webm]);
+      const ziel = join(kopie, "videos/probe-a/vorschau.mp4");
+      cpSync(webm, ziel);
+      const buf = readFileSync(ziel);
+      if (va.vorschauFilm) { va.vorschauFilm.groesse = buf.length; va.vorschauFilm.sha256 = sha(buf); }
+    }
     const N = va.teile.length;
     ok(`Testvideo zerfällt in mehr als 4 Teile (${N})`, N > 4);
     const teil = (id, i) => `/videos/${id}/teil-${String(i).padStart(2, "0")}.bin`;
@@ -469,6 +480,11 @@ try {
         const log = await w.evaluate(() => { clearInterval(window.__filmUhr); return window.__filmLog; });
         const zuFrueh = log.filter((x) => x.finale && x.n < NN);
         ok("laden-film: das Finale stand nie vor dem letzten Teil da", log.length > 5 && zuFrueh.length === 0, JSON.stringify({ proben: log.length, zuFrueh: zuFrueh.slice(0, 3) }));
+        const lagen = log.map((x) => x.film);
+        ok("laden-film: der Vorschaufilm läuft wirklich (Lage „laeuft“ gesehen)", lagen.includes("laeuft"), JSON.stringify([...new Set(lagen)]));
+        ok("laden-film: … und endet („fertig“), statt in „fehler“ zu fallen", lagen.includes("fertig") && !lagen.includes("fehler"), JSON.stringify([...new Set(lagen)]));
+        const nachFilm = (() => { const i = log.findIndex((x) => x.film === "fertig"); return i < 0 ? null : log.slice(i).some((x) => x.szene >= 0 && !x.finale); })();
+        ok("laden-film: nach dem Film kommen die App-Szenen", nachFilm === true, String(nachFilm));
         await warteLage(w, id, ["fertig", "fehler"], 60000);
         const l = await karteLage(w, id);
         ok("laden-film: fertig, alle Teile geprüft", l.lage === "fertig", JSON.stringify({ lage: l.lage, meldung: l.meldung }));
