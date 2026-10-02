@@ -5,6 +5,7 @@
  *        [--beschreibung "<ein, zwei Sätze>"] [--dateiname <name.mp4>]
  *        [--vorschau <bild.jpg> | --vorschau-bei <sekunden>] [--ersetzen]
  *   node tools/video-aufnehmen.mjs --entfernen <kennung>
+ *   node tools/video-aufnehmen.mjs --film-nachtragen <kennung>
  *   node tools/video-aufnehmen.mjs --liste
  *
  * Was es tut:
@@ -13,6 +14,12 @@
  *   · liest Bild, Länge, Bildrate, Video- und Tonart mit ffprobe (fehlt ffprobe,
  *     steht „nicht gemessen“ da — nie eine geratene Zahl)
  *   · legt ein Vorschaubild ab (eigenes Bild, oder ein Standbild per ffmpeg)
+ *   · legt einen Vorschaufilm ab (videos/<kennung>/vorschau.mp4: 960×540, ohne
+ *     Ton, höchstens 14 MB) — für „Laden mit Vorschaufilm“. Ohne ffmpeg null,
+ *     und der Knopf bleibt auf der Seite verborgen.
+ *   · --film-nachtragen setzt die Teile eines vorhandenen Videos wieder
+ *     zusammen (Prüfsumme gegen die Liste), legt NUR den Vorschaufilm neu an
+ *     und lässt alles andere am Eintrag stehen.
  *   · trägt das Video in videos.json ein, das neueste zuerst
  *
  * Grenzen, die es selbst prüft (GitHub Pages):
@@ -36,6 +43,9 @@ export const TEIL_BYTES = 14000000;
 export const SEITE_MAX = 1000000000;
 export const SEITE_WARNUNG = 900000000;
 export const DATEI_MAX = 50000000;
+export const FILM_MAX = 14000000;
+export const FILM_BREITE = 960;
+export const FILM_HOEHE = 540;
 export const KENNUNG = /^[a-z0-9][a-z0-9-]{1,59}$/;
 
 const WURZEL = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -156,6 +166,66 @@ function vorschauAnlegen(datei, zielOrdner, a, dauer) {
   }
 }
 
+/* Der Vorschaufilm: dasselbe Video, klein und stumm, für das Fenster der Ladeschau.
+   Die Bitrate wird aus der Länge gerechnet, damit er unter FILM_MAX bleibt; ist er
+   trotzdem zu groß, wird mit halber Bitrate neu gerechnet. Ohne ffmpeg: null. */
+function filmAnlegen(datei, zielOrdner, dauer) {
+  const ziel = join(zielOrdner, "vorschau.mp4");
+  const sek = dauer && dauer > 0 ? dauer : 60;
+  let kbit = Math.min(1600, Math.floor(FILM_MAX * 0.85 * 8 / sek / 1000));
+  for (let versuch = 0; versuch < 4; versuch++) {
+    try {
+      execFileSync("ffmpeg", ["-v", "error", "-y", "-i", datei, "-an", "-map_metadata", "-1",
+        "-vf", `scale=${FILM_BREITE}:${FILM_HOEHE}:force_original_aspect_ratio=decrease,pad=${FILM_BREITE}:${FILM_HOEHE}:(ow-iw)/2:(oh-ih)/2,setsar=1`,
+        "-c:v", "libx264", "-preset", "slow", "-profile:v", "main", "-pix_fmt", "yuv420p",
+        "-b:v", kbit + "k", "-maxrate", Math.floor(kbit * 1.5) + "k", "-bufsize", kbit * 2 + "k",
+        "-movflags", "+faststart", ziel], { stdio: ["ignore", "ignore", "pipe"] });
+    } catch (e) {
+      if (existsSync(ziel)) rmSync(ziel);
+      console.warn("⚠ ffmpeg fehlt oder scheiterte — kein Vorschaufilm. Der Knopf „Laden mit Vorschaufilm“ bleibt verborgen.");
+      return null;
+    }
+    const groesse = statSync(ziel).size;
+    if (groesse > 0 && groesse <= FILM_MAX) {
+      return { groesse, sha256: createHash("sha256").update(readFileSync(ziel)).digest("hex") };
+    }
+    kbit = Math.floor(kbit / 2);
+  }
+  rmSync(ziel);
+  console.warn("⚠ der Vorschaufilm blieb über 14 MB — keiner angelegt.");
+  return null;
+}
+
+function filmEintrag(id, f) {
+  return f ? { pfad: `videos/${id}/vorschau.mp4`, groesse: f.groesse, sha256: f.sha256 } : null;
+}
+
+/* Für ein Video, das schon da ist: Teile zusammensetzen, Prüfsumme gegen die
+   Liste, nur den Vorschaufilm neu anlegen. Der Rest des Eintrags bleibt stehen. */
+function filmNachtragen(id, wurzel = WURZEL) {
+  if (!KENNUNG.test(id)) fehler("ungültige Kennung: " + id, 2);
+  const d = listeLesen(join(wurzel, "videos.json"));
+  const v = d.videos.find((x) => x.id === id);
+  if (!v) fehler("kein Video mit der Kennung " + id);
+  const ordner = join(wurzel, "videos", id);
+  const ganz = join(ordner, ".ganz-" + process.pid + ".mp4");
+  const h = createHash("sha256");
+  try {
+    const teile = v.teile.map((t, i) => {
+      const b = readFileSync(join(ordner, "teil-" + String(i).padStart(2, "0") + ".bin"));
+      if (b.length !== t.groesse || createHash("sha256").update(b).digest("hex") !== t.sha256) fehler(`Teil ${i + 1} stimmt nicht mit der Liste überein`);
+      h.update(b);
+      return b;
+    });
+    if (h.digest("hex") !== v.sha256) fehler("das zusammengesetzte Video stimmt nicht mit der Liste überein");
+    writeFileSync(ganz, Buffer.concat(teile));
+    const f = filmAnlegen(ganz, ordner, v.dauer);
+    v.vorschauFilm = filmEintrag(id, f);
+    listeSchreiben(d, join(wurzel, "videos.json"));
+    console.log(f ? `✓ ${id}: Vorschaufilm ${(f.groesse / 1e6).toFixed(1)} MB` : `⚠ ${id}: kein Vorschaufilm`);
+  } finally { if (existsSync(ganz)) rmSync(ganz); }
+}
+
 function entfernen(id, wurzel = WURZEL) {
   if (!KENNUNG.test(id)) fehler("ungültige Kennung: " + id, 2);
   const d = listeLesen(join(wurzel, "videos.json"));
@@ -187,7 +257,8 @@ function aufnehmen(a) {
   /* VOR dem Schreiben prüfen: ein Abbruch mittendrin ließe halbe Teile liegen */
   if (Math.ceil(neuGroesse / teilBytes) > 100) fehler("mehr als 100 Teile — die Seite zählt zweistellig (teil-00 … teil-99). Größeres --teil wählen.");
   const altGroesse = existsSync(ordner) ? seitenGroesse(ordner) : 0;
-  const danach = seitenGroesse() - altGroesse + neuGroesse;
+  /* der Vorschaufilm zählt mit, höchstens FILM_MAX */
+  const danach = seitenGroesse() - altGroesse + neuGroesse + FILM_MAX;
   if (danach > SEITE_MAX) {
     fehler(`danach wäre die Seite ${(danach / 1e6).toFixed(1)} MB groß — GitHub Pages erlaubt höchstens 1 000 MB. Erst ein Video entfernen (--entfernen).`);
   }
@@ -197,6 +268,7 @@ function aufnehmen(a) {
   const z = zerlegen(quelle, ordner, teilBytes);
   const m = messen(quelle);
   const mitVorschau = vorschauAnlegen(quelle, ordner, a, m.dauer);
+  const film = filmAnlegen(quelle, ordner, m.dauer);
 
   const eintrag = {
     id,
@@ -206,6 +278,7 @@ function aufnehmen(a) {
     groesse: z.groesse,
     sha256: z.sha256,
     vorschau: mitVorschau ? `videos/${id}/vorschau.jpg` : null,
+    vorschauFilm: filmEintrag(id, film),
     ...m,
     aufgenommen: new Date().toISOString(),
     teile: z.teile
@@ -215,8 +288,9 @@ function aufnehmen(a) {
   listeSchreiben(d);
 
   console.log(`✓ ${id}: ${z.teile.length} Teile · ${(z.groesse / 1e6).toFixed(1)} MB · sha256 ${z.sha256}`);
-  console.log(`  Seite jetzt ${(danach / 1e6).toFixed(1)} MB von 1 000 MB`);
-  if (danach > SEITE_WARNUNG) console.warn("⚠ die Seite nähert sich der Grenze von 1 GB.");
+  const jetzt = seitenGroesse();
+  console.log(`  Seite jetzt ${(jetzt / 1e6).toFixed(1)} MB von 1 000 MB` + (film ? ` · Vorschaufilm ${(film.groesse / 1e6).toFixed(1)} MB` : " · kein Vorschaufilm"));
+  if (jetzt > SEITE_WARNUNG) console.warn("⚠ die Seite nähert sich der Grenze von 1 GB.");
   console.log("  Jetzt prüfen: node tests/smoke.mjs");
 }
 
@@ -227,7 +301,8 @@ if (istDirekt) {
     for (const v of listeLesen().videos) console.log(`${v.id}  ${(v.groesse / 1e6).toFixed(1)} MB  ${v.titel}`);
     console.log(`Seite: ${(seitenGroesse() / 1e6).toFixed(1)} MB von 1 000 MB`);
   } else if (a.entfernen) entfernen(a.entfernen);
+  else if (a["film-nachtragen"]) filmNachtragen(a["film-nachtragen"]);
   else aufnehmen(a);
 }
 
-export { entfernen, relative, basename };
+export { entfernen, filmNachtragen, relative, basename };

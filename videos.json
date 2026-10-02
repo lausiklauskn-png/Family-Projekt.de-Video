@@ -80,7 +80,12 @@
           "groesse": 2056499,
           "sha256": "872f40236df1411742f3eb27586af6b439ffcfae724ff98f1a96dd0f07e037c6"
         }
-      ]
+      ],
+      "vorschauFilm": {
+        "pfad": "videos/werbevideo-67s/vorschau.mp4",
+        "groesse": 11569698,
+        "sha256": "9085cf5e6ba109687b96d66227adfea614f3d6ae06c1db5610988efc93e172a5"
+      }
     },
     {
       "id": "werbevideo-60s",
@@ -161,7 +166,12 @@
           "groesse": 2887002,
           "sha256": "482d8f21401bcfc441b2028a394027ad6e32cead7a7eb80872dd57b910efbf8d"
         }
-      ]
+      ],
+      "vorschauFilm": {
+        "pfad": "videos/werbevideo-60s/vorschau.mp4",
+        "groesse": 11618058,
+        "sha256": "f08789d81ba707cdade16d2981c3cac059a59958beabd17bb27b4ae509d39468"
+      }
     }
   ]
 }
