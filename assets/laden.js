@@ -77,6 +77,11 @@
     el.querySelectorAll("[data-feld]").forEach(function (n) { f[n.getAttribute("data-feld")] = n; });
     f.laden = el.querySelector('[data-knopf="laden"]');
     f.speichern = el.querySelector('[data-knopf="speichern"]');
+    /* Drei Wege, derselbe Inhalt: schlicht · mit Hintergrundbildern · mit Werbeschau.
+       Die Teile, die Prüfung und die gespeicherte Datei sind in allen drei gleich. */
+    f.arten = [["laden-bilder", "bilder"], ["laden-schau", "werbung"]]
+      .map(function (a) { return { knopf: el.querySelector('[data-knopf="' + a[0] + '"]'), art: a[1] }; })
+      .filter(function (a) { return a.knopf; });
 
     f.titel.textContent = v.titel;
     f.beschreibung.textContent = v.beschreibung || "";
@@ -108,7 +113,8 @@
       k.streifen.push(feld);
     });
     melde(k, "Erst laden, dann speichern. Das Laden braucht je nach Verbindung ein paar Minuten (" + mb(v.groesse) + ").");
-    f.laden.addEventListener("click", function () { laden(k); });
+    f.laden.addEventListener("click", function () { laden(k, false); });
+    f.arten.forEach(function (a) { a.knopf.addEventListener("click", function () { laden(k, a.art); }); });
     f.speichern.addEventListener("click", function () { speichern(k); });
     return k;
   }
@@ -119,15 +125,19 @@
     k.puffer = []; k.blob = null;
     k.streifen.forEach(function (s) { s.removeAttribute("data-lage"); });
     k.felder.stand.textContent = "noch nicht geladen";
-    k.felder.laden.textContent = "Video laden und prüfen";
+    k.felder.laden.textContent = "Schlicht laden";
     k.felder.laden.className = "haupt"; k.felder.speichern.className = "zweit";
+    artKnoepfe(k, { hidden: false, disabled: false });
     k.felder.speichern.disabled = true;
     k.el.removeAttribute("data-lage");
     melde(k, grund, "warn");
   }
 
+  function artKnoepfe(k, was) {
+    k.felder.arten.forEach(function (a) { for (var x in was) a.knopf[x] = was[x]; });
+  }
   function alleKnoepfe(an) {
-    karten.forEach(function (k) { if (k !== laeuft) k.felder.laden.disabled = !an; });
+    karten.forEach(function (k) { if (k !== laeuft) { k.felder.laden.disabled = !an; artKnoepfe(k, { disabled: !an }); } });
   }
 
   async function holeTeil(k, i) {
@@ -148,8 +158,35 @@
     throw letzter;
   }
 
-  async function laden(k) {
+  /* Die Werbeschau: dieselben Teile, dieselbe Prüfung — nur läuft im
+     Vorschaufenster eine Schau, bis das Video da ist. Sie wird erst beim
+     Tippen geholt; wer schlicht lädt, lädt nichts davon. */
+  var schauLaedt = null;
+  function holeSchau() {
+    if (window.Ladeschau) return Promise.resolve(true);
+    if (schauLaedt) return schauLaedt;
+    window.LADESCHAU_BASIS = "assets/ls/";
+    schauLaedt = new Promise(function (ok) {
+      var s = document.createElement("script");
+      s.src = "assets/ladeschau.js?v=1";
+      s.onload = function () { ok(!!window.Ladeschau); };
+      s.onerror = function () { schauLaedt = null; ok(false); };
+      document.head.appendChild(s);
+    });
+    return schauLaedt;
+  }
+  function schau(k, was, a, b) {
+    if (!k.schau || !window.Ladeschau) return;
+    try { window.Ladeschau[was](a, b); } catch (e) {}
+  }
+
+  async function laden(k, mitSchau) {
     if (laeuft) return;
+    if (mitSchau && !k.schau) {
+      if (await holeSchau()) { k.schau = mitSchau; schau(k, "start", k.felder.vorschau, mitSchau); }
+      else melde(k, "Die Schau ließ sich nicht laden. Das Video wird trotzdem geladen und geprüft.", "warn");
+      if (laeuft) return;   /* während des Holens hat ein anderes Video begonnen */
+    } else if (k.schau) schau(k, "start", k.felder.vorschau, k.schau);   /* „Weiter laden“: die Schau läuft weiter */
     if (!window.crypto || !crypto.subtle) {
       melde(k, "Dieser Browser kann hier nicht prüfen (kein crypto.subtle — die Seite muss über https geöffnet sein).", "fehler");
       return;
@@ -158,7 +195,7 @@
     laeuft = k; alleKnoepfe(false);
     k.el.setAttribute("data-lage", "laedt");
     var f = k.felder, v = k.v, n = v.teile.length;
-    f.laden.disabled = true; f.speichern.disabled = true;
+    f.laden.disabled = true; f.speichern.disabled = true; artKnoepfe(k, { disabled: true });
     k.blob = null;
     var geladen = 0;
     for (var i = 0; i < n; i++) {
@@ -170,27 +207,32 @@
         k.puffer[i] = await holeTeil(k, i);
       } catch (e) {
         k.streifen[i].setAttribute("data-lage", "fehler");
+        schau(k, "pause");
         f.stand.textContent = k.puffer.filter(Boolean).length + " von " + n + " Teilen geprüft";
         melde(k, "Teil " + (i + 1) + " kam nicht richtig an (" + (e && e.message ? e.message : "unbekannter Fehler") +
           "). Tippe auf „Weiter laden“, dann geht es an dieser Stelle weiter — die schon geprüften Teile bleiben.", "fehler");
         f.laden.textContent = "Weiter laden";
         f.laden.disabled = false;
+        artKnoepfe(k, { hidden: true });
         k.el.setAttribute("data-lage", "fehler");
         laeuft = null; alleKnoepfe(true);
         return;
       }
       geladen += v.teile[i].groesse;
       k.streifen[i].setAttribute("data-lage", "ok");
+      schau(k, "teil", k.puffer.filter(Boolean).length, n);
     }
     var blob = new Blob(k.puffer, { type: "video/mp4" });
     k.puffer = [];
     laeuft = null; alleKnoepfe(true);
+    schau(k, "ende"); k.schau = false;
     if (blob.size !== v.groesse) {
       k.streifen.forEach(function (s) { s.removeAttribute("data-lage"); });
       k.el.setAttribute("data-lage", "fehler");
       melde(k, "Zusammengesetzt sind " + blob.size + " Bytes statt " + v.groesse + ". Bitte noch einmal laden.", "fehler");
-      f.laden.textContent = "Video laden und prüfen";
+      f.laden.textContent = "Schlicht laden";
       f.laden.disabled = false;
+      artKnoepfe(k, { hidden: false, disabled: false });
       return;
     }
     k.blob = blob;
@@ -198,6 +240,7 @@
     f.stand.textContent = n + " von " + n + " Teilen geprüft · " + mb(v.groesse);
     f.laden.textContent = "Geladen";
     f.laden.disabled = true;
+    artKnoepfe(k, { hidden: true });
     f.laden.className = "zweit"; f.speichern.className = "haupt";
     f.speichern.disabled = false;
     melde(k, "Alle " + n + " Teile stimmen mit ihrer Prüfsumme überein. Tippe jetzt auf „Video speichern“.", "gut");

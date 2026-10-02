@@ -164,6 +164,18 @@ ok(".nojekyll liegt da (sonst lässt Pages Ordner mit _ weg)", existsSync(join(W
 const ladenCode = ladenQuelle.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
 ok("Texte aus der Liste gehen nie über innerHTML", !/innerHTML|outerHTML|insertAdjacentHTML/.test(ladenCode));
 
+kopf("D2 · drei Lade-Wege und die Ladeschau");
+const lsQuelle = existsSync(join(WURZEL, "assets/ladeschau.js")) ? readFileSync(join(WURZEL, "assets/ladeschau.js"), "utf8") : "";
+const indexQ = readFileSync(join(WURZEL, "index.html"), "utf8");
+ok("drei Lade-Knöpfe in der Vorlage (schlicht, Hintergrundbilder, Werbeschau)", ["laden", "laden-bilder", "laden-schau"].every((n) => indexQ.includes(`data-knopf="${n}"`)));
+ok("assets/ladeschau.js liegt da und nimmt den Ordner aus LADESCHAU_BASIS", /var B = window\.LADESCHAU_BASIS \|\| "ls\/";/.test(lsQuelle));
+ok("laden.js holt die Schau aus assets/ls/", /LADESCHAU_BASIS = "assets\/ls\/"/.test(ladenQuelle));
+const lsDateien = existsSync(join(WURZEL, "assets/ls")) ? readdirSync(join(WURZEL, "assets/ls")) : [];
+ok("assets/ls/ trägt Hintergrundbilder und Musik", lsDateien.some((n) => /^bg-.*\.jpg$/.test(n)) && lsDateien.includes("musik.mp3"), lsDateien.length + " Dateien");
+ok("keine .wav und keine Datei über 50 MB in assets/ls/", lsDateien.every((n) => !/\.wav$/i.test(n) && statSync(join(WURZEL, "assets/ls", n)).size < 50e6));
+ok("Ladeschau und ls/ stehen NICHT im Installations-Vorrat (erst auf Tipp)", !schaleListe.some((u) => /ladeschau|assets\/ls\//.test(u)));
+ok("node --check assets/ladeschau.js", spawnSync(NODE, ["--check", join(WURZEL, "assets/ladeschau.js")]).status === 0);
+
 kopf("E · node --check");
 const jsDateien = ["assets/laden.js", "sw.js", ...readdirSync(join(WURZEL, "tools")).filter((n) => /\.m?js$/.test(n)).map((n) => "tools/" + n),
   ...readdirSync(join(WURZEL, "tests")).filter((n) => /\.m?js$/.test(n)).map((n) => "tests/" + n)];

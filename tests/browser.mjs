@@ -341,7 +341,7 @@ try {
     ok("B lädt: alle anderen Laden-Knöpfe sind aus", waehrend.filter((x) => x.id !== "probe-b").every((x) => x.aus), JSON.stringify(waehrend));
     const aFrei = await karteLage(q, "probe-a");
     ok("B lädt: A ist freigegeben (kein Blob, Speichern aus, Warnung)",
-      aFrei.lage === null && !aFrei.hatBlob && aFrei.speichernAus && aFrei.meldungArt === "warn" && /^Freigegeben/.test(aFrei.meldung) && aFrei.ladenText === "Video laden und prüfen",
+      aFrei.lage === null && !aFrei.hatBlob && aFrei.speichernAus && aFrei.meldungArt === "warn" && /^Freigegeben/.test(aFrei.meldung) && aFrei.ladenText === "Schlicht laden",
       JSON.stringify(aFrei));
     ok("B lädt: A's Streifen ist wieder leer", aFrei.streifen.every((s) => s === null), JSON.stringify(aFrei.streifen));
     await warteLage(q, "probe-b", ["fertig", "fehler"]);
@@ -380,6 +380,44 @@ try {
     ok("zu kurzer Teil: Meldung nennt „falsche Größe“", o1.lage === "fehler" && /\(falsche Größe: \d+ statt \d+ Bytes\)/.test(o1.meldung), o1.meldung);
     s2.stoerung.delete(teil("probe-ohne", 0));
     ok("keine Skriptfehler in der Wegwerf-Kopie", q.__fehler.length === 0, q.__fehler.join(" | "));
+
+    kopf("2e2 · drei Lade-Wege: schlicht, mit Hintergrundbildern, mit Werbeschau — derselbe Inhalt");
+    {
+      const w = await oeffne(c2, s2.url);
+      const knopfLage = await w.$eval(karteSel("probe-b"), (el) => ["laden", "laden-bilder", "laden-schau"].map((n) => {
+        const b = el.querySelector(`[data-knopf="${n}"]`);
+        return b ? { n, da: !b.hidden && b.getClientRects().length > 0, aus: b.disabled, text: b.textContent } : { n, da: false };
+      }));
+      ok("drei Lade-Knöpfe stehen an jeder Karte", knopfLage.every((k) => k.da && !k.aus), JSON.stringify(knopfLage));
+      for (const [id, knopf, art] of [["probe-b", "laden-bilder", "bilder"], ["probe-c", "laden-schau", "werbung"]]) {
+        s2.stoerung.set(teil(id, 1), { art: "warte", mal: 1, ms: 1500 });
+        await klick(w, id, knopf);
+        let artWaehrend = null;
+        try {
+          await w.waitForFunction((sel) => { const v = document.querySelector(sel + ' [data-feld="vorschau"]'); return v && v.getAttribute("data-ls-art"); }, karteSel(id), { timeout: 15000 });
+          artWaehrend = await w.$eval(`${karteSel(id)} [data-feld="vorschau"]`, (v) => v.getAttribute("data-ls-art"));
+        } catch (_e) {}
+        ok(`${knopf}: während des Ladens läuft die Schau „${art}“`, artWaehrend === art, String(artWaehrend));
+        if (art === "bilder") {
+          const sicht = await w.$eval(`${karteSel(id)} [data-feld="vorschau"]`, (v) => {
+            const img = v.querySelector(":scope > img"); const m = document.getElementById("ls-musik");
+            return { img: img ? getComputedStyle(img).opacity : null, musik: !!m && (m.classList.contains("weg") || m.getClientRects().length === 0) };
+          });
+          ok("Hintergrundbilder: das Vorschaubild bleibt sichtbar, keine Musik", sicht.img === "1" && sicht.musik, JSON.stringify(sicht));
+        }
+        await warteLage(w, id, ["fertig", "fehler"], 60000);
+        const l = await karteLage(w, id);
+        ok(`${knopf}: fertig, alle Teile geprüft`, l.lage === "fertig", JSON.stringify({ lage: l.lage, meldung: l.meldung }));
+        const nachher = await w.$eval(`${karteSel(id)} [data-feld="vorschau"]`, (v) => v.getAttribute("data-ls-art"));
+        ok(`${knopf}: die Schau endet mit dem Laden`, nachher === null, String(nachher));
+        const [d] = await Promise.all([w.waitForEvent("download", { timeout: 30000 }), klick(w, id, "speichern")]);
+        const dSha = await shaDatei(await d.path());
+        ok(`${knopf}: der Download ist Byte für Byte dasselbe Video`, dSha === filmSha, dSha);
+        s2.stoerung.delete(teil(id, 1));
+      }
+      ok("keine Skriptfehler bei den Lade-Wegen", w.__fehler.length === 0, w.__fehler.join(" | "));
+      await w.close();
+    }
 
     kopf("2f · der Vorrat des Service-Workers");
     const swQuelle = readFileSync(join(kopie, "sw.js"), "utf8");

@@ -82,10 +82,22 @@ const FAELLE = [
               ["e.respondWith(caches.match(req).then((r) => r || fetch(req)));",
                "e.respondWith(caches.match(req).then((r) => r || fetch(req).then((a) => { const k = a.clone(); caches.open(CACHE_VERSION).then((c) => c.put(req, k)); return a; })));"]],
     proben: ["smoke", "browser"], erwartet: /kein Teil und keine Liste im Vorrat|legt nichts aus videos\/ und videos\.json ab/ },
-  { name: "VERSION: die Seite holt laden.js?v=3, der Vorrat kennt ?v=2",
+  { name: "VERSION: die Seite holt laden.js?v=4, der Vorrat kennt ?v=3",
     datei: "sw.js",
-    ersetze: [['"assets/laden.js?v=3",', '"assets/laden.js?v=2",']],
-    proben: ["smoke"], erwartet: /wortgleich im Vorrat/ }
+    ersetze: [['"assets/laden.js?v=4",', '"assets/laden.js?v=3",']],
+    proben: ["smoke"], erwartet: /wortgleich im Vorrat/ },
+  { name: "BILDER: „Laden mit Hintergrundbildern“ startet die Werbeschau",
+    datei: "assets/laden.js",
+    ersetze: [['["laden-bilder", "bilder"]', '["laden-bilder", "werbung"]']],
+    proben: ["browser"], erwartet: /läuft die Schau „bilder“/ },
+  { name: "SCHAUENDE: die Schau bleibt nach dem Laden stehen",
+    datei: "assets/ladeschau.js",
+    ersetze: [['s.d.fenster.removeAttribute("data-ls-art");', '']],
+    proben: ["browser"], erwartet: /die Schau endet mit dem Laden/ },
+  { name: "BASIS: die Ladeschau sucht ihre Bilder wieder fest unter ls/",
+    datei: "assets/ladeschau.js",
+    ersetze: [['var B = window.LADESCHAU_BASIS || "ls/";', 'var B = "ls/";']],
+    proben: ["smoke"], erwartet: /LADESCHAU_BASIS/ }
 ];
 
 function zaehle(text, anker) { let n = 0, i = 0; while ((i = text.indexOf(anker, i)) !== -1) { n++; i += anker.length; } return n; }

@@ -77,6 +77,33 @@ einen Download und stolperte — Vorrat, offline und ⟳ blieben ungemessen.
 Gespeichert wird jetzt nur, wenn die Karte wirklich fertig ist; sonst zwei rote
 Zeilen mit Grund, und die Probe läuft weiter.
 
+## ⬇ Drei Lade-Wege, derselbe Inhalt (Klaus 2026-10-02)
+
+Klaus: *„verschiedene Möglichkeiten des Herunterladens … mit verschiedenen
+Hintergründen … aber jeweils immer die gleichen Videos“*. Jede Karte trägt:
+
+| Knopf | was während des Ladens zu sehen ist |
+|---|---|
+| **Schlicht laden** (`laden`) | nur der Fortschritt — wie bisher |
+| **Laden mit Hintergrundbildern** (`laden-bilder`) | Hintergrundbilder und Mycel, keine App-Szenen, **keine Musik**; das Vorschaubild bleibt sichtbar |
+| **Laden mit Werbeschau** (`laden-schau`) | die Werbeschau mit App-Szenen und Musik (Knopf „Musik aus“) |
+
+- **Geladen und geprüft wird in allen drei Wegen genau dasselbe** — die Teile,
+  ihre SHA-256, die ganze Datei. Die Schau ist nur Begleitung (`k.schau`), sie
+  pausiert bei einem Fehler, läuft bei „Weiter laden“ weiter und endet bei „fertig“.
+  Die Browser-Probe lädt in beiden Schau-Wegen und vergleicht den Download Byte für Byte.
+- `assets/ladeschau.js` + `assets/ls/` (Bilder, Clips, `musik.mp3` = die Spur des
+  Werbevideos) stammen aus der Ladeschau-Vorschau vom selben Tag, **Fassung 3**
+  (die Fassung 2 schnitt Texte am Fensterrand ab und ist nicht übernommen).
+  Der Ordner kommt aus `window.LADESCHAU_BASIS` (laden.js setzt `assets/ls/`).
+- **Erst auf Tipp geladen**, nicht im Installations-Vorrat. **three.js r128 kommt
+  von cdnjs** — erst nach dem Tipp auf einen Schau-Knopf; offline oder gesperrt
+  fällt das Mycel weg, geladen wird trotzdem (eine Warnung sagt es).
+- ⚠ **Nicht gemessen:** die Schau am Tablet (Ruckeln, Akku), und ob drei Knöpfe
+  neben „Speichern“ am Handy gut zu treffen sind. Klaus entscheidet nach dem
+  Sichttest, welche Wege bleiben.
+- Proben: `smoke` § D2 · `browser` § 2e2 · Gegenprobe `BILDER:`, `SCHAUENDE:`, `BASIS:`.
+
 ## Prüfen
 
 ```bash
