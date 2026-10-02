@@ -107,6 +107,7 @@ for (const v of videos) {
   ok(`${v.id}: die zusammengesetzten Teile ergeben die Gesamt-Prüfsumme`, alleTeile && ganz.digest("hex") === v.sha256);
   const erwartet = new Set(v.teile.map((_, i) => "teil-" + String(i).padStart(2, "0") + ".bin"));
   if (v.vorschau) erwartet.add("vorschau.jpg");
+  if (v.vorschauFilm) erwartet.add("vorschau.mp4");
   const fremd = readdirSync(ordner).filter((n) => !erwartet.has(n));
   ok(`${v.id}: keine überzähligen Dateien im Ordner`, !fremd.length, fremd.join(", "));
   if (v.vorschau) {
@@ -114,6 +115,14 @@ for (const v of videos) {
     const p = join(WURZEL, v.vorschau);
     const kopfBytes = existsSync(p) ? readFileSync(p).subarray(0, 3) : Buffer.alloc(0);
     ok(`${v.id}: Vorschaubild ist ein JPEG unter 2 MB`, kopfBytes.equals(Buffer.from([0xff, 0xd8, 0xff])) && statSync(p).size < 2e6);
+  }
+  if (v.vorschauFilm) {
+    const vf = v.vorschauFilm, p = join(WURZEL, vf.pfad || "");
+    ok(`${v.id}: Vorschaufilm liegt im eigenen Ordner`, vf.pfad === `videos/${v.id}/vorschau.mp4`, vf.pfad);
+    const fb = existsSync(p) ? readFileSync(p) : Buffer.alloc(0);
+    ok(`${v.id}: Vorschaufilm höchstens 14 MB, Größe stimmt`, fb.length > 0 && fb.length <= 14e6 && fb.length === vf.groesse, fb.length + " / " + vf.groesse);
+    ok(`${v.id}: Vorschaufilm-Prüfsumme stimmt`, fb.length > 0 && sha(fb) === vf.sha256);
+    ok(`${v.id}: Vorschaufilm ist ein MP4 (ftyp)`, fb.subarray(4, 8).toString("latin1") === "ftyp");
   }
 }
 const ordnerOhneEintrag = existsSync(join(WURZEL, "videos")) ? readdirSync(join(WURZEL, "videos")).filter((n) => !ids.has(n)) : [];
@@ -167,7 +176,20 @@ ok("Texte aus der Liste gehen nie über innerHTML", !/innerHTML|outerHTML|insert
 kopf("D2 · drei Lade-Wege und die Ladeschau");
 const lsQuelle = existsSync(join(WURZEL, "assets/ladeschau.js")) ? readFileSync(join(WURZEL, "assets/ladeschau.js"), "utf8") : "";
 const indexQ = readFileSync(join(WURZEL, "index.html"), "utf8");
-ok("drei Lade-Knöpfe in der Vorlage (schlicht, Hintergrundbilder, Werbeschau)", ["laden", "laden-bilder", "laden-schau"].every((n) => indexQ.includes(`data-knopf="${n}"`)));
+ok("vier Lade-Knöpfe in der Vorlage (schlicht, Hintergrundbilder, Werbeschau, Vorschaufilm)", ["laden", "laden-bilder", "laden-schau", "laden-film"].every((n) => indexQ.includes(`data-knopf="${n}"`)));
+ok("der Film-Knopf ist in der Vorlage verborgen (erscheint nur mit vorschauFilm)", /data-knopf="laden-film" hidden/.test(indexQ));
+ok("laden.js prüft den Vorschaufilm (Pfad, Größe ≤ 14 MB, SHA) bevor der Knopf erscheint", /function filmGueltig/.test(ladenQuelle) && /filmKnopf\.hidden = !mitFilm/.test(ladenQuelle));
+{
+  const m = ladenQuelle.match(/function filmGueltig\(v\) \{[\s\S]*?\n  \}/);
+  let fg = null; try { fg = m && new Function(m[0] + "; return filmGueltig;")(); } catch (_e) {}
+  const H = "a".repeat(64), gut = { id: "x-1", vorschauFilm: { pfad: "videos/x-1/vorschau.mp4", groesse: 5, sha256: H } };
+  const mit = (f) => ({ id: "x-1", vorschauFilm: Object.assign({}, gut.vorschauFilm, f) });
+  ok("filmGueltig nimmt den eigenen Vorschaufilm an", !!fg && fg(gut) === true);
+  ok("filmGueltig weist fremde Pfade, zu große Dateien und kaputte Prüfsummen ab", !!fg &&
+    [mit({ pfad: "https://fremd.example/x.mp4" }), mit({ pfad: "videos/y-2/vorschau.mp4" }), mit({ pfad: "videos/x-1/../../x.mp4" }),
+     mit({ groesse: 14000001 }), mit({ groesse: 0 }), mit({ sha256: "zz" }), { id: "x-1", vorschauFilm: null }].every((v) => fg(v) === false));
+}
+ok("Ladeschau kennt den Film-Modus und hält das Finale bis zum letzten Teil", /art === "film"/.test(lsQuelle) && /S\.alle = n >= S\.N/.test(lsQuelle));
 ok("assets/ladeschau.js liegt da und nimmt den Ordner aus LADESCHAU_BASIS", /var B = window\.LADESCHAU_BASIS \|\| "ls\/";/.test(lsQuelle));
 ok("laden.js holt die Schau aus assets/ls/", /LADESCHAU_BASIS = "assets\/ls\/"/.test(ladenQuelle));
 const lsDateien = existsSync(join(WURZEL, "assets/ls")) ? readdirSync(join(WURZEL, "assets/ls")) : [];
@@ -232,6 +254,14 @@ if (!hatFfmpeg) {
       ok("aufnehmen: Länge gemessen (2 s)", Math.abs(a.dauer - 2) < 0.1, a.dauer);
       ok("aufnehmen: Vorschaubild abgelegt", a.vorschau === "videos/probe-a/vorschau.jpg" && existsSync(join(kopie, a.vorschau)));
       ok("aufnehmen: Dateiname folgt der Kennung, wenn keiner genannt ist", a.dateiname === "probe-a.mp4");
+      const vf = a.vorschauFilm, vfp = vf ? join(kopie, vf.pfad) : "";
+      ok("aufnehmen: Vorschaufilm abgelegt, Größe und SHA stimmen", !!vf && vf.pfad === "videos/probe-a/vorschau.mp4" && existsSync(vfp) &&
+        statSync(vfp).size === vf.groesse && sha(readFileSync(vfp)) === vf.sha256, JSON.stringify(vf));
+      if (vf && existsSync(vfp)) {
+        const pr = spawnSync("ffprobe", ["-v", "error", "-show_entries", "stream=codec_type,width,height", "-of", "json", vfp], { encoding: "utf8" });
+        const st = JSON.parse(pr.stdout || "{}").streams || [];
+        ok("aufnehmen: Vorschaufilm ohne Ton, höchstens 960 × 540", st.length === 1 && st[0].codec_type === "video" && st[0].width <= 960 && st[0].height <= 540, JSON.stringify(st));
+      }
       ok("aufnehmen: sagt am Ende, welche Probe zu fahren ist", /node tests\/smoke\.mjs/.test(r1.stdout));
     }
 
@@ -245,6 +275,7 @@ if (!hatFfmpeg) {
     ok("mit --ersetzen: Rückgabe 0, neuer Titel", r3.status === 0 && a2 && a2.titel === "Probe A neu", r3.stderr);
     ok("mit --ersetzen: keine alten Teile bleiben liegen", a2 && teileIn("probe-a").length === a2.teile.length && a2.teile.length === Math.ceil(filmGroesse / 40000));
     ok("mit --ersetzen: die Kennung steht nur einmal in der Liste", listeK().videos.filter((v) => v.id === "probe-a").length === 1);
+    ok("mit --ersetzen: Vorschaufilm neu erzeugt und eingetragen", a2 && a2.vorschauFilm && existsSync(join(kopie, a2.vorschauFilm.pfad)) && sha(readFileSync(join(kopie, a2.vorschauFilm.pfad))) === a2.vorschauFilm.sha256);
 
     const r4 = lauf([film, "--id", "probe-b", "--titel"]);
     ok("ein Schalter ohne Wert ist ein Fehler (Rückgabe 2), kein Rückfall", r4.status === 2 && /--titel braucht einen Wert/.test(r4.stderr), r4.status + " " + r4.stderr);
@@ -271,6 +302,7 @@ if (!hatFfmpeg) {
     ok("ohne ffprobe: alle Messwerte null, keiner geraten",
       d && ["breite", "hoehe", "dauer", "fps", "video", "videoBitrate", "ton", "tonHz", "tonKanaele"].every((k) => d[k] === null));
     ok("ohne ffmpeg: kein Vorschaubild, und das steht als null da", d && d.vorschau === null && !existsSync(join(kopie, "videos/probe-d/vorschau.jpg")));
+    ok("ohne ffmpeg: kein Vorschaufilm, und das steht als null da", d && d.vorschauFilm === null && !existsSync(join(kopie, "videos/probe-d/vorschau.mp4")));
     ok("ohne Messung trotzdem gültig für die Seite", d && typeof gueltig === "function" && gueltig(d));
     const reihe = listeK().videos.map((v) => v.id);
     ok("das zuletzt aufgenommene steht oben", reihe[0] === "probe-d", reihe.join(","));
