@@ -1,0 +1,86 @@
+{
+  "fassung": 1,
+  "videos": [
+    {
+      "id": "werbevideo-60s",
+      "titel": "family-projekt.de in 60 Sekunden",
+      "beschreibung": "Das Werbevideo für family-projekt.de: eine Minute, Full HD, mit Ton.",
+      "dateiname": "family-projekt-werbevideo.mp4",
+      "groesse": 198887002,
+      "sha256": "1e94d6c673b348000e9d1ef0cd5f8434e56a5028e2a0f7160e763caf7ec1f5b2",
+      "vorschau": "videos/werbevideo-60s/vorschau.jpg",
+      "breite": 1920,
+      "hoehe": 1080,
+      "dauer": 60,
+      "fps": 30,
+      "video": "H.264",
+      "videoBitrate": 26312972,
+      "ton": "AAC",
+      "tonHz": 48000,
+      "tonKanaele": 2,
+      "aufgenommen": "2026-10-02T17:57:38.773Z",
+      "teile": [
+        {
+          "groesse": 14000000,
+          "sha256": "67ab795a561f80aeaf3d95bc2650e334fcd512d04b76022c69ea7a7a0cf8294d"
+        },
+        {
+          "groesse": 14000000,
+          "sha256": "11dce7d6ec46916ff2a0faa5be6453f32794665af886a5f6092884cf2ff0f9e4"
+        },
+        {
+          "groesse": 14000000,
+          "sha256": "9f0f93a9b2275e6b54ca1724f88c5ab0a5c70c33245c5fe0733799431f9a4a2b"
+        },
+        {
+          "groesse": 14000000,
+          "sha256": "97bb0d29ba8b3db1aeaf2868fc9d8cd7f7b8e7c3741cf2d0b00a9d8de3d4f512"
+        },
+        {
+          "groesse": 14000000,
+          "sha256": "ffe55156657fc1c51ef7a75604317df344f699405a284332e414e32d1449ba32"
+        },
+        {
+          "groesse": 14000000,
+          "sha256": "a02e922067fa5476915312bea54b6216a6c1902763227579b4f8cca1b165b084"
+        },
+        {
+          "groesse": 14000000,
+          "sha256": "676e35e5c04259434fee60fb0b56ee7ed29f69e20ee4527d3adc52d744994398"
+        },
+        {
+          "groesse": 14000000,
+          "sha256": "2acee8e394e81f75efdf2f0ce8cade36850c16fe0da3789086971e616a013ada"
+        },
+        {
+          "groesse": 14000000,
+          "sha256": "bbec47fd368ebd1f97c5234b8525ab9f525d2749cb9b051b7a8dd4931f84bdb5"
+        },
+        {
+          "groesse": 14000000,
+          "sha256": "365f74b419f4ffc3dffefc2523c4bcb039a6676962fdf2747f0c167ecfd81c0b"
+        },
+        {
+          "groesse": 14000000,
+          "sha256": "f252d18c654df823edcf6d06a7e2b41d8b52466466cda77123781b3779db15d0"
+        },
+        {
+          "groesse": 14000000,
+          "sha256": "b67336feca11fc6ef790c0c29d013f7539fcd677410b64e4582e997c3076a81e"
+        },
+        {
+          "groesse": 14000000,
+          "sha256": "a38cea4f695f28f1b90f79f9b6ab3f7c4f5b20878dcc838f12accc65aa08f7b1"
+        },
+        {
+          "groesse": 14000000,
+          "sha256": "fdb578bdeec5df759708e0882c3b0e5c1495043ed4b09e1a75eee5b44f0951fb"
+        },
+        {
+          "groesse": 2887002,
+          "sha256": "482d8f21401bcfc441b2028a394027ad6e32cead7a7eb80872dd57b910efbf8d"
+        }
+      ]
+    }
+  ]
+}
