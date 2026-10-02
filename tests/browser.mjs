@@ -213,7 +213,7 @@ try {
     const z = await sichtbareZeilen(p);
     const falsch = z.filter((x) => x.zeilen !== x.soll);
     ok(`bei ${breite} px: jedes Feld der Daten hat so viele Zeilen wie Angaben (keine Angabe bricht mittendrin um)`,
-      z.length === 5 && falsch.length === 0, JSON.stringify(falsch.length ? falsch : z));
+      z.length === 5 * liste.videos.length && falsch.length === 0, JSON.stringify(falsch.length ? falsch : z));
     const q = await querlauf(p);
     ok(`bei ${breite} px: kein waagerechtes Rollen`, q <= 0, q + " px");
   }
