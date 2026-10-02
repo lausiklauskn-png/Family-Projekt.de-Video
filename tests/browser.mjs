@@ -238,6 +238,11 @@ try {
   ok("Download hat die SHA-256 der ganzen Datei aus der Liste", dlSha === echt.sha256, dlSha);
   const letzt = await p.evaluate(() => window.__videos.letzterDownload);
   ok("die Seite vermerkt, was sie gespeichert hat", letzt && letzt.id === echt.id && letzt.name === echt.dateiname && letzt.groesse === echt.groesse, JSON.stringify(letzt));
+  /* Klaus 2026-10-02: „dreimal gespeichert, weil es nicht angezeigt wurde" — ein zweiter Tipp gleich danach lädt nicht noch einmal */
+  let zweiter = 0; const zaehle = () => { zweiter++; }; p.on("download", zaehle);
+  await klick(p, echt.id, "speichern"); await p.waitForTimeout(1500); p.off("download", zaehle);
+  const dop = { n: await p.evaluate(() => window.__videos.doppelGesperrt || 0), m: (await karteLage(p, echt.id)).meldung };
+  ok("zweiter Tipp auf Speichern gleich danach: kein zweiter Download, aber eine Meldung", zweiter === 0 && dop.n === 1 && /Schon gespeichert/.test(dop.m), `Downloads ${zweiter} · gesperrt ${dop.n} · ${dop.m.slice(0, 60)}`);
   ok("keine Skriptfehler im echten Baum", p.__fehler.length === 0, p.__fehler.join(" | "));
   await ctx.close(); aufraeumen.pop();
   await srv.close(); aufraeumen.pop();
@@ -404,6 +409,16 @@ try {
             return { img: img ? getComputedStyle(img).opacity : null, musik: !!m && (m.classList.contains("weg") || m.getClientRects().length === 0) };
           });
           ok("Hintergrundbilder: das Vorschaubild bleibt sichtbar, keine Musik", sicht.img === "1" && sicht.musik, JSON.stringify(sicht));
+          // Klaus 2026-10-02 „milchig“: im HELLEN Gerätethema griffen die dunklen
+          // Schau-Farben nicht (stil.css ist dort spezifischer) — helle Karten und
+          // dunkle Schrift lagen über dem Bild. Diese Seite läuft im hellen Thema.
+          const farben = await w.evaluate((sel) => {
+            const hell = (c) => { const m = c.match(/[\d.]+/g).map(Number); return (0.2126 * m[0] + 0.7152 * m[1] + 0.0722 * m[2]) / 255; };
+            const h1 = getComputedStyle(document.querySelector("h1")).color;
+            const karte = getComputedStyle(document.querySelector(sel)).backgroundColor;
+            return { thema: matchMedia("(prefers-color-scheme: light)").matches ? "hell" : "dunkel", h1: hell(h1), karte: hell(karte), h1c: h1, kartec: karte };
+          }, karteSel(id));
+          ok("Hintergrundbilder im hellen Gerätethema: Überschrift hell, Karte dunkel", farben.thema === "hell" && farben.h1 > 0.7 && farben.karte < 0.2, JSON.stringify(farben));
         }
         await warteLage(w, id, ["fertig", "fehler"], 60000);
         const l = await karteLage(w, id);
