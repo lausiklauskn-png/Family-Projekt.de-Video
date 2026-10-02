@@ -7,12 +7,12 @@
  *   · videos.json — immer frisch aus dem Netz (die Seite fragt mit no-store);
  *     eine eingefrorene Liste zeigte Videos, die es nicht mehr gibt.
  * Wer eine Datei aus SCHALE ändert, erhöht CACHE_VERSION (und die ?v= in der Seite). */
-const CACHE_VERSION = "fp-videos-v3";
+const CACHE_VERSION = "fp-videos-v4";
 const SCHALE = [
   "./",
   "index.html",
   "assets/stil.css?v=2",
-  "assets/laden.js?v=3",
+  "assets/laden.js?v=4",
   "manifest.webmanifest",
   "icons/icon-192.png?v=1",
   "icons/icon-512.png?v=1",

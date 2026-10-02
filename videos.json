@@ -2,6 +2,87 @@
   "fassung": 1,
   "videos": [
     {
+      "id": "werbevideo-67s",
+      "titel": "family-projekt.de in 67 Sekunden",
+      "beschreibung": "Die längere Fassung des Werbevideos: alle Räume, die Apps und das Mycel.",
+      "dateiname": "family-projekt-werbevideo-67s.mp4",
+      "groesse": 198056499,
+      "sha256": "f46399f798eabba417090104a60e96f39267490ac6cd5df940ab151e64197c58",
+      "vorschau": "videos/werbevideo-67s/vorschau.jpg",
+      "breite": 1920,
+      "hoehe": 1080,
+      "dauer": 67.5,
+      "fps": 30,
+      "video": "H.264",
+      "videoBitrate": 23268156,
+      "ton": "AAC",
+      "tonHz": 48000,
+      "tonKanaele": 2,
+      "aufgenommen": "2026-10-02T21:22:05.878Z",
+      "teile": [
+        {
+          "groesse": 14000000,
+          "sha256": "5bd3310b373973debb0e68bcdf9d35d0ca093f48928f0abaa78201f0dec0f0b1"
+        },
+        {
+          "groesse": 14000000,
+          "sha256": "b93a1c5c94a74f3c8930f848ba97ced6356005f37da7ad0494256c97d7b7ba19"
+        },
+        {
+          "groesse": 14000000,
+          "sha256": "3ad2e250b29996721f42005b7083782001495f6c775ac1d9918d4ee7ffcda565"
+        },
+        {
+          "groesse": 14000000,
+          "sha256": "c07fa05d53a8796b52f1e2b0c0f75958ddcd5e1b47871a714414210184699c6f"
+        },
+        {
+          "groesse": 14000000,
+          "sha256": "6d9cbeb8e44189ae5bffdb27f30a7c501e31efe3e0c835660bc984cf00a0e9f5"
+        },
+        {
+          "groesse": 14000000,
+          "sha256": "970bacfd4d4eebc036a9055c2001d47636e8203db7006678cd1613cc4d84dae2"
+        },
+        {
+          "groesse": 14000000,
+          "sha256": "a9d7e1b20c688417214ac09a37cfa34573a0502e298be0718801163eb6d8c1bd"
+        },
+        {
+          "groesse": 14000000,
+          "sha256": "325131cd8723d7667bdde525346a708f6a0086488f6fba7a84e5ca1b7f44bb84"
+        },
+        {
+          "groesse": 14000000,
+          "sha256": "02644379554f8a255a18bf6c853f9b5ece9e3a2e3a474b9b94f9ad0f8701b143"
+        },
+        {
+          "groesse": 14000000,
+          "sha256": "ab847893002b405119e7be90d6004b142bc5711229bb41ab862baf3e83b0b17b"
+        },
+        {
+          "groesse": 14000000,
+          "sha256": "8b8a500219f6af11fdf6b2052e319ff2315dbfe4b04f11d28d48e5fda0b79eea"
+        },
+        {
+          "groesse": 14000000,
+          "sha256": "e957ae4949f775f7f9cdab58eefdaa2bc1dba37a5a0132adde05346b8da9424a"
+        },
+        {
+          "groesse": 14000000,
+          "sha256": "b3f5e06c5909c391ec78762474fd2da00c488fa3cb042555086b6ce2198c1841"
+        },
+        {
+          "groesse": 14000000,
+          "sha256": "a26d3771effc07c8ff4a02f2657a3010d4b6a2f26437295eec1006c764201984"
+        },
+        {
+          "groesse": 2056499,
+          "sha256": "872f40236df1411742f3eb27586af6b439ffcfae724ff98f1a96dd0f07e037c6"
+        }
+      ]
+    },
+    {
       "id": "werbevideo-60s",
       "titel": "family-projekt.de in 60 Sekunden",
       "beschreibung": "Das Werbevideo für family-projekt.de: eine Minute, Full HD, mit Ton.",
