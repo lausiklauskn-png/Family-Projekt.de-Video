@@ -496,6 +496,35 @@ try {
         ok("laden-film: der Download ist Byte für Byte dasselbe Video", dSha === filmSha, dSha);
         s2.stoerung.delete(teil(id, halt));
       }
+      // Scanner (Klaus 2026-10-02): „nur einmal pro Bild … entweder von oben nach unten oder
+      // von rechts nach links … nicht pro Bild zwei, dreimal“. Gemessen an einer Schau, deren Uhr
+      // die Probe Schritt für Schritt vorstellt — ohne Film, damit gleich die App-Szenen kommen.
+      {
+        const lauf = await w.evaluate(async (sel) => {
+          const fenster = document.querySelector(sel + ' [data-feld="vorschau"]');
+          const L = window.Ladeschau; if (!L || !fenster) return { fehlt: true };
+          const bild = () => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+          L.start(fenster, "film", null);
+          for (let i = 0; i < 100; i++) { const z = L._zustand(); if (z && z.vorab.iconsBereit === z.vorab.icons) break; await new Promise((r) => setTimeout(r, 50)); }
+          const szenen = [];
+          for (let t = 0; t <= 60; t += 0.5) { L._zeit(t); await bild(); const z = L._zustand(); szenen.push({ bild: z.bilderGezeigt - 1, szene: z.szene, aufdeck: z.aufdeck }); }
+          const z = L._zustand(); L.ende(true);
+          return { scans: z.scans, szenen };
+        }, karteSel("probe-ohne"));
+        ok("Scanner: die Schau ließ sich direkt starten", !lauf.fehlt, JSON.stringify(lauf).slice(0, 200));
+        const scans = lauf.scans || [], szenen = lauf.szenen || [];
+        const jeBild = {}; scans.forEach((x) => { jeBild[x.bild] = (jeBild[x.bild] || 0) + 1; });
+        const doppelt = Object.keys(jeBild).filter((b) => jeBild[b] > 1);
+        // Vorbedingung: es gab Bilder mit MEHREREN App-Szenen, sonst misst die Zeile darunter nichts
+        const szenenJeBild = {}; let vorher = null;
+        szenen.forEach((x) => { const k = x.bild + "/" + x.szene; if (x.szene >= 0 && k !== vorher) szenenJeBild[x.bild] = (szenenJeBild[x.bild] || 0) + 1; vorher = k; });
+        const mehrfach = Object.keys(szenenJeBild).filter((b) => szenenJeBild[b] > 1).length;
+        ok("Scanner: es gab Bilder mit mehreren App-Szenen (sonst misst die Probe nichts)", mehrfach >= 2, JSON.stringify(szenenJeBild));
+        ok("Scanner: höchstens EIN Scannerbalken je Hintergrundbild", scans.length > 0 && doppelt.length === 0, JSON.stringify(jeBild));
+        ok("Scanner: nur von oben nach unten oder von rechts nach links", scans.length > 0 && scans.every((x) => x.art === "runter" || x.art === "links"), JSON.stringify([...new Set(scans.map((x) => x.art))]));
+        ok("Scanner: die Richtung wechselt von Bild zu Bild", scans.length >= 3 && scans.slice(1).every((x, i) => x.art !== scans[i].art), JSON.stringify(scans.slice(0, 6)));
+        ok("Scanner: die übrigen Szenen auf demselben Bild werden nur überblendet", szenen.some((x) => x.aufdeck === "blende"), JSON.stringify([...new Set(szenen.map((x) => x.aufdeck))]));
+      }
       ok("keine Skriptfehler bei den Lade-Wegen", w.__fehler.length === 0, w.__fehler.join(" | "));
       await w.close();
     }

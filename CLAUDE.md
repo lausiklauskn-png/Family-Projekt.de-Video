@@ -140,7 +140,7 @@ Werbeschau bleiben unverändert. Geladen und geprüft wird wie in den anderen dr
 |---|---|
 | Ablauf | erst der Vorschaufilm (stumm), dann die App-Szenen in Schleife, bis alle Teile geprüft sind; **erst dann** das Finale |
 | vorab | alle Symbole und Clips werden beim Start geladen und entschlüsselt (`_zustand().vorab`) — kein schwarzer Handyrahmen, kein spätes Icon; eine Szene, deren Bild nicht bereit ist, wird übersprungen und gezählt |
-| Abwechslung | Aufdeck-Arten reihum (`AUFDECK`: runter · rechts · links · kreis · schraeg · blende), Hintergründe reihum, je mit wechselnder Bewegung und Überblendung (blende · wisch · kreis) |
+| Abwechslung | Scanner (Klaus 2026-10-02: „nicht pro Bild zwei, dreimal“): **höchstens einer je Hintergrundbild**, abwechselnd von oben nach unten und von rechts nach links (`SCAN_ARTEN`); jede weitere Szene auf demselben Bild wird nur überblendet. Hintergründe reihum, je mit wechselnder Bewegung und Überblendung (blende · wisch · kreis) |
 | Finale | `ende()` wartet im Film-Modus 2,8 s (bei „weniger Bewegung" 1,2 s), damit das Finale sichtbar bleibt |
 | Film fehlt / lädt nicht | nach 12 s „laedt" gilt er als `fehler`, es geht mit den App-Szenen weiter — geladen wird trotzdem |
 
@@ -150,7 +150,7 @@ Werbeschau bleiben unverändert. Geladen und geprüft wird wie in den anderen dr
 - **Der Knopf steht nur da, wenn die Liste einen gültigen Film nennt** (`filmGueltig` in
   `laden.js`: Pfad genau `videos/<id>/vorschau.mp4`, Größe 1…14 000 000, SHA-256 aus 64 Hex).
   `ladeschau.js` prüft den Pfad beim Start noch einmal. Der Film steht **nicht** im Vorrat.
-- Cache: `fp-videos-v6`, `laden.js?v=6`, `ladeschau.js?v=3`.
+- Cache: `fp-videos-v7`, `laden.js?v=7`, `ladeschau.js?v=4`. Proben zum Scanner: `smoke` (zwei Richtungen) · `browser` (je Bild höchstens einer, Richtung wechselt) · Gegenprobe `SCANNER:` (3 Fälle).
 
 ⚠ **DER TEST-BROWSER SPIELT KEIN H.264 — gemessen: `canPlayType("avc1")` ist leer.** In der
 ersten Fassung der Probe landete der echte Film deshalb immer in `fehler`, und der Film-Weg war

@@ -97,8 +97,6 @@ html.ls-an .einstieg{text-shadow:0 1px 3px #000,0 2px 18px #000c}
 .ls-scan{position:absolute;z-index:2;pointer-events:none;opacity:0;background:linear-gradient(90deg,transparent,var(--ak,#5fe0b3),#fff,var(--ak,#5fe0b3),transparent);box-shadow:0 0 18px var(--ak,#5fe0b3);mix-blend-mode:screen}
 .ls-scan.quer{left:0;right:0;height:3px;top:0}
 .ls-scan.hoch{top:0;bottom:0;width:3px;left:0;background:linear-gradient(180deg,transparent,var(--ak,#5fe0b3),#fff,var(--ak,#5fe0b3),transparent)}
-.ls-scan.ring{left:50%;top:50%;width:10px;height:10px;margin:-5px 0 0 -5px;border-radius:50%;background:none;border:2px solid #fff;box-shadow:0 0 18px var(--ak,#5fe0b3),inset 0 0 12px var(--ak,#5fe0b3)}
-.ls-scan.schraeg{left:-50%;top:50%;width:200%;height:3px;transform-origin:50% 50%}
 #ls-buehne.ls-film-art .ls-bild.an{opacity:.82}
 @keyframes lsZoomRein{from{transform:scale(1.02)}to{transform:scale(1.12)}}
 @keyframes lsZoomRaus{from{transform:scale(1.12)}to{transform:scale(1.02)}}
@@ -360,7 +358,9 @@ html.ls-an .einstieg{text-shadow:0 1px 3px #000,0 2px 18px #000c}
   }
 
   // ---------- Vorschaufilm: vorab laden, Film-Szene, Aufdeck-Arten, wechselnde Hintergründe ----------
-  var AUFDECK = ["runter", "rechts", "links", "kreis", "schraeg", "blende"];
+  // Scanner (Klaus 2026-10-02): höchstens EINER je Hintergrundbild, abwechselnd ↓ oder ←;
+  // jede weitere Szene auf demselben Bild wird nur überblendet
+  var SCAN_ARTEN = ["runter", "links"];
   var BEWEGUNG = ["lsZoomRein", "lsSchwenkL", "lsZoomRaus", "lsDreh", "lsSchwenkR", "lsHeben"];
   var UEBERGANG = ["blende", "wisch", "kreis"];
   var T_BILD = 7.5;
@@ -434,19 +434,16 @@ html.ls-an .einstieg{text-shadow:0 1px 3px #000,0 2px 18px #000c}
     aufdecken(kino, sz, art);
     return sz;
   }
-  // Aufdecken mit Scanner-Linie: ↓ → ← Kreis schräg Überblenden, reihum
+  // Aufdecken: mit Scanner-Linie (↓ oder ←) oder nur Überblenden
   function aufdecken(kino, sz, art) {
     var D = RUHIG ? 400 : 900, von, bis = "inset(0 0 0 0)", scan = null, bahn = null;
     if (RUHIG || art === "blende") { sz.animate([{ opacity: 0 }, { opacity: 1 }], { duration: D, fill: "both", easing: "ease-out" }); return; }
     if (art === "runter") { von = "inset(0 0 100% 0)"; scan = "quer"; bahn = [{ top: "0%" }, { top: "100%" }]; }
-    else if (art === "rechts") { von = "inset(0 100% 0 0)"; scan = "hoch"; bahn = [{ left: "0%" }, { left: "100%" }]; }
-    else if (art === "links") { von = "inset(0 0 0 100%)"; scan = "hoch"; bahn = [{ left: "100%" }, { left: "0%" }]; }
-    else if (art === "kreis") { von = "circle(0% at 50% 50%)"; bis = "circle(75% at 50% 50%)"; scan = "ring"; bahn = [{ transform: "scale(0)", opacity: 1 }, { transform: "scale(" + Math.ceil((kino.clientWidth || 600) / 7) + ")", opacity: 0 }]; }
-    else { von = "polygon(0 0, 0 0, 0 0)"; bis = "polygon(0 0, 200% 0, 0 200%)"; scan = "schraeg"; bahn = [{ transform: "translate(-50%,-50%) rotate(-45deg)" }, { transform: "translate(50%,50%) rotate(-45deg)" }]; }
+    else { von = "inset(0 0 0 100%)"; scan = "hoch"; bahn = [{ left: "100%" }, { left: "0%" }]; }
     sz.animate([{ clipPath: von }, { clipPath: bis }], { duration: D, fill: "both", easing: "cubic-bezier(.45,0,.2,1)" });
     var s = el("div", "ls-scan " + scan); kino.insertBefore(s, kino.lastChild);
-    var f = bahn.map(function (x, i) { return Object.assign({ opacity: i === 0 ? 1 : (scan === "ring" ? 0 : 1) }, x); });
-    var an = s.animate(f, { duration: D, easing: "cubic-bezier(.45,0,.2,1)" });
+    if (S) S.scans.push({ bild: S.bildZaehler, art: art });
+    var an = s.animate(bahn.map(function (x) { return Object.assign({ opacity: 1 }, x); }), { duration: D, easing: "cubic-bezier(.45,0,.2,1)" });
     an.onfinish = function () { s.remove(); };
   }
   // Hintergrund im Film-Modus: Schleife über alle Bilder, wechselnde Bewegung und wechselnder Übergang
@@ -485,7 +482,8 @@ html.ls-an .einstieg{text-shadow:0 1px 3px #000,0 2px 18px #000c}
       if (i === 0 && S.appZeiger > 0) S.runde++;
       var a = APPS[i];
       if (!bereit(a)) { S.uebersprungen++; continue; }
-      var art = AUFDECK[S.aufdeckZaehler++ % AUFDECK.length];
+      var art = "blende";
+      if (S.scanBild !== S.bildZaehler) { S.scanBild = S.bildZaehler; art = SCAN_ARTEN[S.aufdeckZaehler++ % SCAN_ARTEN.length]; }
       wegmit(S.szene); S.szeneNr = i; S.aufdeck = art;
       S.szene = szeneAppVorab(S.d.kino, a, i, art);
       S.bis = t + (a[0].indexOf("clip:") === 0 ? T_CLIP : T_APP);
@@ -528,7 +526,7 @@ html.ls-an .einstieg{text-shadow:0 1px 3px #000,0 2px 18px #000c}
       var d = aufbauen(fenster);
       S = { nurBilder: nurBilder, d: d, ton: Ton(), zeit: 0, letzt: performance.now(), szene: null, szeneNr: -2, bildNr: -1, mycel: null, n: 0, N: 15, pausiert: false, zu: false, tempo: 1, finale: finaleZeit(), t0: performance.now(), zeitTeil: [] };
       if (art === "film") {
-        S.film = true; S.vorab = vorabLaden(); S.runde = 0; S.appZeiger = -1; S.aufdeckZaehler = 0; S.uebersprungen = 0;
+        S.film = true; S.vorab = vorabLaden(); S.runde = 0; S.appZeiger = -1; S.aufdeckZaehler = 0; S.uebersprungen = 0; S.scanBild = -2; S.scans = [];
         S.bildZaehler = -1; S.alle = false; S.finaleDa = false; S.bis = 0; S.szeneAb = 0;
         d.buehne.classList.add("ls-film-art"); d.fenster.setAttribute("data-ls-art", "film"); S.ton.start(); musikText();
         var bild = fenster.querySelector("img");
@@ -580,7 +578,7 @@ html.ls-an .einstieg{text-shadow:0 1px 3px #000,0 2px 18px #000c}
       var z = { zeit: S.zeit, szene: S.szeneNr, bild: S.bildNr, n: S.n, mycel: !!S.mycel, musik: S.ton.istAn(), puls: +S.ton.puls().toFixed(2) };
       if (S.film) {
         var ic = Object.keys(S.vorab.ico), cl = Object.keys(S.vorab.clip);
-        z.art = "film"; z.film = S.filmLage; z.finale = !!S.finaleDa; z.runde = S.runde; z.aufdeck = S.aufdeck || null;
+        z.art = "film"; z.film = S.filmLage; z.finale = !!S.finaleDa; z.runde = S.runde; z.aufdeck = S.aufdeck || null; z.scans = S.scans.slice();
         z.bildArt = S.bildArt || null; z.bilderGezeigt = S.bildZaehler + 1; z.uebersprungen = S.uebersprungen;
         z.vorab = { icons: ic.length, iconsBereit: ic.filter(function (k) { return S.vorab.ico[k]._bereit; }).length,
                     clips: cl.length, clipsBereit: cl.filter(function (k) { return S.vorab.clip[k].readyState >= 2; }).length };

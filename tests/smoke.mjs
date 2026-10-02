@@ -207,6 +207,9 @@ ok("Ladeschau: nur sichtbare Bilder bekommen eine eigene Ebene", /\.ls-bild\{[^}
 function jpegBreite(datei) { const b = readFileSync(datei); for (let i = 2; i < b.length - 9; ) { if (b[i] !== 0xff) return 0; const m = b[i + 1], l = b.readUInt16BE(i + 2); if (m >= 0xc0 && m <= 0xc2) return b.readUInt16BE(i + 7); i += 2 + l; } return 0; }
 const bgBreiten = (lsQuelle.match(/var BILDER = \[([^\]]*)\]/) || ["", ""])[1].split(",").map((x) => x.trim().replace(/"/g, "")).filter(Boolean).map((n) => [n, existsSync(join(WURZEL, "assets/ls", n + ".jpg")) ? jpegBreite(join(WURZEL, "assets/ls", n + ".jpg")) : 0]);
 ok("Ladeschau: jedes Hintergrundbild ist mindestens 1920 px breit (scharf am Tablet)", bgBreiten.length === 8 && bgBreiten.every(([, w]) => w >= 1920), JSON.stringify(bgBreiten));
+// Scanner (Klaus 2026-10-02): einer je Bild, nur ↓ oder ←, keine Kreis- oder Schräg-Scanner mehr
+ok("Scanner: nur zwei Richtungen (von oben nach unten, von rechts nach links)", /var SCAN_ARTEN = \["runter", "links"\];/.test(lsQuelle));
+ok("Scanner: kein Kreis- oder Schräg-Scanner mehr", !/ls-scan\.(ring|schraeg)|"kreis", "schraeg"/.test(lsQuelle));
 ok("node --check assets/ladeschau.js", spawnSync(NODE, ["--check", join(WURZEL, "assets/ladeschau.js")]).status === 0);
 
 kopf("E · node --check");

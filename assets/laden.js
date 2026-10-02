@@ -180,7 +180,7 @@
     window.LADESCHAU_BASIS = "assets/ls/";
     schauLaedt = new Promise(function (ok) {
       var s = document.createElement("script");
-      s.src = "assets/ladeschau.js?v=3";
+      s.src = "assets/ladeschau.js?v=4";
       s.onload = function () { ok(!!window.Ladeschau); };
       s.onerror = function () { schauLaedt = null; ok(false); };
       document.head.appendChild(s);
