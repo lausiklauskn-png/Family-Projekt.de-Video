@@ -30,6 +30,10 @@ const NUR_FALL = process.env.NUR_FALL || "";
  * woran die rote Zeile zu erkennen ist. Zwei Riegel, die einander decken,
  * stehen in EINEM Fall — einer allein misst nichts. */
 const FAELLE = [
+  { name: "LEISTE: die Leiste trägt wieder einen dunklen Streifen über die ganze Breite",
+    datei: "assets/abspielen-rahmen.js",
+    ersetze: [["background:transparent;box-shadow:none;", "background:rgba(6,10,16,.66);"]],
+    proben: ["smoke"], erwartet: /keinen Hintergrund und keinen Schatten/ },
   { name: "KANTE: die Lage wird wieder am GENEIGTEN Bild gemessen (getBoundingClientRect)",
     datei: "assets/laden.js",
     ersetze: [["var r = flach(el);", "var r = el.getBoundingClientRect();"],
