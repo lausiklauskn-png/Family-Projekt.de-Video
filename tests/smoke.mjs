@@ -235,6 +235,14 @@ ok("abspielen-rahmen.js lädt vor dem Tipp nichts: preload none, die Quelle erst
 ok("abspielen-rahmen.js: Stopp nimmt die Quelle weg (jedes Laden hört auf)", /vid\.removeAttribute\("src"\);\s*try \{ vid\.load\(\); \}/.test(raQ));
 ok("abspielen-rahmen.js liest alles Seitenabhängige aus Marken am Behälter",
   ["data-video-id", "data-video-fassungen", "data-video-weg", "data-video-sw", "data-video-quelle", "data-video-laden", "data-video-merken", "data-video-ausweich"].every((n) => raQ.includes('"' + n + '"')));
+/* Klaus 2026-10-06: Rahmen in Videoform, am Ende zurück zum Bild, Punkte beim Laden.
+   Gemessen wird es im Browser in family-project (smoke_werbevideo.mjs, B10–B12). */
+ok("abspielen-rahmen.js: am Ende geht es zurück in die Grundansicht (ended → stoppe)",
+  /addEventListener\("ended", function \(\) \{ if \(zustand !== "ruhe"\) stoppe\(\); \}\)/.test(raQ));
+ok("abspielen-rahmen.js: außer Ruhe nimmt der Rahmen die Form des Videos an",
+  /\.vr-rahmen:not\(\[data-vr-zustand=ruhe\]\)\{aspect-ratio:var\(--vr-format/.test(raQ) && /--vr-format", \(vid\.videoWidth \/ vid\.videoHeight\)/.test(raQ));
+ok("abspielen-rahmen.js: Punkte im Kreis beim Laden, still bei weniger Bewegung",
+  /melde\(t\(\)\.vorbereiten, false, true\)/.test(raQ) && /punkte\(warte\)/.test(raQ) && /prefers-reduced-motion:reduce\)\{\.vr-punkte\{animation:none/.test(raQ));
 ok("node --check assets/abspielen-kern.js und assets/abspielen.js", ["assets/abspielen-kern.js", "assets/abspielen.js"].every((d) => spawnSync(NODE, ["--check", join(WURZEL, d)]).status === 0));
 
 kopf("E · node --check");

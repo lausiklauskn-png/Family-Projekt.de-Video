@@ -238,6 +238,25 @@ nie die Hand.
 Proben: `smoke` (Rahmen-Spieler ohne Browser, `--ohne-film`). Die Wirkung misst
 `family-project/tests/smoke_werbevideo.mjs` im echten Browser mit VP9-Stellvertreter.
 
+**Nach Klaus' erstem Test (2026-10-06):** *„Rechts und links sind ein großer breiter
+Balken … Sobald das Video fertig ist, soll es automatisch wieder in die Grundansicht
+zurückgehen … beim Start … mit Punkten, die kurz umkreisen."*
+
+- **Der Rahmen nimmt beim Abspielen die Form des Films an.** Die Balken kamen vom
+  Bildmaß (`aspect-ratio:2.5016` inline) gegen einen 16:9-Film mit `object-fit:contain`.
+  Statt den Rahmen nur breiter zu ziehen, gilt außerhalb von `ruhe` das Verhältnis
+  `--vr-format` (bei `loadedmetadata` aus `videoWidth/videoHeight`, Vorgabe 16:9),
+  höchstens `85vh` hoch, mittig; im Vollbild `auto`. In Ruhe steht wieder das Bildmaß.
+  Beim Start rückt `scrollIntoView({block:"nearest"})` die Leiste ins Fenster.
+  ⚠ Der Rahmen wird beim Start höher — das ist ein Sprung nach einem Tipp, kein CLS beim Laden.
+- **Am Ende `stoppe()`:** Bild wieder da, keine Quelle, keine Stelle gemerkt, Vollbild zu.
+- **Acht kreisende Punkte** (`.vr-punkte`, `steps(8)`) in der Meldung „wird vorbereitet"
+  und in der Warte-Pille; die Pille steht auch beim ersten Start, solange `readyState < 3`.
+  Bei „weniger Bewegung" stehen sie still.
+- Gemessen im Browser in family-project (`smoke_werbevideo` B2/B8/B10): Rahmen 1.7778 beim
+  Film 1.7778, Film füllt ihn, nach Stopp und am Ende wieder 2.5016. Gegen die alte Datei
+  fallen genau diese drei Wächter. ⚠ Am Tablet nicht gemessen.
+
 ## Netzweit
 
 Freibrief · frisch von `origin/main` · Ton · kein PII · Ehrlichkeit:
