@@ -152,7 +152,30 @@
       "background:rgba(6,10,16,.9);color:#fff;font:500 12px/1.35 system-ui,sans-serif}" +
     ".vr-meldung a{color:var(--vr-akzent,#5eead4)}" +
     ".vr-rahmen:fullscreen{background:#000}" +
-    ".vr-rahmen:fullscreen .vr-leiste{left:16px;right:16px;bottom:16px}";
+    ".vr-rahmen:fullscreen .vr-leiste{left:16px;right:16px;bottom:16px}" +
+    /* Solange das Video steht oder läuft, nimmt der Rahmen SEINE Form an (Klaus
+       2026-10-06: „rechts und links große breite Balken"). In Ruhe gilt wieder die
+       Form des Bildes. Höchstens 85 % der Fensterhöhe, dann schmaler statt höher. */
+    ".vr-rahmen:not([data-vr-zustand=ruhe]){aspect-ratio:var(--vr-format,1.7778)!important;" +
+      "max-width:calc(85vh * var(--vr-format,1.7778));margin-left:auto;margin-right:auto}" +
+    ".vr-rahmen:fullscreen:not([data-vr-zustand=ruhe]){aspect-ratio:auto!important;max-width:none}" +
+    /* Punkte im Kreis: es lädt noch, die Leitung ist nicht weg. */
+    ".vr-punkte{display:inline-block;position:relative;width:14px;height:14px;margin-right:7px;vertical-align:-3px;" +
+      "animation:vr-kreis .9s steps(8) infinite}" +
+    ".vr-punkte i{position:absolute;left:5.5px;top:0;width:3px;height:3px;border-radius:50%;background:currentColor;transform-origin:1.5px 7px}" +
+    "@keyframes vr-kreis{to{transform:rotate(360deg)}}" +
+    "@media (prefers-reduced-motion:reduce){.vr-punkte{animation:none}}";
+
+  function punkte(eltern) {
+    var p = el("span", "vr-punkte", eltern);
+    p.setAttribute("aria-hidden", "true");
+    for (var k = 0; k < 8; k++) {
+      var i = el("i", "", p);
+      i.style.transform = "rotate(" + (k * 45) + "deg)";
+      i.style.opacity = String(((k + 1) / 8).toFixed(3));
+    }
+    return p;
+  }
 
   function stil() {
     if (document.getElementById("vr-stil")) return;
@@ -206,6 +229,8 @@
     var vid = el("video", "vr-video", schicht);
     vid.setAttribute("playsinline", ""); vid.setAttribute("preload", "none");
     var warte = el("p", "vr-warte", schicht); warte.hidden = true;
+    punkte(warte);
+    var warteText = el("span", "vr-warte-text", warte);
     var meldung = el("p", "vr-meldung", rahmen); meldung.hidden = true;
     meldung.setAttribute("role", "status"); meldung.setAttribute("aria-live", "polite");
 
@@ -345,7 +370,7 @@
       voll.setAttribute("aria-label", istVoll ? T.vollAus : T.voll); voll.title = voll.getAttribute("aria-label");
       zeit.setAttribute("aria-label", T.stelle);
       titel.textContent = (M.titel || T.gruppe) + (stelle > 0 ? " · " + T.weiterBei + mmss(stelle) : "");
-      warte.textContent = T.warte;
+      warteText.textContent = T.warte;
       zeit.max = String(d);
       if (!ziehen) zeit.value = String(vid.currentTime);
       /* Der Ladebalken: gespielt in der Akzentfarbe, geladen heller, Rest dunkel. */
@@ -358,9 +383,10 @@
       uhr.textContent = rahmen.hasAttribute("data-vr-schmal") ? mmss(vid.currentTime) : mmss(vid.currentTime) + " / " + mmss(d);
     }
 
-    function melde(text, mitAusweich) {
+    function melde(text, mitAusweich, mitPunkten) {
       while (meldung.firstChild) meldung.removeChild(meldung.firstChild);
       if (!text) { meldung.hidden = true; return; }
+      if (mitPunkten) punkte(meldung);
       meldung.appendChild(document.createTextNode(text));
       if (mitAusweich && M.ausweich) {
         meldung.appendChild(document.createTextNode(" "));
@@ -388,7 +414,9 @@
       if (gestartet) return gestartet;
       setzeZustand("bereit");
       schicht.hidden = false;
-      melde(t().vorbereiten);
+      /* Der Rahmen ist eben höher geworden — die Leiste bleibt im Blick. */
+      try { rahmen.scrollIntoView({ block: "nearest" }); } catch (e) {}
+      melde(t().vorbereiten, false, true);
       gestartet = gesteuert(M.sw).then(function (ja) {
         if (!ja) {
           melde("serviceWorker" in navigator ? t().swNicht : t().keinSw, true);
@@ -403,6 +431,8 @@
       return gestartet;
     }
     function spieleJetzt() {
+      /* Bis das erste Bild kommt, drehen sich die Punkte. */
+      if (vid.readyState < 3) warte.hidden = false;
       var p = vid.play();
       if (p && p.catch) p.catch(function (e) { if (e && e.name !== "AbortError") melde(t().fehler + " (" + (e.message || e.name) + ")", true); });
     }
@@ -476,7 +506,12 @@
     });
     vid.addEventListener("play", function () { setzeZustand("laeuft"); });
     vid.addEventListener("pause", function () { merke(); if (zustand !== "ruhe") setzeZustand("pause"); });
-    vid.addEventListener("ended", function () { merke(); if (zustand !== "ruhe") setzeZustand("pause"); });
+    /* Fertig gesehen: zurück in die Grundansicht (Klaus 2026-10-06) — Bild, kein
+       Laden, keine gemerkte Stelle, Vollbild zu. */
+    vid.addEventListener("ended", function () { if (zustand !== "ruhe") stoppe(); });
+    vid.addEventListener("loadedmetadata", function () {
+      if (vid.videoWidth && vid.videoHeight) rahmen.style.setProperty("--vr-format", (vid.videoWidth / vid.videoHeight).toFixed(4));
+    });
     vid.addEventListener("timeupdate", function () { if (zustand !== "ruhe" && Date.now() - zuletztGemerkt > 2000) merke(); });
     vid.addEventListener("waiting", function () { warte.hidden = false; });
     ["playing", "canplay", "seeked", "pause"].forEach(function (n) {
