@@ -3,7 +3,7 @@
  *
  *   node tools/video-aufnehmen.mjs <datei.mp4> --id <kennung> --titel "<Titel>"
  *        [--beschreibung "<ein, zwei Sätze>"] [--dateiname <name.mp4>]
- *        [--vorschau <bild.jpg> | --vorschau-bei <sekunden>] [--ersetzen]
+ *        [--vorschau <bild.jpg> | --vorschau-bei <sekunden>] [--ersetzen] [--ohne-film]
  *   node tools/video-aufnehmen.mjs --entfernen <kennung>
  *   node tools/video-aufnehmen.mjs --film-nachtragen <kennung>
  *   node tools/video-aufnehmen.mjs --liste
@@ -62,7 +62,7 @@ function argumente(argv) {
     const s = argv[i];
     if (!s.startsWith("--")) { a.frei.push(s); continue; }
     const name = s.slice(2);
-    if (name === "ersetzen" || name === "liste") { a[name] = true; continue; }
+    if (name === "ersetzen" || name === "liste" || name === "ohne-film") { a[name] = true; continue; }
     const wert = argv[i + 1];
     /* Ein Schalter ohne Wert ist ein Fehler, kein stiller Rückfall auf die Vorgabe. */
     if (wert === undefined || wert.startsWith("--") || wert === "") fehler(`--${name} braucht einen Wert`, 2);
@@ -268,7 +268,9 @@ function aufnehmen(a) {
   const z = zerlegen(quelle, ordner, teilBytes);
   const m = messen(quelle);
   const mitVorschau = vorschauAnlegen(quelle, ordner, a, m.dauer);
-  const film = filmAnlegen(quelle, ordner, m.dauer);
+  /* --ohne-film: eine kleinere Fassung desselben Videos braucht keinen eigenen
+     Vorschaufilm — sie stünde sonst mit 11 MB für nichts im Depot. */
+  const film = a["ohne-film"] ? null : filmAnlegen(quelle, ordner, m.dauer);
 
   const eintrag = {
     id,
