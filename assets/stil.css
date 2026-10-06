@@ -371,3 +371,15 @@ dl { margin: 0; }
   .knoepfe button, .rund, .vorschau { transform: none !important; }
   .vorschau:hover img { transform: none; }
 }
+
+/* ── Abspielen (abspielen.html) ── */
+.spieler { display: grid; gap: 12px; animation: auftauchen .7s cubic-bezier(.2, .8, .2, 1) both; }
+.spieler-bild { position: relative; border-radius: 16px; overflow: hidden; border: 1px solid var(--linie); background: #000; aspect-ratio: 16 / 9; }
+.spieler-bild video { display: block; width: 100%; height: 100%; object-fit: contain; background: #000; }
+.spieler-warte { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); margin: 0; padding: 8px 14px; border-radius: 10px;
+  background: color-mix(in srgb, #000 70%, transparent); color: #fff; font-family: var(--f-zahl); font-size: 14px; }
+#ab-zeit { width: 100%; accent-color: var(--akzent); min-height: 32px; }
+.spieler-zeilen { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.knopf-link { display: inline-flex; align-items: center; min-height: 46px; padding: 11px 18px; border-radius: 12px; font: 700 16px/1.2 var(--f-text);
+  border: 1px solid var(--linie); background: var(--karte); color: var(--text); text-decoration: none; }
+.knopf-link:hover { border-color: var(--akzent); color: var(--akzent); }

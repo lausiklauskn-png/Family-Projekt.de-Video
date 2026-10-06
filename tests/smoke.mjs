@@ -212,6 +212,21 @@ ok("Scanner: nur zwei Richtungen (von oben nach unten, von rechts nach links)", 
 ok("Scanner: kein Kreis- oder Schräg-Scanner mehr", !/ls-scan\.(ring|schraeg)|"kreis", "schraeg"/.test(lsQuelle));
 ok("node --check assets/ladeschau.js", spawnSync(NODE, ["--check", join(WURZEL, "assets/ladeschau.js")]).status === 0);
 
+kopf("D3 · Abspielen: Kern und Seite");
+const kernQ = existsSync(join(WURZEL, "assets/abspielen-kern.js")) ? lesen("assets/abspielen-kern.js") : "";
+const abQ = existsSync(join(WURZEL, "assets/abspielen.js")) ? lesen("assets/abspielen.js") : "";
+const swQ = lesen("sw.js");
+ok("der Abspiel-Kern liegt da und steht im Vorrat", kernQ.length > 0 && schaleListe.some((u) => /^assets\/abspielen-kern\.js\?v=\d+$/.test(u)));
+ok("sw.js holt den Kern mit derselben ?v= wie der Vorrat", (() => { const m = /importScripts\("(assets\/abspielen-kern\.js\?v=\d+)"\)/.exec(swQ); return !!m && schaleListe.includes(m[1]); })());
+ok("sw.js beantwortet die Abspiel-Adresse über den Kern", /self\.FPAbspielKern\.antwort\(req, abs\[1\]/.test(swQ));
+ok("der Kern legt nichts in die Cache Storage", kernQ.length > 0 && !/caches\./.test(kernQ));
+ok("der Kern antwortet mit no-store", /"Cache-Control": "no-store"/.test(kernQ));
+ok("höchstens drei Teile im Arbeitsspeicher", /var TEIL_MAX = 3;/.test(kernQ) && /while \(teile\.size > TEIL_MAX\)/.test(kernQ));
+ok("abspielen.js liest Quelle, Weg, Worker und Herunterladen aus Marken", ["videoQuelle", "videoWeg", "videoSw", "videoLaden"].every((n) => abQ.includes("M." + n)));
+ok("abspielen.js setzt Texte nie über innerHTML", abQ.length > 0 && !/innerHTML/.test(abQ));
+ok("abspielen.html lädt abspielen.js mit derselben ?v= wie der Vorrat", (() => { const h = existsSync(join(WURZEL, "abspielen.html")) ? lesen("abspielen.html") : ""; const m = /src="(assets\/abspielen\.js\?v=\d+)"/.exec(h); return !!m && schaleListe.includes(m[1]); })());
+ok("node --check assets/abspielen-kern.js und assets/abspielen.js", ["assets/abspielen-kern.js", "assets/abspielen.js"].every((d) => spawnSync(NODE, ["--check", join(WURZEL, d)]).status === 0));
+
 kopf("E · node --check");
 const jsDateien = ["assets/laden.js", "sw.js", ...readdirSync(join(WURZEL, "tools")).filter((n) => /\.m?js$/.test(n)).map((n) => "tools/" + n),
   ...readdirSync(join(WURZEL, "tests")).filter((n) => /\.m?js$/.test(n)).map((n) => "tests/" + n)];

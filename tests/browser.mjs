@@ -256,7 +256,7 @@ try {
     const tmp = mkdtempSync(join(tmpdir(), "fp-videos-browser-"));
     aufraeumen.push(() => rmSync(tmp, { recursive: true, force: true }));
     const kopie = join(tmp, "depot");
-    for (const n of ["index.html", "sw.js", "manifest.webmanifest", ".nojekyll", "assets", "icons", "tools"]) {
+    for (const n of ["index.html", "abspielen.html", "sw.js", "manifest.webmanifest", ".nojekyll", "assets", "icons", "tools"]) {
       if (existsSync(join(WURZEL, n))) cpSync(join(WURZEL, n), join(kopie, n), { recursive: true });
     }
     writeFileSync(join(kopie, "videos.json"), JSON.stringify({ fassung: 1, videos: [] }, null, 2) + "\n");
@@ -527,6 +527,167 @@ try {
       }
       ok("keine Skriptfehler bei den Lade-Wegen", w.__fehler.length === 0, w.__fehler.join(" | "));
       await w.close();
+    }
+
+    kopf("2i · Stopp und Zurück: anhalten, das Geladene bleibt");
+    {
+      const w = await oeffne(c2, s2.url);
+      s2.stoerung.set(teil("probe-c", 2), { art: "warte", mal: 1, ms: 4000 });
+      const vorher0 = s2.anzahl(teil("probe-c", 0)), vorher1 = s2.anzahl(teil("probe-c", 1));
+      await klick(w, "probe-c", "laden");
+      let sichtbar = null;
+      try {
+        await w.waitForFunction((sel) => { const s = document.querySelectorAll(sel + " .streifen .feld"); return s[1] && s[1].getAttribute("data-lage") === "ok"; }, karteSel("probe-c"), { timeout: 20000 });
+        sichtbar = await w.$eval(karteSel("probe-c"), (el) => ["stopp", "zurueck"].map((n) => { const b = el.querySelector(`[data-knopf="${n}"]`); return !!b && !b.hidden && b.getClientRects().length > 0; }));
+      } catch (_e) {}
+      ok("während des Ladens stehen Stopp und Zurück da", !!sichtbar && sichtbar[0] && sichtbar[1], JSON.stringify(sichtbar));
+      if (sichtbar && sichtbar[0]) await klick(w, "probe-c", "stopp");
+      let st = null;
+      try { await warteLage(w, "probe-c", ["angehalten"], 15000); st = await karteLage(w, "probe-c"); } catch (_e) {}
+      ok("Stopp: Lage „angehalten“", !!st && st.lage === "angehalten", JSON.stringify(st && st.lage));
+      ok("Stopp: Meldung nennt, was geprüft im Speicher bleibt", !!st && /^Angehalten: 2 von \d+ Teilen geprüft\. Sie bleiben im Speicher/.test(st.meldung), st && st.meldung);
+      ok("Stopp: Knopf heißt „Weiter laden“ und ist an", !!st && st.ladenText === "Weiter laden" && !st.ladenAus, JSON.stringify(st && [st.ladenText, st.ladenAus]));
+      const stoppDa = await w.$eval(`${karteSel("probe-c")} [data-knopf="stopp"]`, (b) => !b.hidden);
+      ok("Stopp: der Stopp-Knopf geht danach weg", stoppDa === false);
+      await klick(w, "probe-c", "laden");
+      await warteLage(w, "probe-c", ["fertig", "fehler"], 60000);
+      const st2 = await karteLage(w, "probe-c");
+      ok("nach „Weiter laden“ fertig", st2.lage === "fertig", JSON.stringify({ lage: st2.lage, meldung: st2.meldung }));
+      ok("Teil 1 und 2 wurden NICHT noch einmal geholt", s2.anzahl(teil("probe-c", 0)) === vorher0 + 1 && s2.anzahl(teil("probe-c", 1)) === vorher1 + 1,
+        [s2.anzahl(teil("probe-c", 0)) - vorher0, s2.anzahl(teil("probe-c", 1)) - vorher1].join(","));
+      s2.stoerung.delete(teil("probe-c", 2));
+
+      s2.stoerung.set(teil("probe-b", 1), { art: "warte", mal: 1, ms: 4000 });
+      await klick(w, "probe-b", "laden-schau");
+      let schauDa = null;
+      try {
+        await w.waitForFunction((sel) => { const v = document.querySelector(sel + ' [data-feld="vorschau"]'); return v && v.getAttribute("data-ls-art"); }, karteSel("probe-b"), { timeout: 15000 });
+        schauDa = true;
+      } catch (_e) {}
+      ok("Zurück: vorher läuft die Werbeschau", schauDa === true);
+      if (schauDa) await klick(w, "probe-b", "zurueck");
+      let zb = null;
+      try { await warteLage(w, "probe-b", ["angehalten"], 15000); zb = await karteLage(w, "probe-b"); } catch (_e) {}
+      ok("Zurück: Lage „angehalten“", !!zb && zb.lage === "angehalten", JSON.stringify(zb && zb.lage));
+      const nachZ = await w.$eval(`${karteSel("probe-b")} [data-feld="vorschau"]`, (v) => v.getAttribute("data-ls-art"));
+      ok("Zurück: die Schau ist geschlossen", nachZ === null, String(nachZ));
+      const zurueckDa = await w.$eval(`${karteSel("probe-b")} [data-knopf="zurueck"]`, (b) => !b.hidden);
+      ok("Zurück: der Zurück-Knopf geht danach weg", zurueckDa === false);
+
+      /* Zweiter Weg: erst Stopp (die Schau bleibt stehen), dann Zurück ohne laufendes Laden. */
+      s2.stoerung.set(teil("probe-b", 1), { art: "warte", mal: 1, ms: 4000 });
+      await klick(w, "probe-b", "laden-schau");
+      let schau2 = null;
+      try {
+        await w.waitForFunction((sel) => { const v = document.querySelector(sel + ' [data-feld="vorschau"]'); return v && v.getAttribute("data-ls-art"); }, karteSel("probe-b"), { timeout: 15000 });
+        schau2 = true;
+      } catch (_e) {}
+      if (schau2) await klick(w, "probe-b", "stopp");
+      let zs = null;
+      try { await warteLage(w, "probe-b", ["angehalten"], 15000); zs = await karteLage(w, "probe-b"); } catch (_e) {}
+      const nachS = await w.$eval(`${karteSel("probe-b")} [data-feld="vorschau"]`, (v) => v.getAttribute("data-ls-art"));
+      ok("Stopp mit Schau: die Schau bleibt angehalten stehen", schau2 === true && !!zs && zs.lage === "angehalten" && nachS !== null, JSON.stringify([schau2, zs && zs.lage, nachS]));
+      const zDa = await w.$eval(`${karteSel("probe-b")} [data-knopf="zurueck"]`, (b) => !b.hidden);
+      if (zDa) await klick(w, "probe-b", "zurueck");
+      const nachSZ = await w.$eval(`${karteSel("probe-b")} [data-feld="vorschau"]`, (v) => v.getAttribute("data-ls-art"));
+      ok("Zurück nach Stopp: die stehengebliebene Schau ist geschlossen", zDa && nachSZ === null, JSON.stringify([zDa, nachSZ]));
+      s2.stoerung.delete(teil("probe-b", 1));
+      ok("keine Skriptfehler bei Stopp und Zurück", w.__fehler.length === 0, w.__fehler.join(" | "));
+      await w.close();
+
+      const a = await oeffne(c2, s2.url + "index.html?laden=probe-b#video-probe-b");
+      let auto = null;
+      try { await warteLage(a, "probe-b", ["fertig", "fehler"], 60000); auto = await karteLage(a, "probe-b"); } catch (_e) {}
+      ok("index.html?laden=probe-b lädt von selbst bis „fertig“", !!auto && auto.lage === "fertig", JSON.stringify(auto && { lage: auto.lage, meldung: auto.meldung }));
+      await a.close();
+    }
+
+    kopf("2j · Abspielen über den Service-Worker: Zeit, Pause, Springen, Teil für Teil");
+    {
+      const lang = join(tmp, "lang.webm");
+      execFileSync("ffmpeg", ["-v", "error", "-y", "-f", "lavfi", "-i", "testsrc2=size=320x180:rate=25", "-t", "25", "-c:v", "libvpx-vp9", "-b:v", "300k", "-an", lang]);
+      const langBuf = readFileSync(lang);
+      const r = lauf([lang, "--id", "probe-spiel", "--titel", "Probe Spiel", "--teil", "100000"]);
+      ok("Werkzeug nimmt probe-spiel auf", r.status === 0, r.stderr);
+      const vs = JSON.parse(readFileSync(join(kopie, "videos.json"), "utf8")).videos.find((v) => v.id === "probe-spiel");
+      const NS = vs ? vs.teile.length : 0;
+      ok(`probe-spiel liegt in mehreren Teilen (${NS})`, NS >= 4);
+      const logVor = s2.log.length;
+      const p = await c2.newPage();
+      const fehler = []; p.on("pageerror", (e) => fehler.push(String(e)));
+      await p.goto(s2.url + "abspielen.html?id=probe-spiel", { waitUntil: "load" });
+      let meta = null;
+      try {
+        await p.waitForFunction(() => { const v = window.__abspielen && window.__abspielen.vid; return v && isFinite(v.duration) && v.duration > 0; }, null, { timeout: 30000 });
+        meta = await p.evaluate(() => ({ d: window.__abspielen.vid.duration, uhr: document.getElementById("ab-uhr").textContent, titel: document.getElementById("ab-titel").textContent, sichtbar: !document.getElementById("spieler").hidden }));
+      } catch (_e) { meta = await p.evaluate(() => ({ meldung: document.getElementById("ab-meldung").textContent })); }
+      ok("der Spieler kennt die Länge (≈ 25 s)", !!meta && meta.d > 24 && meta.d < 26, JSON.stringify(meta));
+      ok("die Uhr zeigt „0:00 / 0:25“", !!meta && meta.uhr === "0:00 / 0:25", JSON.stringify(meta));
+      ok("Titel aus der Liste, Spieler sichtbar", !!meta && meta.titel === "Probe Spiel" && meta.sichtbar, JSON.stringify(meta));
+      await p.click("#ab-ton").catch(() => {});
+      await p.click("#ab-spielen");
+      let laeuft = null;
+      try {
+        await p.waitForFunction(() => window.__abspielen.vid.currentTime > 1, null, { timeout: 20000 });
+        laeuft = await p.evaluate(() => ({ t: window.__abspielen.vid.currentTime, knopf: document.getElementById("ab-spielen").textContent }));
+      } catch (_e) {}
+      ok("▶: das Video läuft", !!laeuft && laeuft.t > 1, JSON.stringify(laeuft));
+      ok("… und der Knopf heißt „⏸ Pause“", !!laeuft && laeuft.knopf === "⏸ Pause", JSON.stringify(laeuft));
+      await p.click("#ab-spielen");
+      await p.waitForFunction(() => window.__abspielen.vid.paused && document.getElementById("ab-spielen").textContent !== "⏸ Pause", null, { timeout: 5000 }).catch(() => {});
+      const pausiert = await p.evaluate(() => ({ p: window.__abspielen.vid.paused, knopf: document.getElementById("ab-spielen").textContent }));
+      ok("⏸: angehalten, Knopf „▶ Weiter“", pausiert.p && pausiert.knopf === "▶ Weiter", JSON.stringify(pausiert));
+      const t0 = await p.evaluate(() => window.__abspielen.vid.currentTime);
+      await p.click("#ab-vor");
+      const t1 = await p.evaluate(() => window.__abspielen.vid.currentTime);
+      ok("⏩ springt 10 s vor", Math.abs(t1 - t0 - 10) < 0.5, [t0, t1].join(" → "));
+      await p.click("#ab-zurueck");
+      const t2 = await p.evaluate(() => window.__abspielen.vid.currentTime);
+      ok("⏪ springt 10 s zurück", Math.abs(t2 - t0) < 0.5, [t1, t2].join(" → "));
+      await p.evaluate(() => window.__abspielen.springe(20));
+      let spaet = null;
+      try { await p.waitForFunction(() => { const v = window.__abspielen.vid; return !v.seeking && v.readyState >= 2; }, null, { timeout: 20000 }); spaet = true; } catch (_e) {}
+      ok("ein Sprung nach hinten (20 s) wird geladen und steht", spaet === true);
+      await p.click("#ab-stopp");
+      const gestoppt = await p.evaluate(() => ({ p: window.__abspielen.vid.paused, t: window.__abspielen.vid.currentTime }));
+      ok("⏹: angehalten und am Anfang", gestoppt.p && gestoppt.t === 0, JSON.stringify(gestoppt));
+      const href = await p.$eval("#ab-laden", (a) => a.getAttribute("href"));
+      ok("„Herunterladen“ führt zum Zusammensetzen auf der Startseite", href === "index.html?laden=probe-spiel#video-probe-spiel", href);
+
+      const weg = await p.evaluate(async () => {
+        const hol = async (bereich, wo) => {
+          const r = await fetch(wo || "videos/probe-spiel/abspielen.mp4", bereich ? { headers: { Range: bereich } } : {});
+          return { s: r.status, cr: r.headers.get("content-range"), typ: r.headers.get("content-type"), b: Array.from(new Uint8Array(await r.arrayBuffer())) };
+        };
+        return { a: await hol("bytes=0-99"), b: await hol("bytes=150000-"), c: await hol("bytes=999999999-"), d: await hol("bytes=0-9", "videos/gibt-es-nicht/abspielen.mp4") };
+      });
+      const gesamt = langBuf.length;
+      ok("Range 0–99: 206 mit genau den ersten 100 Bytes der Datei", weg.a.s === 206 && weg.a.cr === `bytes 0-99/${gesamt}` && Buffer.from(weg.a.b).equals(langBuf.subarray(0, 100)), JSON.stringify({ s: weg.a.s, cr: weg.a.cr }));
+      const ende = Math.min(gesamt - 1, 199999);
+      ok("Range ab 150000: höchstens bis ans Ende des Teils, Bytes stimmen", weg.b.s === 206 && weg.b.cr === `bytes 150000-${ende}/${gesamt}` && Buffer.from(weg.b.b).equals(langBuf.subarray(150000, ende + 1)), JSON.stringify({ s: weg.b.s, cr: weg.b.cr }));
+      ok("außerhalb: 416", weg.c.s === 416 && weg.c.cr === `bytes */${gesamt}`, JSON.stringify({ s: weg.c.s, cr: weg.c.cr }));
+      ok("unbekanntes Video: 404", weg.d.s === 404, String(weg.d.s));
+      const letzter = NS - 1;
+      const vorKaputt = s2.anzahl(teil("probe-spiel", letzter));
+      s2.stoerung.set(teil("probe-spiel", letzter), { art: "kaputt", mal: Infinity });
+      const kaputt = await p.evaluate(async (von) => { const r = await fetch("videos/probe-spiel/abspielen.mp4", { headers: { Range: "bytes=" + von + "-" } }); return { s: r.status, t: await r.text() }; }, letzter * 100000);
+      ok("ein kaputter Teil: 502 mit Grund, nichts Falsches ausgeliefert", kaputt.s === 502 && /Prüfsumme stimmt nicht/.test(kaputt.t), JSON.stringify(kaputt));
+      ok("… und er wurde dreimal versucht", s2.anzahl(teil("probe-spiel", letzter)) - vorKaputt === 3, String(s2.anzahl(teil("probe-spiel", letzter)) - vorKaputt));
+      s2.stoerung.delete(teil("probe-spiel", letzter));
+      const neu = s2.log.slice(logVor);
+      ok("der Server sah nie eine Abspiel-Adresse (sie entsteht im Worker)", !neu.some((l) => /abspielen\.mp4/.test(l)), JSON.stringify(neu.filter((l) => /abspielen\.mp4/.test(l))));
+      ok("der Server sah die Teile einzeln", neu.some((l) => /\/videos\/probe-spiel\/teil-00\.bin/.test(l)));
+      const imVorr = await p.evaluate(async () => { const out = []; for (const n of await caches.keys()) for (const r of await (await caches.open(n)).keys()) out.push(r.url); return out.filter((u) => /\/videos\//.test(u)); });
+      ok("abgespielte Teile liegen in keinem Vorrat", imVorr.length === 0, JSON.stringify(imVorr));
+      ok("keine Skriptfehler im Spieler", fehler.length === 0, fehler.join(" | "));
+      await p.close();
+
+      const u = await c2.newPage();
+      await u.goto(s2.url + "abspielen.html?id=gibt-es-nicht", { waitUntil: "load" });
+      try { await u.waitForFunction(() => /^(warn|fehler)$/.test(document.getElementById("ab-meldung").getAttribute("data-art") || ""), null, { timeout: 15000 }); } catch (_e) {}
+      const um = await u.$eval("#ab-meldung", (m) => m.textContent);
+      ok("unbekannte Kennung in der Adresse: die Seite sagt es und zeigt das erste Video", /Das gefragte Video gibt es nicht/.test(um), um);
+      await u.close();
     }
 
     kopf("2f · der Vorrat des Service-Workers");

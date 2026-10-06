@@ -6,13 +6,23 @@
  *     vorbei direkt ins Netz und landen in keinem Vorrat.
  *   · videos.json — immer frisch aus dem Netz (die Seite fragt mit no-store);
  *     eine eingefrorene Liste zeigte Videos, die es nicht mehr gibt.
+ *
+ * Eine Ausnahme, und sie legt ebenfalls nichts ab: videos/<kennung>/abspielen.mp4
+ * gibt es nicht als Datei. Der Worker setzt es beim Abspielen aus den geprüften
+ * Teilen zusammen (Klaus 2026-10-05: „während des Abspielens soll das Video
+ * laden"). Er antwortet auf Range-Anfragen mit 206, holt je Anfrage nur den Teil,
+ * in dem die Stelle liegt, prüft dessen SHA-256 und hält höchstens drei Teile im
+ * Arbeitsspeicher — nie in der Cache Storage.
  * Wer eine Datei aus SCHALE ändert, erhöht CACHE_VERSION (und die ?v= in der Seite). */
-const CACHE_VERSION = "fp-videos-v7";
+const CACHE_VERSION = "fp-videos-v10";
 const SCHALE = [
   "./",
   "index.html",
-  "assets/stil.css?v=2",
-  "assets/laden.js?v=7",
+  "assets/stil.css?v=3",
+  "assets/laden.js?v=8",
+  "abspielen.html",
+  "assets/abspielen.js?v=3",
+  "assets/abspielen-kern.js?v=1",
   "manifest.webmanifest",
   "icons/icon-192.png?v=1",
   "icons/icon-512.png?v=1",
@@ -40,6 +50,11 @@ function istSchale(url) {
   return SCHALE.includes(pfad) || pfad === "" || pfad.split("?")[0] === "index.html";
 }
 
+
+/* ── Abspielen: das Zusammensetzen steht in assets/abspielen-kern.js (auch für family-projekt.de) ── */
+importScripts("assets/abspielen-kern.js?v=1");
+const ABSPIEL = /^videos\/([a-z0-9][a-z0-9-]{1,59})\/abspielen\.mp4$/;
+
 self.addEventListener("fetch", (e) => {
   const req = e.request;
   if (req.method !== "GET") return;
@@ -48,6 +63,8 @@ self.addEventListener("fetch", (e) => {
   const basis = new URL("./", self.registration.scope);
   const rest = url.pathname.startsWith(basis.pathname) ? url.pathname.slice(basis.pathname.length) : null;
   if (rest === null) return;
+  const abs = ABSPIEL.exec(rest);
+  if (abs) { e.respondWith(self.FPAbspielKern.antwort(req, abs[1], new URL("./", self.registration.scope).href)); return; }
   /* Videos und Liste: nie anfassen, nie ablegen. */
   if (rest.startsWith("videos/") || rest === "videos.json") return;
   if (req.mode === "navigate") {
