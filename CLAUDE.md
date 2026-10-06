@@ -257,6 +257,15 @@ zurückgehen … beim Start … mit Punkten, die kurz umkreisen."*
   Film 1.7778, Film füllt ihn, nach Stopp und am Ende wieder 2.5016. Gegen die alte Datei
   fallen genau diese drei Wächter. ⚠ Am Tablet nicht gemessen.
 
+**Die schlanke Leiste (Klaus 2026-10-06):** beim Abspielen tritt die Leiste nach
+`LEISE_MS` (2,5 s) zurück (`data-vr-leise`); ein Tipp aufs Video holt sie wieder, statt
+anzuhalten (`wach()`); die Qualitätsangabe („720p") verschwindet nach `QUAL_MS` (2 s);
+sichtbar steht nicht mehr der Name des Videos, nur „weiter bei mm:ss", wenn eine Stelle
+gemerkt ist. Datei byte-gleich mit family-project (Pin `bfc69ca9…460e`). Proben: vier
+Text-Wächter in `smoke` (160 grün), je von Hand sabotiert → genau ihre rote Zeile; die
+Wirkung misst `smoke_werbevideo` B11 in family-project. Nicht im Vorrat (`SCHALE`),
+deshalb kein Cache-Bump. ⚠ Am Tablet nicht gemessen (Ausblenden mit dem Finger).
+
 ## Netzweit
 
 Freibrief · frisch von `origin/main` · Ton · kein PII · Ehrlichkeit:

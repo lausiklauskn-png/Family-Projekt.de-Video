@@ -19,7 +19,7 @@
  * Was je Seite anders ist, steht als Marke am Behälter, nie im Code:
  *   data-video-id         die Kennung, die zuerst gestreamt wird (Pflicht)
  *   data-video-fassungen  weitere Qualitäten: "kennung:Name kennung:Name" (Vorgabe: nur data-video-id)
- *   data-video-titel      was vor dem Start in der Leiste steht
+ *   data-video-titel      Name des Videos für Vorlese-Programme (steht NICHT sichtbar in der Leiste)
  *   data-video-weg        die Abspiel-Adresse, {id} wird ersetzt (Vorgabe videos/{id}/abspielen.mp4)
  *   data-video-sw         der Worker, der sie bedient (Vorgabe sw.js)
  *   data-video-quelle     wo videos.json liegt — nur für die Größen im Menü, erst beim Öffnen gefragt
@@ -31,32 +31,38 @@
  * Abruf. Das Bild im Behälter bleibt das Vorschaubild, und die Leiste liegt
  * darüber (position:absolute) — sie schiebt nichts, der Platz steht vorher fest.
  * ⏹ Stopp nimmt dem Video die Quelle: jedes Laden hört auf, das Bild steht wieder da.
+ *
+ * Schlanke Leiste (Klaus 2026-10-06): in Ruhe nur ▶ und ⛶, Qualität und
+ * Herunterladen hinter ⋯. Während es läuft, tritt die Leiste nach 2,5 s zurück;
+ * ein Tipp holt sie wieder und zählt dabei NICHT als Tipp auf den Rahmen. Sie
+ * bleibt stehen, solange es angehalten ist, lädt oder das Menü offen ist. Die
+ * Qualität („720p") steht 2 s nach Start oder Wechsel oben links, dann nicht mehr.
  * Texte nur über textContent. */
 (function () {
   "use strict";
   var KENNUNG = /^[a-z0-9][a-z0-9-]{1,59}$/;
   var TEXT = {
     de: {
-      gruppe: "Werbevideo", spielen: "Abspielen", weiter: "Weiter abspielen", pause: "Anhalten", stopp: "Stoppen",
+      gruppe: "Video", spielen: "Abspielen", weiter: "Weiter abspielen", pause: "Anhalten", stopp: "Stoppen",
       zurueck: "10 Sekunden zurück", vor: "10 Sekunden vor", tonAn: "Ton ausschalten", tonAus: "Ton einschalten",
       voll: "Vollbild", vollAus: "Vollbild verlassen", stelle: "Stelle im Video", weiterBei: "weiter bei ",
       warte: "lädt kurz vor …", vorbereiten: "Das Video wird vorbereitet …",
       keinSw: "Dieser Browser kann das Video hier nicht abspielen.",
       swNicht: "Der Hintergrund-Helfer der Seite ist noch nicht bereit. Einmal neu laden, dann geht es.",
       fehler: "Das Video lässt sich hier nicht abspielen.", ausweich: "Auf der Video-Seite ansehen",
-      geladen: "geladen bis ", mehr: "Qualität, Ton und Herunterladen", schliessen: "Schließen",
+      geladen: "geladen bis ", mehr: "Qualität, Ton und Herunterladen", zeigen: "Bedienung zeigen", schliessen: "Schließen",
       qualitaet: "Qualität", springen: "Springen", ton: "Ton", herunterladen: "Herunterladen", tonAnWort: "an", tonAusWort: "aus",
       ladenHinweis: "öffnet die Video-Seite; dort wird jeder Teil geprüft und als eine Datei gespeichert"
     },
     en: {
-      gruppe: "Promo video", spielen: "Play", weiter: "Resume", pause: "Pause", stopp: "Stop",
+      gruppe: "Video", spielen: "Play", weiter: "Resume", pause: "Pause", stopp: "Stop",
       zurueck: "Back 10 seconds", vor: "Forward 10 seconds", tonAn: "Mute", tonAus: "Unmute",
       voll: "Full screen", vollAus: "Exit full screen", stelle: "Position in the video", weiterBei: "resume at ",
       warte: "loading ahead …", vorbereiten: "Preparing the video …",
       keinSw: "This browser cannot play the video here.",
       swNicht: "The page's background helper is not ready yet. Reload once, then it works.",
       fehler: "The video cannot be played here.", ausweich: "Watch on the video page",
-      geladen: "loaded to ", mehr: "Quality, sound and download", schliessen: "Close",
+      geladen: "loaded to ", mehr: "Quality, sound and download", zeigen: "Show controls", schliessen: "Close",
       qualitaet: "Quality", springen: "Skip", ton: "Sound", herunterladen: "Download", tonAnWort: "on", tonAusWort: "off",
       ladenHinweis: "opens the video page; every part is checked there and saved as one file"
     }
@@ -113,24 +119,29 @@
     ".vr-video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;display:block}" +
     ".vr-warte{position:absolute;left:50%;top:40%;transform:translate(-50%,-50%);margin:0;padding:4px 10px;border-radius:999px;" +
       "background:rgba(0,0,0,.6);color:#fff;font:600 12px/1.3 system-ui,sans-serif;pointer-events:none}" +
-    ".vr-leiste{position:absolute;left:6px;right:6px;bottom:6px;z-index:6;display:flex;align-items:center;gap:4px;" +
-      "padding:3px;border-radius:999px;background:rgba(6,10,16,.74);color:#fff;font:600 12px/1 system-ui,sans-serif}" +
-    ".vr-rahmen button{flex:0 0 auto;min-width:34px;height:34px;padding:0 8px;border:0;border-radius:999px;cursor:pointer;" +
-      "background:rgba(255,255,255,.12);color:#fff;font:600 13px/34px system-ui,sans-serif;white-space:nowrap}" +
+    ".vr-leiste{position:absolute;left:6px;right:6px;bottom:6px;z-index:6;display:flex;align-items:center;gap:3px;" +
+      "padding:2px;border-radius:999px;background:rgba(6,10,16,.66);color:#fff;font:600 12px/1 system-ui,sans-serif;transition:opacity .25s}" +
+    ".vr-rahmen[data-vr-leise] .vr-leiste{opacity:0;pointer-events:none}" +
+    ".vr-rahmen button{flex:0 0 auto;min-width:30px;height:30px;padding:0 7px;border:0;border-radius:999px;cursor:pointer;" +
+      "background:rgba(255,255,255,.12);color:#fff;font:600 12px/30px system-ui,sans-serif;white-space:nowrap}" +
+    ".vr-rahmen .vr-mehr{font-size:16px;letter-spacing:.5px}" +
+    ".vr-qual{position:absolute;left:8px;top:8px;z-index:6;margin:0;padding:3px 8px;border-radius:999px;background:rgba(6,10,16,.7);" +
+      "color:#fff;font:600 11px/1.2 system-ui,sans-serif;pointer-events:none;transition:opacity .25s}" +
+    ".vr-qual[hidden]{display:none}" +
     ".vr-rahmen button:hover{background:rgba(255,255,255,.22)}" +
     ".vr-rahmen button svg{display:block;margin:auto}" +
     ".vr-rahmen button:focus-visible,.vr-zeit:focus-visible,.vr-menue a:focus-visible{outline:2px solid var(--vr-akzent,#5eead4);outline-offset:1px}" +
     ".vr-rahmen .vr-spielen,.vr-rahmen .vr-spielen:hover{background:var(--vr-akzent,#5eead4);color:#04121a}" +
     ".vr-rahmen .vr-spielen:hover{filter:brightness(1.12)}" +
     ".vr-titel{flex:1 1 auto;min-width:0;padding:0 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}" +
-    ".vr-zeit{flex:1 1 auto;min-width:36px;height:6px;margin:0 4px;-webkit-appearance:none;appearance:none;border-radius:3px;cursor:pointer;" +
+    ".vr-zeit{flex:1 1 auto;min-width:36px;height:4px;margin:0 4px;-webkit-appearance:none;appearance:none;border-radius:2px;cursor:pointer;" +
       "background:rgba(255,255,255,.18)}" +
-    ".vr-zeit::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:#fff;border:0}" +
-    ".vr-zeit::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:#fff;border:0}" +
+    ".vr-zeit::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:#fff;border:0}" +
+    ".vr-zeit::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:#fff;border:0}" +
     ".vr-uhr{flex:0 0 auto;padding:0 3px;font-variant-numeric:tabular-nums;white-space:nowrap}" +
     ".vr-rahmen[data-vr-zustand=ruhe] .vr-zeit,.vr-rahmen[data-vr-zustand=ruhe] .vr-uhr," +
     ".vr-rahmen[data-vr-zustand=ruhe] .vr-zurueck,.vr-rahmen[data-vr-zustand=ruhe] .vr-vor," +
-    ".vr-rahmen[data-vr-zustand=ruhe] .vr-stopp,.vr-rahmen[data-vr-zustand=ruhe] .vr-ton{display:none}" +
+    ".vr-rahmen[data-vr-zustand=ruhe] .vr-stopp,.vr-rahmen[data-vr-zustand=ruhe] .vr-ton,.vr-rahmen[data-vr-zustand=ruhe] .vr-mehr{display:none}" +
     ".vr-rahmen:not([data-vr-zustand=ruhe]) .vr-titel{display:none}" +
     ".vr-rahmen[data-vr-schmal] .vr-zurueck,.vr-rahmen[data-vr-schmal] .vr-vor,.vr-rahmen[data-vr-schmal] .vr-ton{display:none}" +
     ".vr-menue{position:absolute;inset:0;z-index:8;overflow:auto;padding:4px 8px 4px 10px;background:rgba(6,10,16,.93);color:#fff;" +
@@ -164,7 +175,7 @@
       "animation:vr-kreis .9s steps(8) infinite}" +
     ".vr-punkte i{position:absolute;left:5.5px;top:0;width:3px;height:3px;border-radius:50%;background:currentColor;transform-origin:1.5px 7px}" +
     "@keyframes vr-kreis{to{transform:rotate(360deg)}}" +
-    "@media (prefers-reduced-motion:reduce){.vr-punkte{animation:none}}";
+    "@media (prefers-reduced-motion:reduce){.vr-punkte{animation:none}.vr-leiste,.vr-qual{transition:none}}";
 
   function punkte(eltern) {
     var p = el("span", "vr-punkte", eltern);
@@ -231,6 +242,7 @@
     var warte = el("p", "vr-warte", schicht); warte.hidden = true;
     punkte(warte);
     var warteText = el("span", "vr-warte-text", warte);
+    var qual = el("p", "vr-qual", rahmen); qual.hidden = true;
     var meldung = el("p", "vr-meldung", rahmen); meldung.hidden = true;
     meldung.setAttribute("role", "status"); meldung.setAttribute("aria-live", "polite");
 
@@ -261,6 +273,22 @@
     var groessen = null;
 
     var zustand = "ruhe", ziehen = false, gestartet = null, zuletztGemerkt = 0;
+    var leiseUhr = null, qualUhr = null, qualGezeigt = false;
+    var LEISE_MS = 2500, QUAL_MS = 2000;
+
+    /* Die Leiste tritt nur zurück, solange es läuft, nichts lädt und das Menü zu ist. */
+    function leiseErlaubt() { return zustand === "laeuft" && !vid.paused && warte.hidden && menue.hidden && !ziehen; }
+    function wach() {
+      rahmen.removeAttribute("data-vr-leise");
+      clearTimeout(leiseUhr); leiseUhr = null;
+      if (leiseErlaubt()) leiseUhr = setTimeout(function () { leiseUhr = null; if (leiseErlaubt()) rahmen.setAttribute("data-vr-leise", ""); }, LEISE_MS);
+    }
+    function zeigeQualitaet() {
+      clearTimeout(qualUhr);
+      if (fassungen.length < 2) { qual.hidden = true; return; }
+      qual.textContent = nameVon(aktiv); qual.hidden = false;
+      qualUhr = setTimeout(function () { qual.hidden = true; }, QUAL_MS);
+    }
 
     function gemerkt() {
       try {
@@ -334,6 +362,7 @@
     function oeffneMenue(an) {
       menue.hidden = !an;
       mehr.setAttribute("aria-expanded", an ? "true" : "false");
+      wach();
       if (!an) return;
       zeichneMenue();
       (menue.querySelector("button[aria-pressed=true]") || zu).focus();
@@ -352,7 +381,7 @@
       var T = t();
       var d = isFinite(vid.duration) ? vid.duration : 0;
       var laeuft = zustand !== "ruhe" && !vid.paused && !vid.ended;
-      leiste.setAttribute("aria-label", T.gruppe);
+      leiste.setAttribute("aria-label", M.titel || T.gruppe);
       symbol(spielen, laeuft ? "pause" : "spielen");
       var stelle = zustand === "ruhe" ? gemerkt() : vid.currentTime;
       spielen.setAttribute("aria-label", laeuft ? T.pause : (stelle > 0 && !vid.ended ? T.weiter : T.spielen));
@@ -363,13 +392,13 @@
       vor.setAttribute("aria-label", T.vor); vor.title = T.vor;
       ton.textContent = vid.muted ? "🔇" : "🔊";
       ton.setAttribute("aria-label", vid.muted ? T.tonAus : T.tonAn); ton.title = ton.getAttribute("aria-label");
-      mehr.textContent = fassungen.length > 1 ? nameVon(aktiv) + " ⬇" : "⬇";
+      mehr.textContent = "⋯";
       mehr.setAttribute("aria-label", T.mehr); mehr.title = T.mehr;
       var istVoll = vollbildElement() === rahmen;
       symbol(voll, istVoll ? "vollAus" : "voll");
       voll.setAttribute("aria-label", istVoll ? T.vollAus : T.voll); voll.title = voll.getAttribute("aria-label");
       zeit.setAttribute("aria-label", T.stelle);
-      titel.textContent = (M.titel || T.gruppe) + (stelle > 0 ? " · " + T.weiterBei + mmss(stelle) : "");
+      titel.textContent = stelle > 0 ? T.weiterBei + mmss(stelle) : "";
       warteText.textContent = T.warte;
       zeit.max = String(d);
       if (!ziehen) zeit.value = String(vid.currentTime);
@@ -397,7 +426,7 @@
       meldung.hidden = false;
     }
 
-    function setzeZustand(z) { zustand = z; rahmen.setAttribute("data-vr-zustand", z); zeichne(); }
+    function setzeZustand(z) { zustand = z; rahmen.setAttribute("data-vr-zustand", z); zeichne(); wach(); }
     function quelle(fid, ab, weiterSpielen) {
       if (ab > 0) {
         vid.addEventListener("loadedmetadata", function () {
@@ -445,7 +474,8 @@
       vid.pause();
       vid.removeAttribute("src");
       try { vid.load(); } catch (e) {}
-      gestartet = null; warte.hidden = true; schicht.hidden = true;
+      gestartet = null; warte.hidden = true; schicht.hidden = true; qualGezeigt = false;
+      clearTimeout(qualUhr); qual.hidden = true;
       melde("");
       if (vollbildElement() === rahmen) (document.exitFullscreen || document.webkitExitFullscreen || function () {}).call(document);
       setzeZustand("ruhe");
@@ -456,6 +486,7 @@
       if (zustand !== "ruhe" && vid.getAttribute("src")) {
         var lief = !vid.paused && !vid.ended, ab = vid.currentTime;
         quelle(fid, ab, lief);
+        zeigeQualitaet();
       }
       zeichne(); zeichneMenue();
     }
@@ -497,9 +528,19 @@
     zu.addEventListener("click", function () { oeffneMenue(false); mehr.focus(); });
     menue.addEventListener("keydown", function (e) { if (e.key === "Escape") { e.stopPropagation(); oeffneMenue(false); mehr.focus(); } });
     voll.addEventListener("click", vollbild);
-    vid.addEventListener("click", function () { spielen.click(); });
+    /* Ist die Leiste zurückgetreten, holt der Tipp sie nur zurück — er hält nichts an.
+       Ein Tipp aufs Video zählt auch nicht zum Fünffach-Tipp der Seite aufs Bild. */
+    vid.addEventListener("click", function (e) {
+      e.stopPropagation();
+      if (rahmen.hasAttribute("data-vr-leise")) { wach(); return; }
+      spielen.click();
+    });
+    schicht.addEventListener("click", function () { if (rahmen.hasAttribute("data-vr-leise")) wach(); });
+    rahmen.addEventListener("pointermove", function (e) { if (e.pointerType === "mouse" && zustand === "laeuft") wach(); });
+    leiste.addEventListener("focusin", wach);
+    leiste.addEventListener("click", wach);
     zeit.addEventListener("input", function () { ziehen = true; uhr.textContent = mmss(Number(zeit.value)); });
-    zeit.addEventListener("change", function () { ziehen = false; springe(Number(zeit.value)); });
+    zeit.addEventListener("change", function () { ziehen = false; springe(Number(zeit.value)); wach(); });
 
     ["timeupdate", "progress", "durationchange", "loadedmetadata", "seeked", "volumechange"].forEach(function (n) {
       vid.addEventListener(n, zeichne);
@@ -513,9 +554,10 @@
       if (vid.videoWidth && vid.videoHeight) rahmen.style.setProperty("--vr-format", (vid.videoWidth / vid.videoHeight).toFixed(4));
     });
     vid.addEventListener("timeupdate", function () { if (zustand !== "ruhe" && Date.now() - zuletztGemerkt > 2000) merke(); });
-    vid.addEventListener("waiting", function () { warte.hidden = false; });
+    vid.addEventListener("waiting", function () { warte.hidden = false; wach(); });
+    vid.addEventListener("playing", function () { if (!qualGezeigt) { qualGezeigt = true; zeigeQualitaet(); } });
     ["playing", "canplay", "seeked", "pause"].forEach(function (n) {
-      vid.addEventListener(n, function () { if (!vid.seeking) warte.hidden = true; });
+      vid.addEventListener(n, function () { if (!vid.seeking) { warte.hidden = true; wach(); } });
     });
     vid.addEventListener("error", function () {
       if (!vid.getAttribute("src")) return;
@@ -539,7 +581,8 @@
       rahmen: rahmen, vid: vid, id: id,
       zustand: function () { return zustand; },
       aktiv: function () { return aktiv; },
-      springe: springe, abspielen: abspielen, stoppe: stoppe, wechsle: wechsle, gemerkt: gemerkt
+      springe: springe, abspielen: abspielen, stoppe: stoppe, wechsle: wechsle, gemerkt: gemerkt,
+      leise: function () { return rahmen.hasAttribute("data-vr-leise"); }, zeigen: wach
     };
     rahmen.__vr = ich;
     return ich;
