@@ -84,6 +84,9 @@
     el.querySelectorAll("[data-feld]").forEach(function (n) { f[n.getAttribute("data-feld")] = n; });
     f.laden = el.querySelector('[data-knopf="laden"]');
     f.speichern = el.querySelector('[data-knopf="speichern"]');
+    f.stopp = el.querySelector('[data-knopf="stopp"]');
+    f.zurueck = el.querySelector('[data-knopf="zurueck"]');
+    f.abspielen = el.querySelector('[data-knopf="abspielen"]');
     /* Vier Wege, derselbe Inhalt: schlicht · mit Hintergrundbildern · mit Werbeschau ·
        mit Vorschaufilm. Die Teile, die Prüfung und die gespeicherte Datei sind in allen gleich.
        Der Film-Knopf steht nur da, wenn die Liste einen gültigen Vorschaufilm nennt —
@@ -128,6 +131,14 @@
     f.laden.addEventListener("click", function () { laden(k, false); });
     f.arten.forEach(function (a) { a.knopf.addEventListener("click", function () { laden(k, a.art); }); });
     f.speichern.addEventListener("click", function () { speichern(k); });
+    /* Stopp und Zurück (Klaus 2026-10-05): wer nur sehen wollte, wie es geht, hört auf.
+       Die schon geprüften Teile bleiben, „Weiter laden“ macht an der Stelle weiter. */
+    if (f.stopp) f.stopp.addEventListener("click", function () { anhalten(k, "stopp"); });
+    if (f.zurueck) f.zurueck.addEventListener("click", function () { anhalten(k, "zurueck"); });
+    if (f.abspielen) f.abspielen.addEventListener("click", function () {
+      if (laeuft) return;
+      location.href = "abspielen.html?id=" + encodeURIComponent(v.id);
+    });
     return k;
   }
 
@@ -149,7 +160,48 @@
     k.felder.arten.forEach(function (a) { for (var x in was) a.knopf[x] = was[x]; });
   }
   function alleKnoepfe(an) {
-    karten.forEach(function (k) { if (k !== laeuft) { k.felder.laden.disabled = !an; artKnoepfe(k, { disabled: !an }); } });
+    karten.forEach(function (k) {
+      if (k.felder.abspielen) k.felder.abspielen.disabled = !an;
+      if (k !== laeuft) { k.felder.laden.disabled = !an; artKnoepfe(k, { disabled: !an }); }
+    });
+  }
+
+  function abgebrochen() { var e = new Error("angehalten"); e.angehalten = true; return e; }
+
+  /* Stopp: anhalten, die Schau bleibt angehalten stehen. Zurück: anhalten UND die Schau
+     schließen. Ohne laufendes Laden schließt Zurück nur eine stehengebliebene Schau. */
+  function anhalten(k, wie) {
+    if (laeuft === k && k.abbruch) {
+      k.anhalten = wie;
+      try { k.abbruch.abort(); } catch (e) {}
+      return;
+    }
+    if (wie === "zurueck") schauZu(k);
+  }
+  function schauZu(k) {
+    if (k.schau) { schau(k, "ende", true); k.schau = false; }
+    k.felder.zurueck.hidden = true;
+    if (!k.blob) artKnoepfe(k, { hidden: false, disabled: !!laeuft });
+  }
+  function angehalten(k, i, wie) {
+    var f = k.felder, n = k.v.teile.length, da = k.puffer.filter(Boolean).length;
+    if (k.streifen[i]) k.streifen[i].removeAttribute("data-lage");
+    k.abbruch = null; k.anhalten = null;
+    laeuft = null;
+    f.stopp.hidden = true;
+    f.stand.textContent = da + " von " + n + " Teilen geprüft";
+    f.laden.textContent = da ? "Weiter laden" : "Schlicht laden";
+    f.laden.disabled = false;
+    k.el.setAttribute("data-lage", "angehalten");
+    if (wie === "zurueck") { schauZu(k); }
+    else {
+      schau(k, "pause");
+      artKnoepfe(k, { hidden: !!k.schau });
+      f.zurueck.hidden = !k.schau;
+    }
+    alleKnoepfe(true);
+    melde(k, "Angehalten: " + da + " von " + n + " Teilen geprüft. " +
+      (da ? "Sie bleiben im Speicher — „Weiter laden“ macht an dieser Stelle weiter." : "Es wurde noch kein Teil geladen."), "warn");
   }
 
   async function holeTeil(k, i) {
@@ -158,14 +210,20 @@
     for (var versuch = 1; versuch <= VERSUCHE; versuch++) {
       try {
         k.holZaehler[i]++;
-        var antwort = await fetch(teilAdresse(k.v, i), { cache: "no-store" });
+        var signal = k.abbruch ? k.abbruch.signal : undefined;
+        var antwort = await fetch(teilAdresse(k.v, i), { cache: "no-store", signal: signal });
         if (!antwort.ok) throw new Error("Antwort " + antwort.status);
         var buf = await antwort.arrayBuffer();
         if (buf.byteLength !== t.groesse) throw new Error("falsche Größe: " + buf.byteLength + " statt " + t.groesse + " Bytes");
         var summe = hex(await crypto.subtle.digest("SHA-256", buf));
+        if (signal && signal.aborted) throw abgebrochen();
         if (summe !== t.sha256) throw new Error("Prüfsumme stimmt nicht");
         return buf;
-      } catch (e) { letzter = e; }
+      } catch (e) {
+        /* Angehalten heißt angehalten: kein zweiter Versuch */
+        if (signal && signal.aborted) throw abgebrochen();
+        letzter = e;
+      }
     }
     throw letzter;
   }
@@ -196,6 +254,8 @@
 
   async function laden(k, mitSchau) {
     if (laeuft) return;
+    /* eine stehengebliebene Schau einer anderen Karte zuerst schließen */
+    karten.forEach(function (andere) { if (andere !== k && andere.schau) schauZu(andere); });
     if (mitSchau && !k.schau) {
       if (await holeSchau()) { k.schau = mitSchau; schau(k, "start", k.felder.vorschau, mitSchau, filmAdresse(k)); }
       else melde(k, "Die Schau ließ sich nicht laden. Das Video wird trotzdem geladen und geprüft.", "warn");
@@ -211,6 +271,9 @@
     var f = k.felder, v = k.v, n = v.teile.length;
     f.laden.disabled = true; f.speichern.disabled = true; artKnoepfe(k, { disabled: true });
     k.blob = null;
+    k.abbruch = typeof AbortController === "function" ? new AbortController() : null;
+    k.anhalten = null;
+    f.stopp.hidden = false; f.zurueck.hidden = false;
     var geladen = 0;
     for (var i = 0; i < n; i++) {
       if (k.puffer[i]) { geladen += v.teile[i].groesse; continue; }
@@ -219,7 +282,11 @@
       melde(k, "Lade Teil " + (i + 1) + " von " + n + " …");
       try {
         k.puffer[i] = await holeTeil(k, i);
+        if (k.anhalten) throw abgebrochen();
       } catch (e) {
+        if (k.anhalten || (e && e.angehalten)) { angehalten(k, i, k.anhalten || "stopp"); return; }
+        f.stopp.hidden = true; k.abbruch = null;
+        f.zurueck.hidden = !k.schau;
         k.streifen[i].setAttribute("data-lage", "fehler");
         schau(k, "pause");
         f.stand.textContent = k.puffer.filter(Boolean).length + " von " + n + " Teilen geprüft";
@@ -236,6 +303,7 @@
       k.streifen[i].setAttribute("data-lage", "ok");
       schau(k, "teil", k.puffer.filter(Boolean).length, n);
     }
+    f.stopp.hidden = true; f.zurueck.hidden = true; k.abbruch = null;
     var blob = new Blob(k.puffer, { type: "video/mp4" });
     k.puffer = [];
     laeuft = null; alleKnoepfe(true);
@@ -312,6 +380,14 @@
       if (schlecht) listeMeldung.setAttribute("data-art", "warn"); else listeMeldung.removeAttribute("data-art");
     }
     probe.bereit = true;
+    /* index.html?laden=<kennung> (aus dem Abspieler: „Herunterladen“) startet das schlichte Laden */
+    try {
+      var gewuenscht = new URLSearchParams(location.search).get("laden");
+      if (gewuenscht && KENNUNG.test(gewuenscht)) {
+        var ziel = karten.filter(function (x) { return x.v.id === gewuenscht; })[0];
+        if (ziel) { try { ziel.el.scrollIntoView({ block: "start" }); } catch (e) {} laden(ziel, false); }
+      }
+    } catch (e) {}
   }
 
   /* ── Installieren ── */

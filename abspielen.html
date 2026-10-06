@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Werbevideo abspielen · family-projekt.de</title>
+<meta name="description" content="Das Werbevideo von family-projekt.de direkt ansehen. Es lädt beim Abspielen; jeder Teil wird mit seiner Prüfsumme verglichen.">
+<meta name="theme-color" content="#0a1016">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png?v=1">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=1">
+<link rel="stylesheet" href="assets/stil.css?v=3">
+</head>
+<body>
+<header class="kopf">
+  <a class="marke-link" href="./" aria-label="Videos von family-projekt.de — Startseite">
+    <img src="icons/icon-192.png?v=1" alt="" width="36" height="36">
+    <span class="marke">Videos · family-projekt.de</span>
+  </a>
+  <div class="werkzeug">
+    <a class="rund" href="./" title="Alle Videos"><span aria-hidden="true">☰</span><span class="t"> Alle Videos</span></a>
+  </div>
+</header>
+
+<main class="blatt">
+  <section class="einstieg">
+    <h1 id="ab-titel">Werbevideo <span>ansehen</span></h1>
+    <p class="einleitung" id="ab-beschreibung">Das Video lädt beim Abspielen. Reicht der Vorrat nicht, hält es kurz an und lädt vor.</p>
+  </section>
+
+  <p class="meldung" id="ab-meldung" role="status" aria-live="polite">Das Video wird vorbereitet …</p>
+  <noscript><p class="meldung" data-art="warn">Diese Seite braucht JavaScript: sie setzt das Video aus geprüften Teilen zusammen.</p></noscript>
+
+  <section class="spieler" id="spieler" hidden>
+    <div class="spieler-bild">
+      <video id="ab-video" preload="auto" playsinline></video>
+      <p class="spieler-warte" id="ab-warte" hidden>lädt kurz vor …</p>
+    </div>
+    <input type="range" id="ab-zeit" min="0" max="0" step="0.1" value="0" aria-label="Stelle im Video">
+    <div class="spieler-zeilen">
+      <span class="stand" id="ab-uhr">0:00 / 0:00</span>
+      <span class="stand" id="ab-vorrat">vorgeladen bis 0:00</span>
+    </div>
+    <div class="knoepfe">
+      <button type="button" class="zweit" id="ab-zurueck" aria-label="10 Sekunden zurück">⏪ 10 s</button>
+      <button type="button" class="haupt" id="ab-spielen">▶ Abspielen</button>
+      <button type="button" class="zweit" id="ab-vor" aria-label="10 Sekunden vor">10 s ⏩</button>
+      <button type="button" class="zweit" id="ab-stopp">⏹ Stopp</button>
+      <button type="button" class="zweit" id="ab-ton">🔊 Ton an</button>
+      <button type="button" class="zweit" id="ab-voll">⛶ Vollbild</button>
+    </div>
+    <div class="knoepfe">
+      <a class="knopf-link" id="ab-laden" href="./">⬇ Herunterladen (ganze Datei, geprüft)</a>
+    </div>
+  </section>
+
+  <footer class="kleingedruckt">
+    <p><b>So funktioniert es.</b> Das Video liegt in Teilen. Beim Abspielen holt die Seite nur den Teil, der gerade gebraucht wird, und den nächsten dazu. Jeder Teil wird vor dem Zeigen mit seiner SHA-256-Prüfsumme verglichen. Gespeichert wird dabei nichts.</p>
+    <p><b>Herunterladen.</b> Wer das Video behalten will, tippt auf „Herunterladen“. Dann setzt die Seite alle Teile zusammen und speichert eine Videodatei.</p>
+  </footer>
+</main>
+<script src="assets/abspielen.js?v=3"></script>
+</body>
+</html>

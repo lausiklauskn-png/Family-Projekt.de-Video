@@ -183,6 +183,24 @@ trägt; „gefangen“ allein reicht nicht.
 Touch-Ereignisse selbst zu stellen. Ebenso nicht gemessen: Laden und Speichern am
 Tablet und echte github.io-Auslieferung (aus dem Behälter gesperrt, 403).
 
+## ▶ Abspielen, während es lädt (Klaus 2026-10-05)
+
+Klaus: *„Das Werbevideo soll wie ein normales Video laufen … Stopp und Zurück
+sollen jedes Laden unterbrechen, was geladen ist, bleibt."*
+
+- `abspielen.html` + `assets/abspielen.js`: Zeit, ▶/⏸, ±10 s, Stopp, Ton, Vollbild,
+  Vorratsanzeige. Marken `data-video-quelle`, `data-video-weg`, `data-video-sw`, `data-video-laden`.
+- `assets/abspielen-kern.js` (`self.FPAbspielKern.antwort(req, id, basis)`) läuft im
+  Service-Worker (`importScripts`, Route `videos/<id>/abspielen.mp4`): Range → 206 bis zum
+  Ende des Teils, nächster Teil vorgeholt; ohne Range 200 als Strom; 416/404/503/502.
+  Jeder Teil 3 Versuche, Größe und SHA-256 geprüft, höchstens 3 Teile im Speicher, nie im Cache.
+- Stopp und Zurück unterbrechen jedes Laden (auch `?laden=`); geprüfte Teile bleiben.
+- Dieselben zwei Dateien sollen **byte-1:1** nach family-project (Plan:
+  `Kimhub/docs/sessions/BRIEF_werbevideo-family-project.md`) — hier pflegen, dort kopieren.
+- Gegenproben `ABSPIEL:` 8 gefangen · `STOPP:` 5 gefangen, 0 blind. Der Testbrowser hat
+  kein H.264, die Probe nimmt einen VP9-Stellvertreter. ⚠ Am Tablet und mit dem echten
+  MP4 nicht gemessen.
+
 ## Netzweit
 
 Freibrief · frisch von `origin/main` · Ton · kein PII · Ehrlichkeit:

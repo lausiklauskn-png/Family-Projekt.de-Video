@@ -15,6 +15,10 @@ außer GitHub Pages.
 Bricht die Leitung ab, heißt der Knopf **Weiter laden**. Die schon geprüften Teile
 werden dann nicht noch einmal geholt.
 
+## Anschauen, ohne herunterzuladen
+
+Im Verzeichnis führt **▶ Abspielen** zu `abspielen.html`. Das Video lädt beim Abspielen Teil für Teil und wird geprüft. Stopp oder Zurück halten das Laden an, und was schon geladen ist, bleibt.
+
 ## Als App installieren
 
 Oben steht **⬇ Installieren**. Bietet der Browser das Installieren an, öffnet sich
