@@ -243,6 +243,15 @@ ok("abspielen-rahmen.js: außer Ruhe nimmt der Rahmen die Form des Videos an",
   /\.vr-rahmen:not\(\[data-vr-zustand=ruhe\]\)\{aspect-ratio:var\(--vr-format/.test(raQ) && /--vr-format", \(vid\.videoWidth \/ vid\.videoHeight\)/.test(raQ));
 ok("abspielen-rahmen.js: Punkte im Kreis beim Laden, still bei weniger Bewegung",
   /melde\(t\(\)\.vorbereiten, false, true\)/.test(raQ) && /punkte\(warte\)/.test(raQ) && /prefers-reduced-motion:reduce\)\{\.vr-punkte\{animation:none/.test(raQ));
+/* Die schlanke Leiste (Klaus 2026-10-06). Gemessen im Browser in family-project (B11). */
+ok("abspielen-rahmen.js: die Leiste tritt beim Spielen nach LEISE_MS zurück",
+  /var LEISE_MS = 2500, QUAL_MS = 2000;/.test(raQ) && /if \(leiseErlaubt\(\)\) rahmen\.setAttribute\("data-vr-leise", ""\); \}, LEISE_MS\);/.test(raQ));
+ok("abspielen-rahmen.js: ein Tipp aufs Video holt die Leiste zurück, statt anzuhalten",
+  /if \(rahmen\.hasAttribute\("data-vr-leise"\)\) \{ wach\(\); return; \}/.test(raQ));
+ok("abspielen-rahmen.js: die Qualität verschwindet nach QUAL_MS",
+  /qualUhr = setTimeout\(function \(\) \{ qual\.hidden = true; \}, QUAL_MS\);/.test(raQ));
+ok("abspielen-rahmen.js: sichtbar steht nur weiter bei mm:ss, nicht der Name des Videos",
+  /titel\.textContent = stelle > 0 \? T\.weiterBei \+ mmss\(stelle\) : "";/.test(raQ) && !/titel\.textContent = M\.titel/.test(raQ));
 ok("node --check assets/abspielen-kern.js und assets/abspielen.js", ["assets/abspielen-kern.js", "assets/abspielen.js"].every((d) => spawnSync(NODE, ["--check", join(WURZEL, d)]).status === 0));
 
 kopf("E · node --check");
