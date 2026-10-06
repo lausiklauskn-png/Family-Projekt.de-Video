@@ -14,15 +14,15 @@
  * in dem die Stelle liegt, prüft dessen SHA-256 und hält höchstens drei Teile im
  * Arbeitsspeicher — nie in der Cache Storage.
  * Wer eine Datei aus SCHALE ändert, erhöht CACHE_VERSION (und die ?v= in der Seite). */
-const CACHE_VERSION = "fp-videos-v10";
+const CACHE_VERSION = "fp-videos-v11";
 const SCHALE = [
   "./",
   "index.html",
-  "assets/stil.css?v=3",
+  "assets/stil.css?v=4",
   "assets/laden.js?v=8",
   "abspielen.html",
-  "assets/abspielen.js?v=3",
-  "assets/abspielen-kern.js?v=1",
+  "assets/abspielen.js?v=4",
+  "assets/abspielen-kern.js?v=2",
   "manifest.webmanifest",
   "icons/icon-192.png?v=1",
   "icons/icon-512.png?v=1",
@@ -52,8 +52,9 @@ function istSchale(url) {
 
 
 /* ── Abspielen: das Zusammensetzen steht in assets/abspielen-kern.js (auch für family-projekt.de) ── */
-importScripts("assets/abspielen-kern.js?v=1");
+importScripts("assets/abspielen-kern.js?v=2");
 const ABSPIEL = /^videos\/([a-z0-9][a-z0-9-]{1,59})\/abspielen\.mp4$/;
+const TEIL = /^videos\/([a-z0-9][a-z0-9-]{1,59})\/teil-(\d{2})\.bin$/;
 
 self.addEventListener("fetch", (e) => {
   const req = e.request;
@@ -65,6 +66,10 @@ self.addEventListener("fetch", (e) => {
   if (rest === null) return;
   const abs = ABSPIEL.exec(rest);
   if (abs) { e.respondWith(self.FPAbspielKern.antwort(req, abs[1], new URL("./", self.registration.scope).href)); return; }
+  /* Ein Teil, den der Abspiel-Kern schon hält (oder gerade holt), kommt von dort —
+     dieselben Bytes nicht zweimal übers Netz. Sonst wie bisher am Worker vorbei. */
+  const tl = TEIL.exec(rest);
+  if (tl) { const a = self.FPAbspielKern.ausVorrat(req, tl[1], Number(tl[2]), new URL("./", self.registration.scope).href); if (a) { e.respondWith(a); return; } }
   /* Videos und Liste: nie anfassen, nie ablegen. */
   if (rest.startsWith("videos/") || rest === "videos.json") return;
   if (req.mode === "navigate") {

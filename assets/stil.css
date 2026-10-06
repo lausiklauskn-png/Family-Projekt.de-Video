@@ -378,6 +378,20 @@ dl { margin: 0; }
 .spieler-bild video { display: block; width: 100%; height: 100%; object-fit: contain; background: #000; }
 .spieler-warte { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); margin: 0; padding: 8px 14px; border-radius: 10px;
   background: color-mix(in srgb, #000 70%, transparent); color: #fff; font-family: var(--f-zahl); font-size: 14px; }
+/* Punkte im Kreis: es lädt noch, die Leitung ist nicht weg (wie im Rahmen-Spieler, 24 px). */
+.spieler-warte { display: flex; align-items: center; gap: 8px; }
+.spieler-warte[hidden] { display: none; }
+.punkte { position: relative; flex: 0 0 auto; width: 24px; height: 24px; animation: punkte-kreis .9s steps(8) infinite; }
+.punkte i { position: absolute; left: 9.5px; top: 0; width: 5px; height: 5px; border-radius: 50%; background: currentColor; transform-origin: 2.5px 12px; }
+.punkte i:nth-child(1) { transform: rotate(0deg); opacity: 0.125; }
+.punkte i:nth-child(2) { transform: rotate(45deg); opacity: 0.250; }
+.punkte i:nth-child(3) { transform: rotate(90deg); opacity: 0.375; }
+.punkte i:nth-child(4) { transform: rotate(135deg); opacity: 0.500; }
+.punkte i:nth-child(5) { transform: rotate(180deg); opacity: 0.625; }
+.punkte i:nth-child(6) { transform: rotate(225deg); opacity: 0.750; }
+.punkte i:nth-child(7) { transform: rotate(270deg); opacity: 0.875; }
+.punkte i:nth-child(8) { transform: rotate(315deg); opacity: 1.000; }
+@keyframes punkte-kreis { to { transform: rotate(360deg); } }
 #ab-zeit { width: 100%; accent-color: var(--akzent); min-height: 32px; }
 .spieler-zeilen { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
 .knopf-link { display: inline-flex; align-items: center; min-height: 46px; padding: 11px 18px; border-radius: 12px; font: 700 16px/1.2 var(--f-text);

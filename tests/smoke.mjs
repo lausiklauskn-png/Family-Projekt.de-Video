@@ -255,6 +255,16 @@ ok("abspielen-rahmen.js: sichtbar steht nur weiter bei mm:ss, nicht der Name des
 /* Die Leiste selbst ist unsichtbar (Klaus 2026-10-06: „der Container selber soll unsichtbar sein"). */
 ok("abspielen-rahmen.js: die Leiste trägt keinen Hintergrund und keinen Schatten, nur die Knöpfe",
   /\.vr-leiste\{[^}]*background:transparent;box-shadow:none;/.test(raQ) && !/\.vr-leiste\{[^}]*background:rgba/.test(raQ) && /\.vr-uhr\{[^}]*text-shadow:/.test(raQ));
+/* Klaus 2026-10-06: „lädt viel länger als 67 s und ruckelt", „die Punkte sind nicht zu sehen". */
+ok("LADENPAUSE: abspielen-rahmen.js: ein Tipp auf Herunterladen hält das laufende Video an",
+  /a\.addEventListener\("click", function \(\) \{ if \(zustand !== "ruhe" && !vid\.paused\) \{ vid\.pause\(\); merke\(\);/.test(raQ));
+ok("TEILVORRAT: sw.js gibt einen Teil, den der Kern schon hält, aus dem Kern",
+  /self\.FPAbspielKern\.ausVorrat\(req, tl\[1\], Number\(tl\[2\]\)/.test(swQ) && /function ausVorrat\(req, id, i, basis\) \{\s*var s = basis \+ "\|" \+ id \+ "#" \+ i;\s*if \(!teile\.has\(s\)\) return null;/.test(kernQ));
+ok("PUNKTE: abspielen-rahmen.js: 24-px-Kreis, Punkte 5 px",
+  /\.vr-punkte\{[^}]*width:24px;height:24px;/.test(raQ) && /\.vr-punkte i\{[^}]*width:5px;height:5px;/.test(raQ));
+ok("PUNKTE: Rahmen und Abspielseite zeigen die Punkte mindestens 0,8 s",
+  /var WARTE_MIN_MS = 800,/.test(raQ) && /const WARTE_MIN_MS = 800;/.test(abQ) && /"waiting", function \(\) \{ zeigeWarte\(true\);/.test(raQ) && /if \(!vid\.seeking\) \{ zeigeWarte\(false\); wach\(\); \}/.test(raQ) &&
+  /"waiting", \(\) => \{ zeigeWarte\(true\);/.test(abQ) && /if \(!vid\.seeking\) \{ zeigeWarte\(false\);/.test(abQ));
 ok("node --check assets/abspielen-kern.js und assets/abspielen.js", ["assets/abspielen-kern.js", "assets/abspielen.js"].every((d) => spawnSync(NODE, ["--check", join(WURZEL, d)]).status === 0));
 
 kopf("E · node --check");

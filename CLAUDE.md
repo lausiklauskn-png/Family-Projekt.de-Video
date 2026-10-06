@@ -272,6 +272,35 @@ dem Finger)."*
 sehen; `.vr-leiste` ohne Grund und Schatten, die Zeit mit Text-Schatten. Pin in family-project
 `3e5c3b7c…a905a`, gemessen dort in `smoke_werbevideo` B11, Gegenprobe `LEISTE:`.
 
+## ⏳ Lädt zu lange, Punkte unsichtbar (Klaus 2026-10-06)
+
+Klaus: das Video lädt viel länger als 67 s und ruckelt; die kreisenden Punkte bei
+„lädt kurz vor …" sind nicht zu sehen.
+
+| | |
+|---|---|
+| **Herunterladen hält an** | ein Tipp auf einen Download im Rahmen-Menü (`.vr-laden`) hält das laufende Video an und merkt die Stelle — sonst teilen sich Stream und Download die Leitung |
+| **ein Teil nur einmal übers Netz** | `sw.js` fragt bei `videos/<id>/teil-NN.bin` zuerst `FPAbspielKern.ausVorrat()`: hält der Kern den Teil (fertig oder unterwegs), kommt er von dort. Sonst geht die Anfrage wie bisher am Worker vorbei, mit den drei Versuchen der Seite. `laden.js` prüft weiter selbst |
+| **Punkte** | 24 px statt 14, Punkte 5 px statt 3, und die Pille steht **mindestens 0,8 s** (`WARTE_MIN_MS`) — im Rahmen-Spieler **und** auf `abspielen.html` (dort gab es gar keine) |
+
+Proben: `smoke` (`LADENPAUSE:`, `TEILVORRAT:`, `PUNKTE:`) · `browser` (Teil 0 aus dem Kern,
+Server-Zähler unverändert; ein Teil, den der Kern nicht hält, +1; Punkte 24 px) · Gegenprobe
+`LADENPAUSE:`, `TEILVORRAT:`, `TEILVORRAT2:`, `PUNKTE:`, `PUNKTEZEIT:` — je von Hand mit
+`NUR_FALL` gefahren, alle 5 gefangen, jede rote Zeile mit ihrem Namen.
+
+⚠ **Die Sperre geht nur in EINE Richtung.** Lädt die Seite zuerst und spielt danach, holt
+der Kern die Teile trotzdem neu (er sieht die Abrufe der Seite nicht). Und der Download aus
+family-projekt.de läuft auf github.io in einem anderen Worker — dort teilen sich die zwei
+nichts; dort hilft nur das Anhalten.
+
+⚠ **BENANNTE GRENZE, gelesen, nicht gemessen:** der Kern antwortet erst, wenn der **ganze**
+Teil (14 MB) da und geprüft ist. Bei 720p (27 MB, 2 Teile) heißt das: das erste Bild kommt
+erst, wenn die erste Hälfte der Datei geladen ist. Bei 10 Mbit/s sind das rund 11 s Punkte, bei 5 Mbit/s rund 22 s.
+Kleinere Teile für die Stream-Fassungen wären die eigentliche Abhilfe — nicht gebaut, eine
+Frage an Klaus. Am Tablet nicht gemessen.
+
+Cache `fp-videos-v11`, `stil.css?v=4`, `abspielen.js?v=4`, `abspielen-kern.js?v=2`.
+
 ## Netzweit
 
 Freibrief · frisch von `origin/main` · Ton · kein PII · Ehrlichkeit:

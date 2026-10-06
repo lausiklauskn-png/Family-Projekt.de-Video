@@ -64,7 +64,7 @@
   }
 
   spielen.addEventListener("click", () => {
-    if (vid.paused || vid.ended) { const p = vid.play(); if (p && p.catch) p.catch((e) => melde("Abspielen ging nicht: " + (e && e.message || e), "fehler")); }
+    if (vid.paused || vid.ended) { if (vid.readyState < 3) zeigeWarte(true); const p = vid.play(); if (p && p.catch) p.catch((e) => melde("Abspielen ging nicht: " + (e && e.message || e), "fehler")); }
     else vid.pause();
   });
   stopp.addEventListener("click", () => { vid.pause(); springe(0); });
@@ -82,12 +82,22 @@
 
   ["timeupdate", "progress", "durationchange", "loadedmetadata", "play", "pause", "ended", "seeked", "volumechange"]
     .forEach((n) => vid.addEventListener(n, zeichne));
-  vid.addEventListener("waiting", () => { warte.hidden = false; melde("Lädt kurz vor …"); });
+  /* Die Punkte stehen mindestens WARTE_MIN_MS da — ein Aufblitzen sieht niemand. */
+  const WARTE_MIN_MS = 800;
+  let warteSeit = 0, warteUhr = 0;
+  function zeigeWarte(an, sofort) {
+    clearTimeout(warteUhr);
+    if (an) { if (warte.hidden) { warte.hidden = false; warteSeit = Date.now(); } return; }
+    const rest = WARTE_MIN_MS - (Date.now() - warteSeit);
+    if (sofort || warte.hidden || rest <= 0) { warte.hidden = true; return; }
+    warteUhr = setTimeout(() => { warte.hidden = true; }, rest);
+  }
+  vid.addEventListener("waiting", () => { zeigeWarte(true); melde("Lädt kurz vor …"); });
   ["playing", "canplay", "seeked"].forEach((n) => vid.addEventListener(n, () => {
-    if (!vid.seeking) { warte.hidden = true; if (meldung.dataset.art !== "fehler") melde(vid.paused ? "Bereit." : "Läuft — es lädt beim Abspielen weiter."); }
+    if (!vid.seeking) { zeigeWarte(false); if (meldung.dataset.art !== "fehler") melde(vid.paused ? "Bereit." : "Läuft — es lädt beim Abspielen weiter."); }
   }));
   vid.addEventListener("error", () => {
-    warte.hidden = true;
+    zeigeWarte(false, true);
     /* Eine Warnung davor (falsche Kennung) bleibt stehen, statt überschrieben zu werden. */
     const davor = meldung.dataset.art === "warn" ? meldung.textContent + " " : "";
     melde(davor + "Das Video lässt sich hier nicht abspielen. Herunterladen geht trotzdem: „Herunterladen“ antippen.", "fehler");

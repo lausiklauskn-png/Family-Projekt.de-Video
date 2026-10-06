@@ -677,6 +677,19 @@ try {
       const neu = s2.log.slice(logVor);
       ok("der Server sah nie eine Abspiel-Adresse (sie entsteht im Worker)", !neu.some((l) => /abspielen\.mp4/.test(l)), JSON.stringify(neu.filter((l) => /abspielen\.mp4/.test(l))));
       ok("der Server sah die Teile einzeln", neu.some((l) => /\/videos\/probe-spiel\/teil-00\.bin/.test(l)));
+      /* Ein Teil, den der Abspiel-Kern schon hält, holt die Lade-Seite von dort —
+         nicht ein zweites Mal übers Netz (Klaus 2026-10-06: „lädt viel länger"). */
+      await p.evaluate(async () => { await (await fetch("videos/probe-spiel/abspielen.mp4", { headers: { Range: "bytes=0-9" } })).arrayBuffer(); });   /* Teil 0 liegt im Kern */
+      const vor0 = s2.anzahl(teil("probe-spiel", 0));
+      const doppelt = await p.evaluate(async () => { const r = await fetch("videos/probe-spiel/teil-00.bin", { cache: "no-store" }); return { s: r.status, b: Array.from(new Uint8Array(await r.arrayBuffer())) }; });
+      ok("TEILVORRAT: ein Teil, den der Kern hält, geht nicht noch einmal übers Netz", doppelt.s === 200 && s2.anzahl(teil("probe-spiel", 0)) === vor0, JSON.stringify({ s: doppelt.s, vorher: vor0, nachher: s2.anzahl(teil("probe-spiel", 0)) }));
+      ok("TEILVORRAT: … und es sind genau die Bytes des Teils", Buffer.from(doppelt.b).equals(langBuf.subarray(0, Math.min(100000, langBuf.length))), String(doppelt.b.length));
+      const vorL = s2.anzahl(teil("probe-spiel", letzter));
+      const fremd = await p.evaluate(async (adr) => (await fetch(adr, { cache: "no-store" })).status, teil("probe-spiel", letzter).slice(1));
+      ok("TEILVORRAT: ein Teil, den der Kern nicht hält, kommt wie bisher aus dem Netz", fremd === 200 && s2.anzahl(teil("probe-spiel", letzter)) === vorL + 1, JSON.stringify({ s: fremd, vorher: vorL, nachher: s2.anzahl(teil("probe-spiel", letzter)) }));
+      /* Die Punkte: groß genug, um sie zu sehen, und mindestens 0,8 s lang. */
+      const pk = await p.evaluate(() => { const w = document.getElementById("ab-warte"); w.hidden = false; const r = w.querySelector(".punkte").getBoundingClientRect(); const i = w.querySelector(".punkte i").getBoundingClientRect(); const n = w.querySelectorAll(".punkte i").length; w.hidden = true; return { w: r.width, h: r.height, i: i.width, n }; });
+      ok("PUNKTE: in „lädt kurz vor …“ stehen 8 Punkte im 24-px-Kreis, je ≥ 4 px", pk.n === 8 && pk.w >= 22 && pk.h >= 22 && pk.i >= 4, JSON.stringify(pk));
       const imVorr = await p.evaluate(async () => { const out = []; for (const n of await caches.keys()) for (const r of await (await caches.open(n)).keys()) out.push(r.url); return out.filter((u) => /\/videos\//.test(u)); });
       ok("abgespielte Teile liegen in keinem Vorrat", imVorr.length === 0, JSON.stringify(imVorr));
       ok("keine Skriptfehler im Spieler", fehler.length === 0, fehler.join(" | "));
