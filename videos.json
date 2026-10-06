@@ -2,6 +2,62 @@
   "fassung": 1,
   "videos": [
     {
+      "id": "werbevideo-67s-480p",
+      "titel": "family-projekt.de in 67 Sekunden · 480p",
+      "beschreibung": "Dasselbe Werbevideo in 480p: klein, für langsames Netz.",
+      "dateiname": "family-projekt-werbevideo-67s-480p.mp4",
+      "groesse": 9861084,
+      "sha256": "242aa452c3cbafffd65a5dc75298a75ead68966573c3086a8efbe79f68fdd2fd",
+      "vorschau": "videos/werbevideo-67s-480p/vorschau.jpg",
+      "vorschauFilm": null,
+      "breite": 854,
+      "hoehe": 480,
+      "dauer": 67.52,
+      "fps": 30,
+      "video": "H.264",
+      "videoBitrate": 1062749,
+      "ton": "AAC",
+      "tonHz": 48000,
+      "tonKanaele": 2,
+      "aufgenommen": "2026-10-06T07:31:51.725Z",
+      "teile": [
+        {
+          "groesse": 9861084,
+          "sha256": "242aa452c3cbafffd65a5dc75298a75ead68966573c3086a8efbe79f68fdd2fd"
+        }
+      ]
+    },
+    {
+      "id": "werbevideo-67s-720p",
+      "titel": "family-projekt.de in 67 Sekunden · 720p",
+      "beschreibung": "Dasselbe Werbevideo in 720p: rund ein Siebtel der Größe, gut zum Streamen am Handy.",
+      "dateiname": "family-projekt-werbevideo-67s-720p.mp4",
+      "groesse": 27300423,
+      "sha256": "2b129b61ae0f6b35893ef2a96e678fe95282800f2b30353877fcf44c7c298e19",
+      "vorschau": "videos/werbevideo-67s-720p/vorschau.jpg",
+      "vorschauFilm": null,
+      "breite": 1280,
+      "hoehe": 720,
+      "dauer": 67.52,
+      "fps": 30,
+      "video": "H.264",
+      "videoBitrate": 3095399,
+      "ton": "AAC",
+      "tonHz": 48000,
+      "tonKanaele": 2,
+      "aufgenommen": "2026-10-06T07:31:51.437Z",
+      "teile": [
+        {
+          "groesse": 14000000,
+          "sha256": "760916bde7a617abae5fceef1261dc867ce0f697c9ce328bd0ed9578e0caaa67"
+        },
+        {
+          "groesse": 13300423,
+          "sha256": "b18b73b5bafbac95d2ef55af43e3456d35ef3b0db21627420ff88b4f708eb09f"
+        }
+      ]
+    },
+    {
       "id": "werbevideo-67s",
       "titel": "family-projekt.de in 67 Sekunden",
       "beschreibung": "Die längere Fassung des Werbevideos: alle Räume, die Apps und das Mycel.",

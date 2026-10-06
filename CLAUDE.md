@@ -201,6 +201,43 @@ sollen jedes Laden unterbrechen, was geladen ist, bleibt."*
   kein H.264, die Probe nimmt einen VP9-Stellvertreter. ⚠ Am Tablet und mit dem echten
   MP4 nicht gemessen.
 
+## 🖼 Der Rahmen-Spieler für family-projekt.de (Klaus 2026-10-06)
+
+Klaus: *„Das Video soll auf family-projekt.de laufen, im Vorschaufenster der
+Startseite … nicht automatisch starten, sondern erst auf Klick … gestreamt …
+Herunterladen … verschiedene Qualitäten … wieder gestoppt … Vollbildmodus."*
+
+`assets/abspielen-rahmen.js` baut sich **in einen fremden Behälter**
+(`[data-video-rahmen]`), statt feste IDs zu suchen wie `abspielen.js`. Er wird
+**byte-1:1** nach `family-project/assets/` kopiert und dort per SHA-256 gepinnt
+(`tests/smoke_werbevideo.mjs`) — **hier ändern, dort neu kopieren, Pin nachziehen.**
+
+| | |
+|---|---|
+| vor dem Tipp | **lädt nichts**: `preload="none"`, keine Quelle, das Bild des Behälters bleibt Vorschaubild; die Leiste liegt `position:absolute` darüber |
+| Leiste | ▶/⏸ · ⏹ · −10 · Ladebalken (gespielt / geladen) · Zeit · +10 · 🔊 · Qualität ⬇ · Vollbild; Symbole als SVG, nicht als Schriftzeichen |
+| ⏹ Stopp | nimmt die Quelle weg (`removeAttribute("src")` + `load()`): jedes Laden hört auf, das Bild steht wieder da, die gemerkte Stelle ist vergessen |
+| Menü | füllt den Behälter (am Handy ~110 px hoch): Qualität · ±10 s und Ton · ⬇ je Qualität mit Größe aus `videos.json` (erst beim Öffnen gefragt) |
+| Merken | die Stelle in `localStorage` (Marke `data-video-merken`); nach dem Neuladen „weiter bei …", **kein** Selbststart |
+| schmal | unter 460 px wandern ±10 s und Ton ins Menü, unter 330 px die Größen in den `title` |
+
+Marken am Behälter: `data-video-id` (Pflicht) · `-fassungen` (`kennung:Name …`) ·
+`-titel` · `-weg` · `-sw` · `-quelle` · `-laden` · `-merken` · `-ausweich`.
+
+**Die Qualitäten sind eigene Einträge:** `werbevideo-67s-720p` (27,3 MB) und
+`werbevideo-67s-480p` (9,9 MB), mit ffmpeg aus den geprüften Teilen von
+`werbevideo-67s` gerechnet (H.264, `+faststart`), aufgenommen mit dem neuen
+Schalter **`--ohne-film`** (eine kleinere Fassung braucht keinen eigenen
+11-MB-Vorschaufilm). Gestreamt wird zuerst 720p — das Original hat 23 Mbit/s.
+
+⚠ **Das Werkzeug stellt das zuletzt aufgenommene nach oben.** Auf der Liste stehen
+jetzt 480p und 720p **vor** dem Original, und `abspielen.html` ohne `?id=` zeigt
+das erste — also 480p. Benannt, nicht geändert: `videos.json` schreibt das Werkzeug,
+nie die Hand.
+
+Proben: `smoke` (Rahmen-Spieler ohne Browser, `--ohne-film`). Die Wirkung misst
+`family-project/tests/smoke_werbevideo.mjs` im echten Browser mit VP9-Stellvertreter.
+
 ## Netzweit
 
 Freibrief · frisch von `origin/main` · Ton · kein PII · Ehrlichkeit:

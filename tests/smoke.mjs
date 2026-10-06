@@ -225,6 +225,16 @@ ok("höchstens drei Teile im Arbeitsspeicher", /var TEIL_MAX = 3;/.test(kernQ) &
 ok("abspielen.js liest Quelle, Weg, Worker und Herunterladen aus Marken", ["videoQuelle", "videoWeg", "videoSw", "videoLaden"].every((n) => abQ.includes("M." + n)));
 ok("abspielen.js setzt Texte nie über innerHTML", abQ.length > 0 && !/innerHTML/.test(abQ));
 ok("abspielen.html lädt abspielen.js mit derselben ?v= wie der Vorrat", (() => { const h = existsSync(join(WURZEL, "abspielen.html")) ? lesen("abspielen.html") : ""; const m = /src="(assets\/abspielen\.js\?v=\d+)"/.exec(h); return !!m && schaleListe.includes(m[1]); })());
+/* Der Spieler für einen fremden Rahmen (family-projekt.de, Startseite). Seine
+   Wirkung misst family-project im echten Browser; hier steht, was ohne Browser geht. */
+const raQ = existsSync(join(WURZEL, "assets/abspielen-rahmen.js")) ? lesen("assets/abspielen-rahmen.js") : "";
+ok("abspielen-rahmen.js: node --check", raQ.length > 0 && spawnSync(NODE, ["--check", join(WURZEL, "assets/abspielen-rahmen.js")]).status === 0);
+ok("abspielen-rahmen.js setzt Texte nie über innerHTML", raQ.length > 0 && !/innerHTML/.test(raQ));
+ok("abspielen-rahmen.js lädt vor dem Tipp nichts: preload none, die Quelle erst in quelle()",
+  /setAttribute\("preload", "none"\)/.test(raQ) && (raQ.match(/vid\.src = /g) || []).length === 1 && /function quelle\(/.test(raQ));
+ok("abspielen-rahmen.js: Stopp nimmt die Quelle weg (jedes Laden hört auf)", /vid\.removeAttribute\("src"\);\s*try \{ vid\.load\(\); \}/.test(raQ));
+ok("abspielen-rahmen.js liest alles Seitenabhängige aus Marken am Behälter",
+  ["data-video-id", "data-video-fassungen", "data-video-weg", "data-video-sw", "data-video-quelle", "data-video-laden", "data-video-merken", "data-video-ausweich"].every((n) => raQ.includes('"' + n + '"')));
 ok("node --check assets/abspielen-kern.js und assets/abspielen.js", ["assets/abspielen-kern.js", "assets/abspielen.js"].every((d) => spawnSync(NODE, ["--check", join(WURZEL, d)]).status === 0));
 
 kopf("E · node --check");
@@ -324,6 +334,10 @@ if (!hatFfmpeg) {
     ok("ohne Messung trotzdem gültig für die Seite", d && typeof gueltig === "function" && gueltig(d));
     const reihe = listeK().videos.map((v) => v.id);
     ok("das zuletzt aufgenommene steht oben", reihe[0] === "probe-d", reihe.join(","));
+    /* --ohne-film: eine kleinere Fassung braucht keinen eigenen Vorschaufilm */
+    const r9b = lauf([film, "--id", "probe-e", "--titel", "Ohne Film", "--teil", "20000", "--ohne-film"]);
+    const e9 = listeK().videos.find((v) => v.id === "probe-e");
+    ok("--ohne-film: aufgenommen, vorschauFilm null und keine Datei", r9b.status === 0 && e9 && e9.vorschauFilm === null && !existsSync(join(kopie, "videos/probe-e/vorschau.mp4")), r9b.status + " " + r9b.stderr);
 
     const r10 = lauf(["--liste"]);
     ok("--liste nennt alle Videos und die Seitengröße", r10.status === 0 && /probe-a/.test(r10.stdout) && /probe-d/.test(r10.stdout) && /Seite:/.test(r10.stdout));
