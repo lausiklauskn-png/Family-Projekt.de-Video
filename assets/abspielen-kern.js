@@ -13,7 +13,12 @@
  *   · ohne Range: 200, Teil für Teil durchgereicht
  *   · 416 außerhalb, 404 unbekanntes Video, 503 Liste fehlt, 502 Teil kaputt
  * Jeder Teil: bis zu drei Versuche, Größe und SHA-256 geprüft. Höchstens drei
- * Teile im Arbeitsspeicher, nie in der Cache Storage. */
+ * Teile im Arbeitsspeicher, nie in der Cache Storage.
+ *
+ * ausVorrat(req, id, i, basis): liegt Teil i schon hier (fertig oder unterwegs),
+ * bekommt ihn auch die Lade-Seite von hier, statt ihn ein zweites Mal übers Netz
+ * zu holen (Klaus 2026-10-06: „lädt viel länger als 67 s"). Sonst null — dann
+ * geht die Anfrage wie bisher am Worker vorbei, mit den Versuchen der Seite. */
 (function (g) {
   "use strict";
   var TEIL_MAX = 3;
@@ -98,5 +103,13 @@
     });
   }
 
-  g.FPAbspielKern = { antwort: antwort, TEIL_MAX: TEIL_MAX };
+  function ausVorrat(req, id, i, basis) {
+    var s = basis + "|" + id + "#" + i;
+    if (!teile.has(s)) return null;
+    return teile.get(s).then(function (b) {
+      return new Response(b, { status: 200, headers: { "Content-Type": "application/octet-stream", "Content-Length": String(b.byteLength), "Cache-Control": "no-store" } });
+    }, function () { return fetch(req); });
+  }
+
+  g.FPAbspielKern = { antwort: antwort, ausVorrat: ausVorrat, TEIL_MAX: TEIL_MAX };
 })(self);

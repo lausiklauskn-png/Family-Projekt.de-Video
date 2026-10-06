@@ -117,8 +117,8 @@
     ".vr-schicht{position:absolute;inset:0;z-index:5;background:#000}" +
     ".vr-schicht[hidden],.vr-menue[hidden],.vr-meldung[hidden],.vr-warte[hidden]{display:none}" +
     ".vr-video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;display:block}" +
-    ".vr-warte{position:absolute;left:50%;top:40%;transform:translate(-50%,-50%);margin:0;padding:4px 10px;border-radius:999px;" +
-      "background:rgba(0,0,0,.6);color:#fff;font:600 12px/1.3 system-ui,sans-serif;pointer-events:none}" +
+    ".vr-warte{position:absolute;left:50%;top:40%;transform:translate(-50%,-50%);margin:0;padding:6px 14px 6px 8px;border-radius:999px;" +
+      "display:flex;align-items:center;background:rgba(0,0,0,.6);color:#fff;font:600 13px/1.3 system-ui,sans-serif;pointer-events:none;z-index:1}" +
     ".vr-leiste{position:absolute;left:6px;right:6px;bottom:6px;z-index:6;display:flex;align-items:center;gap:3px;" +
       "padding:2px;border-radius:999px;background:transparent;box-shadow:none;color:#fff;font:600 12px/1 system-ui,sans-serif;transition:opacity .25s}" +
     ".vr-rahmen[data-vr-leise] .vr-leiste{opacity:0;pointer-events:none}" +
@@ -171,9 +171,10 @@
       "max-width:calc(85vh * var(--vr-format,1.7778));margin-left:auto;margin-right:auto}" +
     ".vr-rahmen:fullscreen:not([data-vr-zustand=ruhe]){aspect-ratio:auto!important;max-width:none}" +
     /* Punkte im Kreis: es lädt noch, die Leitung ist nicht weg. */
-    ".vr-punkte{display:inline-block;position:relative;width:14px;height:14px;margin-right:7px;vertical-align:-3px;" +
+    /* 24 px, Punkte 5 px (Klaus 2026-10-06: die 14-px-Fassung war nicht zu sehen). */
+    ".vr-punkte{display:inline-block;position:relative;width:24px;height:24px;margin-right:8px;vertical-align:middle;" +
       "animation:vr-kreis .9s steps(8) infinite}" +
-    ".vr-punkte i{position:absolute;left:5.5px;top:0;width:3px;height:3px;border-radius:50%;background:currentColor;transform-origin:1.5px 7px}" +
+    ".vr-punkte i{position:absolute;left:9.5px;top:0;width:5px;height:5px;border-radius:50%;background:currentColor;transform-origin:2.5px 12px}" +
     "@keyframes vr-kreis{to{transform:rotate(360deg)}}" +
     "@media (prefers-reduced-motion:reduce){.vr-punkte{animation:none}.vr-leiste,.vr-qual{transition:none}}";
 
@@ -242,6 +243,16 @@
     var warte = el("p", "vr-warte", schicht); warte.hidden = true;
     punkte(warte);
     var warteText = el("span", "vr-warte-text", warte);
+    /* Die Punkte stehen mindestens WARTE_MIN_MS da: ein Aufblitzen für wenige
+       Bilder sieht niemand (Klaus 2026-10-06: „die Punkte sind nicht zu sehen"). */
+    var WARTE_MIN_MS = 800, warteSeit = 0, warteUhr = 0;
+    function zeigeWarte(an, sofort) {
+      clearTimeout(warteUhr);
+      if (an) { if (warte.hidden) { warte.hidden = false; warteSeit = Date.now(); } return; }
+      var rest = WARTE_MIN_MS - (Date.now() - warteSeit);
+      if (sofort || warte.hidden || rest <= 0) { warte.hidden = true; return; }
+      warteUhr = setTimeout(function () { warte.hidden = true; wach(); }, rest);
+    }
     var qual = el("p", "vr-qual", rahmen); qual.hidden = true;
     var meldung = el("p", "vr-meldung", rahmen); meldung.hidden = true;
     meldung.setAttribute("role", "status"); meldung.setAttribute("aria-live", "polite");
@@ -348,6 +359,10 @@
           var a = el("a", "vr-laden", zLaden);
           a.href = mit(M.laden, f.id); a.target = "_blank"; a.rel = "noopener"; a.title = T.ladenHinweis;
           a.setAttribute("data-fassung", f.id);
+          /* Herunterladen und Abspielen teilen sich eine Leitung: wer lädt, hält
+             das Video an (Klaus 2026-10-06: „lädt viel länger als 67 s und ruckelt").
+             Die Stelle bleibt gemerkt, ▶ macht dort weiter. */
+          a.addEventListener("click", function () { if (zustand !== "ruhe" && !vid.paused) { vid.pause(); merke(); zeichne(); } });
           var g = groessen && groessen[f.id];
           a.textContent = f.name;
           if (g) {
@@ -461,7 +476,7 @@
     }
     function spieleJetzt() {
       /* Bis das erste Bild kommt, drehen sich die Punkte. */
-      if (vid.readyState < 3) warte.hidden = false;
+      if (vid.readyState < 3) zeigeWarte(true);
       var p = vid.play();
       if (p && p.catch) p.catch(function (e) { if (e && e.name !== "AbortError") melde(t().fehler + " (" + (e.message || e.name) + ")", true); });
     }
@@ -474,7 +489,7 @@
       vid.pause();
       vid.removeAttribute("src");
       try { vid.load(); } catch (e) {}
-      gestartet = null; warte.hidden = true; schicht.hidden = true; qualGezeigt = false;
+      gestartet = null; zeigeWarte(false, true); schicht.hidden = true; qualGezeigt = false;
       clearTimeout(qualUhr); qual.hidden = true;
       melde("");
       if (vollbildElement() === rahmen) (document.exitFullscreen || document.webkitExitFullscreen || function () {}).call(document);
@@ -554,14 +569,14 @@
       if (vid.videoWidth && vid.videoHeight) rahmen.style.setProperty("--vr-format", (vid.videoWidth / vid.videoHeight).toFixed(4));
     });
     vid.addEventListener("timeupdate", function () { if (zustand !== "ruhe" && Date.now() - zuletztGemerkt > 2000) merke(); });
-    vid.addEventListener("waiting", function () { warte.hidden = false; wach(); });
+    vid.addEventListener("waiting", function () { zeigeWarte(true); wach(); });
     vid.addEventListener("playing", function () { if (!qualGezeigt) { qualGezeigt = true; zeigeQualitaet(); } });
     ["playing", "canplay", "seeked", "pause"].forEach(function (n) {
-      vid.addEventListener(n, function () { if (!vid.seeking) { warte.hidden = true; wach(); } });
+      vid.addEventListener(n, function () { if (!vid.seeking) { zeigeWarte(false); wach(); } });
     });
     vid.addEventListener("error", function () {
       if (!vid.getAttribute("src")) return;
-      warte.hidden = true;
+      zeigeWarte(false, true);
       melde(t().fehler, true);
     });
     ["fullscreenchange", "webkitfullscreenchange"].forEach(function (n) { document.addEventListener(n, zeichne); });
