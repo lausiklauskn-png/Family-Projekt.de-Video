@@ -252,6 +252,9 @@ ok("abspielen-rahmen.js: die Qualität verschwindet nach QUAL_MS",
   /qualUhr = setTimeout\(function \(\) \{ qual\.hidden = true; \}, QUAL_MS\);/.test(raQ));
 ok("abspielen-rahmen.js: sichtbar steht nur weiter bei mm:ss, nicht der Name des Videos",
   /titel\.textContent = stelle > 0 \? T\.weiterBei \+ mmss\(stelle\) : "";/.test(raQ) && !/titel\.textContent = M\.titel/.test(raQ));
+/* Die Leiste selbst ist unsichtbar (Klaus 2026-10-06: „der Container selber soll unsichtbar sein"). */
+ok("abspielen-rahmen.js: die Leiste trägt keinen Hintergrund und keinen Schatten, nur die Knöpfe",
+  /\.vr-leiste\{[^}]*background:transparent;box-shadow:none;/.test(raQ) && !/\.vr-leiste\{[^}]*background:rgba/.test(raQ) && /\.vr-uhr\{[^}]*text-shadow:/.test(raQ));
 ok("node --check assets/abspielen-kern.js und assets/abspielen.js", ["assets/abspielen-kern.js", "assets/abspielen.js"].every((d) => spawnSync(NODE, ["--check", join(WURZEL, d)]).status === 0));
 
 kopf("E · node --check");
