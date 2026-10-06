@@ -1,0 +1,40 @@
+# Video-Pool — der Caddy im Container „video-pool“ (nicht der Haupt-Caddy).
+# Er liefert /srv/videos/<app>/… nur LESEND aus, mit Range (206) und CORS.
+#
+# CORS steht auf "*": die Dateien sind ohnehin öffentlich (wer die Adresse kennt,
+# lädt sie). Eine Herkunfts-Liste schützte nichts und bräche jede neue App, die
+# den Pool benutzt. Mitgeschickt wird nie ein Cookie (kein Allow-Credentials).
+{
+	admin off
+	auto_https off
+}
+
+:8080 {
+	root * /srv
+
+	# Versteckte Dateien und Sicherungen nie ausliefern.
+	@versteckt path */.* *.bak*
+	respond @versteckt 404
+
+	header {
+		Access-Control-Allow-Origin "*"
+		Access-Control-Allow-Methods "GET, HEAD, OPTIONS"
+		Access-Control-Allow-Headers "Range"
+		Access-Control-Expose-Headers "Content-Range, Content-Length, Accept-Ranges"
+		X-Content-Type-Options "nosniff"
+		-Server
+	}
+
+	@vorab method OPTIONS
+	respond @vorab 204
+
+	# Die Liste ändert sich beim Aufnehmen — immer neu fragen.
+	@liste path */videos.json
+	header @liste Cache-Control "no-cache"
+
+	@teil path *.bin *.mp4 *.jpg *.webp
+	header @teil Cache-Control "public, max-age=300"
+
+	# Kein Verzeichnis-Listing: „file_server“ ohne „browse“.
+	file_server
+}

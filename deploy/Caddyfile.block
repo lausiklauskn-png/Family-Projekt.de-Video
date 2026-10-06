@@ -1,0 +1,3 @@
+videos.family-projekt.de {
+	reverse_proxy video-pool:8080
+}
