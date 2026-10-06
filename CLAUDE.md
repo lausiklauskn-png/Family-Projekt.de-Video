@@ -264,7 +264,13 @@ sichtbar steht nicht mehr der Name des Videos, nur „weiter bei mm:ss", wenn ei
 gemerkt ist. Datei byte-gleich mit family-project (Pin `bfc69ca9…460e`). Proben: vier
 Text-Wächter in `smoke` (160 grün), je von Hand sabotiert → genau ihre rote Zeile; die
 Wirkung misst `smoke_werbevideo` B11 in family-project. Nicht im Vorrat (`SCHALE`),
-deshalb kein Cache-Bump. ⚠ Am Tablet nicht gemessen (Ausblenden mit dem Finger).
+deshalb kein Cache-Bump. ✅ Am Tablet bestätigt (Klaus 2026-10-06: *„Man sieht gar nichts
+mehr. So, genauso sollte es sein."*). Hier stand: *„⚠ Am Tablet nicht gemessen (Ausblenden mit
+dem Finger)."*
+
+**Die Leiste selbst ist unsichtbar (Klaus 2026-10-06, #10):** nur ▶ und Vollbild bleiben zu
+sehen; `.vr-leiste` ohne Grund und Schatten, die Zeit mit Text-Schatten. Pin in family-project
+`3e5c3b7c…a905a`, gemessen dort in `smoke_werbevideo` B11, Gegenprobe `LEISTE:`.
 
 ## Netzweit
 
