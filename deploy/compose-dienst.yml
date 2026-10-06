@@ -1,0 +1,16 @@
+  video-pool:
+    image: caddy:2-alpine
+    container_name: video-pool
+    restart: unless-stopped
+    volumes:
+      - /srv/videos:/srv:ro
+      # the folder, not the file: a file mount pins the inode, and git reset
+      # writes a new one, so the container would keep the old config
+      - /srv/fp-videos/deploy/caddy:/etc/caddy:ro
+    expose:
+      - "8080"
+    logging:
+      driver: json-file
+      options:
+        max-size: "1m"
+        max-file: "2"

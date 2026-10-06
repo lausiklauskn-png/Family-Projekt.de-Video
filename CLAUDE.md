@@ -272,6 +272,14 @@ dem Finger)."*
 sehen; `.vr-leiste` ohne Grund und Schatten, die Zeit mit Text-Schatten. Pin in family-project
 `3e5c3b7c…a905a`, gemessen dort in `smoke_werbevideo` B11, Gegenprobe `LEISTE:`.
 
+## 🖥 Nur die Videos auf den eigenen Server — vorbereitet, ungeprüft (2026-10-06)
+
+Klaus: *„nicht vollkommen auf den Server, sondern nur die Videos … in den eigenen Ordnern."*
+`deploy/` legt nur den Pool (`videos.json` + Teile) unter `https://videos.family-projekt.de/<app>/` auf den Hetzner-Cloud-Server
+(eigener Caddy-Container `video-pool`, ein Ordner je App). **Nichts davon ist gelaufen**: kein Docker im
+Behälter (Caddyfile nicht validiert), DNS-Eintrag fehlt, Platz auf dem Server nicht gemessen. Die Apps
+selbst bleiben auf github.io; später ändert sich in ihnen nur die Adresse der Videos. Plan und Reihenfolge: `docs/BRIEF_2026-10-06_video-pool-server.md`.
+
 ## Netzweit
 
 Freibrief · frisch von `origin/main` · Ton · kein PII · Ehrlichkeit:
