@@ -301,6 +301,16 @@ Frage an Klaus. Am Tablet nicht gemessen.
 
 Cache `fp-videos-v11`, `stil.css?v=4`, `abspielen.js?v=4`, `abspielen-kern.js?v=2`.
 
+## 🛡 Workfloh-PDF-Videos zum Herunterladen (Klaus 2026-10-07)
+
+Klaus: *„damit ich von da aus die Downloads starten kann … Vielleicht ist es besser, wenn es doppelt gespeichert
+wird, falls der Server ausfällt."* Aufgenommen mit `--ohne-film` (deutsche Fassungen):
+`workfloh-pdf-erklaervideo-quer` (25,8 MB, 2 Teile) · `workfloh-pdf-erklaervideo-hochkant` (29,9 MB, 3 Teile) ·
+`workfloh-pdf-versteckte-befehle` (13,8 MB, 1 Teil). Quelle: `Workfloh-PDF-Page/assets/` (workfloh-pdf-quer.mp4,
+workfloh-pdf-hochvoll.mp4, neu-befehle-quer.mp4) — dort liegt das Original, hier die Zweitablage.
+Seite danach **532,8 MB von 1 000 MB**. ⚠ Wer das Erklärvideo neu baut und hier mit `--ersetzen` nachzieht, legt
+die volle Größe noch einmal in die Historie.
+
 ## Netzweit
 
 Freibrief · frisch von `origin/main` · Ton · kein PII · Ehrlichkeit:

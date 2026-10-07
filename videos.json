@@ -2,6 +2,96 @@
   "fassung": 1,
   "videos": [
     {
+      "id": "workfloh-pdf-versteckte-befehle",
+      "titel": "Workfloh PDF · Versteckte Befehle erkennen",
+      "beschreibung": "Wie Betrüger eine KI mit versteckten Befehlen täuschen – und wie Workfloh PDF sie erkennt.",
+      "dateiname": "workfloh-pdf-versteckte-befehle.mp4",
+      "groesse": 13822146,
+      "sha256": "6c84b31f85dced595ff28cffba164ef1c0fd6641f85dc562bdd5c900c000ae0a",
+      "vorschau": "videos/workfloh-pdf-versteckte-befehle/vorschau.jpg",
+      "vorschauFilm": null,
+      "breite": 1920,
+      "hoehe": 1080,
+      "dauer": 72.5,
+      "fps": 30,
+      "video": "H.264",
+      "videoBitrate": 1353596,
+      "ton": "AAC",
+      "tonHz": 44100,
+      "tonKanaele": 2,
+      "aufgenommen": "2026-10-07T00:02:49.425Z",
+      "teile": [
+        {
+          "groesse": 13822146,
+          "sha256": "6c84b31f85dced595ff28cffba164ef1c0fd6641f85dc562bdd5c900c000ae0a"
+        }
+      ]
+    },
+    {
+      "id": "workfloh-pdf-erklaervideo-hochkant",
+      "titel": "Workfloh PDF · Erklärvideo (hochkant)",
+      "beschreibung": "Dasselbe Erklärvideo im Handy-Hochformat.",
+      "dateiname": "workfloh-pdf-erklaervideo-hochkant.mp4",
+      "groesse": 29896814,
+      "sha256": "66052cb34aaa5e380482d451d82b231e7fadbd3b6fb927204f1c821fca2e7875",
+      "vorschau": "videos/workfloh-pdf-erklaervideo-hochkant/vorschau.jpg",
+      "vorschauFilm": null,
+      "breite": 1080,
+      "hoehe": 1920,
+      "dauer": 219.2,
+      "fps": 30,
+      "video": "H.264",
+      "videoBitrate": 906625,
+      "ton": "AAC",
+      "tonHz": 44100,
+      "tonKanaele": 1,
+      "aufgenommen": "2026-10-07T00:02:47.382Z",
+      "teile": [
+        {
+          "groesse": 14000000,
+          "sha256": "dde817a6f5341751c8affde1b84bc51a84a299ce1f75d6ccac62bdb07663e27e"
+        },
+        {
+          "groesse": 14000000,
+          "sha256": "8f72e797c308d7c49b5b6f5670ed5852e5815a88fd9acca073b42024524fdf6e"
+        },
+        {
+          "groesse": 1896814,
+          "sha256": "150e2ef6cb2038778de63e614d0807a23b14b48ae25b8085d1a099570f9df283"
+        }
+      ]
+    },
+    {
+      "id": "workfloh-pdf-erklaervideo-quer",
+      "titel": "Workfloh PDF · Erklärvideo (quer)",
+      "beschreibung": "So geht Workfloh PDF: scannen, Felder erkennen, ausfüllen, ausgeben, übersetzen, suchen und ordnen.",
+      "dateiname": "workfloh-pdf-erklaervideo-quer.mp4",
+      "groesse": 25839204,
+      "sha256": "fdbc905faf8d542f92485e621e71564b7a90b18f473732de61c610b2b4ded256",
+      "vorschau": "videos/workfloh-pdf-erklaervideo-quer/vorschau.jpg",
+      "vorschauFilm": null,
+      "breite": 1920,
+      "hoehe": 1080,
+      "dauer": 219.202,
+      "fps": 30,
+      "video": "H.264",
+      "videoBitrate": 758162,
+      "ton": "AAC",
+      "tonHz": 44100,
+      "tonKanaele": 1,
+      "aufgenommen": "2026-10-07T00:02:43.979Z",
+      "teile": [
+        {
+          "groesse": 14000000,
+          "sha256": "4328f4642e8205803b0d53f52bf82229f89ebff6d5112029f11dcce494605efe"
+        },
+        {
+          "groesse": 11839204,
+          "sha256": "0ab16612eec47a37c21ceb05b95573913527d4762661e12ec9492b9b4f908be9"
+        }
+      ]
+    },
+    {
       "id": "werbevideo-67s-480p",
       "titel": "family-projekt.de in 67 Sekunden · 480p",
       "beschreibung": "Dasselbe Werbevideo in 480p: klein, für langsames Netz.",
