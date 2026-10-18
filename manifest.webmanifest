@@ -2,7 +2,7 @@
   "name": "family-projekt.de Videos",
   "short_name": "FP Videos",
   "description": "Große Videos von family-projekt.de in voller Qualität herunterladen — jeder Teil mit Prüfsumme.",
-  "id": "./",
+  "id": "/Family-Projekt.de-Video/",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

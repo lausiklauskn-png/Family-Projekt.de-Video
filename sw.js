@@ -14,7 +14,7 @@
  * in dem die Stelle liegt, prüft dessen SHA-256 und hält höchstens drei Teile im
  * Arbeitsspeicher — nie in der Cache Storage.
  * Wer eine Datei aus SCHALE ändert, erhöht CACHE_VERSION (und die ?v= in der Seite). */
-const CACHE_VERSION = "fp-videos-v11";
+const CACHE_VERSION = "fp-videos-v12";
 const SCHALE = [
   "./",
   "index.html",

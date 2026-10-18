@@ -161,6 +161,20 @@ ok("der Worker legt nichts aus videos/ und videos.json ab", /rest\.startsWith\("
 ok("kein videos/-Eintrag im Installations-Vorrat", !schaleListe.some((u) => u.startsWith("videos")));
 ok("Manifest: als eigene App (display standalone)", manifest.display === "standalone");
 ok("Manifest: Start und Bereich sind diese Seite", manifest.start_url === "./" && manifest.scope === "./");
+/* Die Kennung, gerechnet wie Chrome (Klaus 2026-10-18, chrome://webapks am Tablet): `id` wird gegen
+ * den URSPRUNG der start_url aufgelöst, nicht gegen den App-Ordner. `"./"` wird damit zu
+ * https://lausiklauskn-png.github.io/ — für JEDE App dort, und Chrome hielt zehn Apps für eine
+ * („bereits installiert", dann „App konnte nicht geöffnet werden"). */
+const BASIS = "https://lausiklauskn-png.github.io/Family-Projekt.de-Video/";   // Repo-Name wie im github.io-Pfad
+const kennung = (m, mu) => { const s = new URL(m.start_url || ".", mu); return new URL(m.id !== undefined ? m.id : s.href, s.origin).href; };
+const bereich = (m, mu) => new URL(m.scope || ".", new URL(m.start_url || ".", mu)).href;
+const mu = BASIS + "manifest.webmanifest";
+ok("Rechnung wie Chrome: \"./\" wird zur Wurzel des Ursprungs (der Befund)", kennung({ id: "./", start_url: "./" }, mu) === "https://lausiklauskn-png.github.io/");
+ok("Rechnung wie Chrome: \"/Family-Projekt.de-Video/\" bleibt im App-Ordner", kennung({ id: "/Family-Projekt.de-Video/", start_url: "./" }, mu) === BASIS);
+ok("Rechnung wie Chrome: ohne id gilt die start_url", kennung({ start_url: "./" }, mu) === BASIS);
+const appId = kennung(manifest, mu);
+ok("Manifest: trägt eine eigene id", typeof manifest.id === "string" && manifest.id.length > 0, manifest.id);
+ok("Manifest: die id liegt im Bereich der App, nicht an der Wurzel von github.io", appId.startsWith(bereich(manifest, mu)), appId + " gegen " + bereich(manifest, mu));
 const icons = manifest.icons || [];
 ok("Manifest: Symbole 192, 512 und maskable", ["192x192", "512x512"].every((s) => icons.some((i) => i.sizes === s)) && icons.some((i) => i.purpose === "maskable"));
 const fehltIcon = icons.filter((i) => !existsSync(join(WURZEL, i.src.split("?")[0])));

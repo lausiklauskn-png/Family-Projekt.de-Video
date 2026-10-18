@@ -44,6 +44,10 @@ da und die Seite sagt „nicht gemessen“ — nie eine geratene Zahl.
 - **Pushen in Etappen:** ein Push mit 190 MB riss im Behälter ab. Je Push etwa
   fünf Teile, mit ausdrücklicher Refspec.
 - **Das Depot ist öffentlich.** Nichts hineinlegen, was nicht jeder laden darf.
+- **Manifest-`id` ist `/Family-Projekt.de-Video/`, nie `./`** (Klaus 2026-10-18, chrome://webapks): Chrome löst `id`
+  gegen den URSPRUNG auf — `./` wird zu `https://lausiklauskn-png.github.io/`, für jede App dort gleich, und Chrome
+  hielt zehn Apps für eine. `tests/smoke.mjs` rechnet wie Chrome, Gegenprobe `MANIFESTID:`. Eine schon installierte
+  Kopie einmal deinstallieren und neu installieren. Cache `fp-videos-v12`.
 
 ## ⚠ Die Neigung flackerte an der Kante — und `getBoundingClientRect` war schuld
 

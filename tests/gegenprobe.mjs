@@ -30,6 +30,10 @@ const NUR_FALL = process.env.NUR_FALL || "";
  * woran die rote Zeile zu erkennen ist. Zwei Riegel, die einander decken,
  * stehen in EINEM Fall — einer allein misst nichts. */
 const FAELLE = [
+  { name: "MANIFESTID: die id steht wieder auf \"./\" (Chrome rechnet daraus die Wurzel von github.io)",
+    datei: "manifest.webmanifest",
+    ersetze: [['"id": "/Family-Projekt.de-Video/",', '"id": "./",']],
+    proben: ["smoke"], erwartet: /die id liegt im Bereich der App/ },
   { name: "LADENPAUSE: ein Tipp auf Herunterladen lässt das Video weiterlaufen",
     datei: "assets/abspielen-rahmen.js",
     ersetze: [['a.addEventListener("click", function () { if (zustand !== "ruhe" && !vid.paused) { vid.pause(); merke(); zeichne(); } });', ""]],
