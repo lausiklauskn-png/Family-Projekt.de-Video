@@ -19,11 +19,19 @@
       "ton": "AAC",
       "tonHz": 48000,
       "tonKanaele": 2,
-      "aufgenommen": "2026-10-23T14:35:39.316Z",
+      "aufgenommen": "2026-10-23T14:56:11.991Z",
       "teile": [
         {
-          "groesse": 14000000,
-          "sha256": "b4e901e6b888a2a527ad78bd9065ceb65cd34f9564905420ea688ae48b094b27"
+          "groesse": 2000000,
+          "sha256": "b122cc0d28342e4a2a7b5a329c6c6fc23856c3de21fe0be1e588febe88793f5d"
+        },
+        {
+          "groesse": 4000000,
+          "sha256": "3ffa77fad7fdee7992b64c5a121f75a174a98d447be5d3ca81c934e316354856"
+        },
+        {
+          "groesse": 8000000,
+          "sha256": "03b7332484b9f5852cd9c680398e10dde1c22e016ba7b50c051285f80776b588"
         },
         {
           "groesse": 2547401,
@@ -49,11 +57,19 @@
       "ton": "AAC",
       "tonHz": 48000,
       "tonKanaele": 2,
-      "aufgenommen": "2026-10-23T14:35:38.647Z",
+      "aufgenommen": "2026-10-23T14:56:10.521Z",
       "teile": [
         {
-          "groesse": 14000000,
-          "sha256": "a7dcc7eee68f45316b8aecdd658a6aafa39eec53fb01c3497d44516c1c0174b8"
+          "groesse": 2000000,
+          "sha256": "bc5452a3fb9653f94ece7108dc7cc6abeb50ae220b950b6a46fb14a66d195e5a"
+        },
+        {
+          "groesse": 4000000,
+          "sha256": "ceb774f1dd9072a06ffe8d33686bf028b6a92d5daa58845e52d7d12ca6454837"
+        },
+        {
+          "groesse": 8000000,
+          "sha256": "59633ee5a74fe408d7cc4a832a011528289af5c666ebc09889bff5b3b176222c"
         },
         {
           "groesse": 2581617,
@@ -79,11 +95,19 @@
       "ton": "AAC",
       "tonHz": 48000,
       "tonKanaele": 2,
-      "aufgenommen": "2026-10-23T14:35:38.049Z",
+      "aufgenommen": "2026-10-23T14:56:08.864Z",
       "teile": [
         {
-          "groesse": 14000000,
-          "sha256": "cdf67a15a10426911b60e0752beb94f0c69316f92eeed3c751790c1125680c2f"
+          "groesse": 2000000,
+          "sha256": "5239df85f7649687129e8fb603168f7a5f098ad414781d0bc9f4460015f8053e"
+        },
+        {
+          "groesse": 4000000,
+          "sha256": "35d54286108d0c72ae74672c02e7077b0be5060d863cbe57fd793b09f1e0c7aa"
+        },
+        {
+          "groesse": 8000000,
+          "sha256": "437ef79bea5d6d7c8a575616225cd56d56acf5f49a53355f429c2f0ad5ecffde"
         },
         {
           "groesse": 3706182,
@@ -109,15 +133,65 @@
       "ton": "AAC",
       "tonHz": 48000,
       "tonKanaele": 2,
-      "aufgenommen": "2026-10-23T14:35:37.325Z",
+      "aufgenommen": "2026-10-23T14:56:07.057Z",
       "teile": [
         {
-          "groesse": 14000000,
-          "sha256": "b8533f400ca78ff244c95ce81381081c2ee4137b095ac533ee3277fabf5500bf"
+          "groesse": 2000000,
+          "sha256": "6d93c8ffcc8b7a47d9766f5155102441e42e36117b94c6b50f90b44a7feb42c5"
+        },
+        {
+          "groesse": 4000000,
+          "sha256": "f096098f803c99283239cd16e11821854bf3f7da0de71ce8e8595fdce0543400"
+        },
+        {
+          "groesse": 8000000,
+          "sha256": "2581fdba07bab3d41c475c96b42e47c611f9c7213c443dd16f4962a1306210cf"
         },
         {
           "groesse": 3721726,
           "sha256": "da48fc2e3dbcb587804116b1a5852493b23239d381ea5c9a69b1ac855093dc81"
+        }
+      ]
+    },
+    {
+      "id": "private-brain-pro-film-720p",
+      "titel": "Private Brain Pro · Werbefilm · 720p",
+      "beschreibung": "Derselbe Film in 720p, schneller zum Abspielen übers Netz.",
+      "dateiname": "private-brain-pro-film-720p.mp4",
+      "groesse": 24066093,
+      "sha256": "9566d5cdeb9972bb77367cc9888156d86ddbbbaf9bf25af59e4ff89b2ae1bbee",
+      "vorschau": "videos/private-brain-pro-film-720p/vorschau.jpg",
+      "vorschauFilm": {
+        "pfad": "videos/private-brain-pro-film-720p/vorschau.mp4",
+        "groesse": 12002126,
+        "sha256": "06d3a8ac2fd7fe0311192802d39fafcdbd7706d95d3fc819548fa56e7bb7ab16"
+      },
+      "breite": 1280,
+      "hoehe": 720,
+      "dauer": 105.002,
+      "fps": 30,
+      "video": "H.264",
+      "videoBitrate": 1661554,
+      "ton": "AAC",
+      "tonHz": 48000,
+      "tonKanaele": 2,
+      "aufgenommen": "2026-10-23T14:56:04.314Z",
+      "teile": [
+        {
+          "groesse": 2000000,
+          "sha256": "ce67d9bcc247b6f2b5903dd0b146da94cad92f8b8a204932bc33d6074221265d"
+        },
+        {
+          "groesse": 4000000,
+          "sha256": "ddff29f971ff998d714fe4fba461358a3753ffa20ea1551bf20a162c97c0470c"
+        },
+        {
+          "groesse": 8000000,
+          "sha256": "f9dcd643b7d488766ff2cca639347c60ad778c30e7fdfb0b8662364500b5fc43"
+        },
+        {
+          "groesse": 10066093,
+          "sha256": "4e7b8a92b5cba1b5d7f2b7464eb9beab13fd66209b59a7f6aed4c5ca161bc734"
         }
       ]
     },
@@ -270,40 +344,6 @@
         {
           "groesse": 9721714,
           "sha256": "8cc941eddb72bc028821536978bb53337bf628624b19dba45a23e7a4cf6cbce8"
-        }
-      ]
-    },
-    {
-      "id": "private-brain-pro-film-720p",
-      "titel": "Private Brain Pro · Werbefilm · 720p",
-      "beschreibung": "Derselbe Film in 720p, schneller zum Abspielen übers Netz.",
-      "dateiname": "private-brain-pro-film-720p.mp4",
-      "groesse": 24066093,
-      "sha256": "9566d5cdeb9972bb77367cc9888156d86ddbbbaf9bf25af59e4ff89b2ae1bbee",
-      "vorschau": "videos/private-brain-pro-film-720p/vorschau.jpg",
-      "vorschauFilm": {
-        "pfad": "videos/private-brain-pro-film-720p/vorschau.mp4",
-        "groesse": 12002029,
-        "sha256": "743bbf09db52334433504ece105c5112bad6ccc617a2d36c832a55561df28957"
-      },
-      "breite": 1280,
-      "hoehe": 720,
-      "dauer": 105.002,
-      "fps": 30,
-      "video": "H.264",
-      "videoBitrate": 1661554,
-      "ton": "AAC",
-      "tonHz": 48000,
-      "tonKanaele": 2,
-      "aufgenommen": "2026-10-23T13:35:51.331Z",
-      "teile": [
-        {
-          "groesse": 14000000,
-          "sha256": "a072af444e5e4d58ccefa5a79175b8b3f8a2526b2656040bc05bb03072da29ad"
-        },
-        {
-          "groesse": 10066093,
-          "sha256": "4e7b8a92b5cba1b5d7f2b7464eb9beab13fd66209b59a7f6aed4c5ca161bc734"
         }
       ]
     },
