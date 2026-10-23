@@ -313,6 +313,26 @@ Größe noch einmal in die Historie).
 
 Cache `fp-videos-v11`, `stil.css?v=4`, `abspielen.js?v=4`, `abspielen-kern.js?v=2`.
 
+## ⏸ „Lädt seit einer halben Stunde, Teil 2 von 6" (Klaus 2026-10-23)
+
+Werbefilm Private Brain Pro, Full HD (78 MB): Teil 1 kam, Teil 2 stand eine halbe Stunde. Die Teile auf dem Server
+stimmen (Größe und SHA-256 nachgerechnet). Die Ursache lag im Holen: **ein `fetch` hat keine eigene Frist.** Bleibt
+die Leitung mitten im Teil stehen (WLAN, Funk, Server), wartet er für immer, und die Seite zeigte nicht einmal, dass
+nichts mehr kommt — der Stand sprang nur am Ende eines Teils.
+
+- `laden.js`: Teil wird Stück für Stück gelesen (`lesen`), der Stand zählt **innerhalb** des Teils mit
+  („Teil 2 von 6 · 17,3 MB von 78,0 MB"). Kommt `STILLE_MS` (25 s) lang kein Byte, wird der Versuch abgebrochen
+  und neu begonnen; die Meldung sagt es („die Leitung stand 25 s still — neuer Versuch (2 von 3)"). Stopp wirkt weiter.
+- `abspielen-kern.js`: derselbe Wächter (20 s) im Worker. `ausVorrat` wartet höchstens so lange auf einen Teil, den
+  der Kern gerade holt, und geht dann selbst ins Netz — vorher hing die Seite an einem hängenden Vorladen des Kerns mit.
+- Proben: `browser` HAENGT (Server schickt die halbe Datei und schweigt), `smoke` HAENGT (2) · Gegenprobe `HAENGT:`,
+  `HAENGT2:`. Von Hand in einer Kopie: ohne den Wächter die rote Zeile HAENGT als erste.
+- ⚠ **Nicht nach family-project kopiert:** der Kern dort ist eine byte-1:1-Kopie (Pin), das Depot ist in dieser
+  Sitzung nicht erreichbar. Der Rahmen-Spieler auf family-projekt.de hat den Wächter also noch nicht.
+- ⚠ Warum die Leitung stand, ist nicht gemessen (github.io ist aus dem Behälter gesperrt). Am Tablet nicht gemessen.
+
+Cache `fp-videos-v13`, `laden.js?v=9`, `abspielen-kern.js?v=3`.
+
 ## 🛡 Workfloh-PDF-Videos zum Herunterladen (Klaus 2026-10-07)
 
 Klaus: *„damit ich von da aus die Downloads starten kann … Vielleicht ist es besser, wenn es doppelt gespeichert

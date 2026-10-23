@@ -22,6 +22,9 @@
 (function (g) {
   "use strict";
   var TEIL_MAX = 3;
+  /* Klaus 2026-10-23: ein Teil hing eine halbe Stunde. Ein fetch hat keine Frist;
+     kommt so lange kein Byte, wird der Versuch abgebrochen und neu begonnen. */
+  var STILLE_MS = 20000;
   var listen = new Map();   /* basis → {liste, um} */
   var teile = new Map();    /* "basis|id#i" → Promise<Uint8Array>, älteste zuerst */
 
@@ -40,15 +43,40 @@
     return v;
   }
 
+  async function mitWaechter(adr, groesse, i) {
+    var ctrl = typeof AbortController === "function" ? new AbortController() : null;
+    var still = false, uhr = null;
+    function wecken() {
+      if (!ctrl) return;
+      clearTimeout(uhr);
+      uhr = setTimeout(function () { still = true; ctrl.abort(); }, STILLE_MS);
+    }
+    try {
+      wecken();
+      var r = await fetch(adr, { cache: "no-store", signal: ctrl ? ctrl.signal : undefined });
+      if (!r.ok) throw new Error("Teil " + (i + 1) + ": Antwort " + r.status);
+      if (!r.body || !r.body.getReader) return new Uint8Array(await r.arrayBuffer());
+      var leser = r.body.getReader(), ziel = new Uint8Array(groesse), da = 0;
+      for (;;) {
+        wecken();
+        var x = await leser.read();
+        if (x.done) break;
+        if (da + x.value.byteLength > groesse) { try { leser.cancel(); } catch (e) {} throw new Error("Teil " + (i + 1) + ": falsche Größe"); }
+        ziel.set(x.value, da); da += x.value.byteLength;
+      }
+      return da === groesse ? ziel : ziel.subarray(0, da);
+    } catch (e) {
+      throw still ? new Error("Teil " + (i + 1) + ": die Leitung stand still") : e;
+    } finally { clearTimeout(uhr); }
+  }
+
   async function teilHolen(basis, v, i) {
     var t = v.teile[i];
     var adr = basis + "videos/" + v.id + "/teil-" + String(i).padStart(2, "0") + ".bin";
     var fehler = null;
     for (var versuch = 0; versuch < 3; versuch++) {
       try {
-        var r = await fetch(adr, { cache: "no-store" });
-        if (!r.ok) throw new Error("Teil " + (i + 1) + ": Antwort " + r.status);
-        var b = new Uint8Array(await r.arrayBuffer());
+        var b = await mitWaechter(adr, t.groesse, i);
         if (b.byteLength !== t.groesse) throw new Error("Teil " + (i + 1) + ": falsche Größe");
         if (hex(await crypto.subtle.digest("SHA-256", b)) !== t.sha256) throw new Error("Teil " + (i + 1) + ": Prüfsumme stimmt nicht");
         return b;
@@ -106,10 +134,14 @@
   function ausVorrat(req, id, i, basis) {
     var s = basis + "|" + id + "#" + i;
     if (!teile.has(s)) return null;
-    return teile.get(s).then(function (b) {
+    var p = teile.get(s), frist = null;
+    var spaet = new Promise(function (ok) { frist = setTimeout(function () { ok(null); }, STILLE_MS); });
+    return Promise.race([p, spaet]).then(function (b) {
+      clearTimeout(frist);
+      if (!b) return fetch(req);   /* unterwegs und noch nicht da: die Seite wartet nicht länger */
       return new Response(b, { status: 200, headers: { "Content-Type": "application/octet-stream", "Content-Length": String(b.byteLength), "Cache-Control": "no-store" } });
-    }, function () { return fetch(req); });
+    }, function () { clearTimeout(frist); return fetch(req); });
   }
 
-  g.FPAbspielKern = { antwort: antwort, ausVorrat: ausVorrat, TEIL_MAX: TEIL_MAX };
+  g.FPAbspielKern = { antwort: antwort, ausVorrat: ausVorrat, TEIL_MAX: TEIL_MAX, stilleMs: function (ms) { STILLE_MS = ms; } };
 })(self);
