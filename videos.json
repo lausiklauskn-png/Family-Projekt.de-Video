@@ -2,6 +2,86 @@
   "fassung": 1,
   "videos": [
     {
+      "id": "private-brain-pro-film-720p",
+      "titel": "Private Brain Pro: die App baut sich zusammen · 720p",
+      "beschreibung": "Derselbe Film in 720p, schneller zum Abspielen übers Netz.",
+      "dateiname": "Private-Brain-Pro-Film-720p.mp4",
+      "groesse": 27158944,
+      "sha256": "ef4dd85edd6e5677daad1adfca160f5c4386288a4098c05255e96ad3c181f5f6",
+      "vorschau": "videos/private-brain-pro-film-720p/vorschau.jpg",
+      "vorschauFilm": null,
+      "breite": 1280,
+      "hoehe": 720,
+      "dauer": 105,
+      "fps": 30,
+      "video": "H.264",
+      "videoBitrate": 1863343,
+      "ton": "AAC",
+      "tonHz": 48000,
+      "tonKanaele": 2,
+      "aufgenommen": "2026-10-23T08:10:59.746Z",
+      "teile": [
+        {
+          "groesse": 14000000,
+          "sha256": "2c02b0d124408824545bf3dc98848f56b5d0923d4fac666ba02c78945fbe4f3a"
+        },
+        {
+          "groesse": 13158944,
+          "sha256": "dedd64a0f88716267bf394599b405cfd36a6e058b46d741c12458f4fe3c78141"
+        }
+      ]
+    },
+    {
+      "id": "private-brain-pro-film",
+      "titel": "Private Brain Pro: die App baut sich zusammen",
+      "beschreibung": "Aus bunten 3D-Puzzleteilen setzt sich die App zusammen und erklärt sich dabei: Suche nach Bedeutung, Explorer, Postfach, Schutz. Mit Musik von Family Projekt, Workflow PDF und dem Sicherheitsfilm.",
+      "dateiname": "Private-Brain-Pro-Film.mp4",
+      "groesse": 78866905,
+      "sha256": "c2cf0be7b1d87be5d1c9c84f4c3eeca9ce01f5f7ed30d325afb772a0677cea50",
+      "vorschau": "videos/private-brain-pro-film/vorschau.jpg",
+      "vorschauFilm": {
+        "pfad": "videos/private-brain-pro-film/vorschau.mp4",
+        "groesse": 12052213,
+        "sha256": "0eb970c3e904606a0812a09c5133d8b9120719aed74b68137f07e494a0fc3d03"
+      },
+      "breite": 1920,
+      "hoehe": 1080,
+      "dauer": 105,
+      "fps": 30,
+      "video": "H.264",
+      "videoBitrate": 5803002,
+      "ton": "AAC",
+      "tonHz": 48000,
+      "tonKanaele": 2,
+      "aufgenommen": "2026-10-23T08:10:51.913Z",
+      "teile": [
+        {
+          "groesse": 14000000,
+          "sha256": "4e54f22525a746516217f6df5c04fe2025e00a973569a6bab505ae4bccb48cc4"
+        },
+        {
+          "groesse": 14000000,
+          "sha256": "d2b1a69ca4ecbcf955a8803a1fdc4ff1f52eb51102eb01b09d632462e7354d2a"
+        },
+        {
+          "groesse": 14000000,
+          "sha256": "c1d6a702480d4f21639acbac184a2eeef35f97e4e5770fe7f09a2000ab791f0b"
+        },
+        {
+          "groesse": 14000000,
+          "sha256": "eb9e4360721bb945935fdf14761ab6f5d3870bd5332de3f5b97afad82ebb938f"
+        },
+        {
+          "groesse": 14000000,
+          "sha256": "90124fb0fca3be19cfdef1be32233e8d164e2a9b5af50688f13f4bcd5660d76d"
+        },
+        {
+          "groesse": 8866905,
+          "sha256": "7d52fc9c5d08f3ded9073b755012fbaba87d46c94a57ed43e1ba331788eaa690"
+        }
+      ]
+    },
+    {
       "id": "workfloh-pdf-versteckte-befehle",
       "titel": "Workfloh PDF · Versteckte Befehle erkennen",
       "beschreibung": "Wie Betrüger eine KI mit versteckten Befehlen täuschen – und wie Workfloh PDF sie erkennt.",
