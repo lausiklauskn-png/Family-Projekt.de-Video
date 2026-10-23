@@ -2,6 +2,82 @@
   "fassung": 1,
   "videos": [
     {
+      "id": "private-brain-pro-handbuch-hoch-uplifting",
+      "titel": "Private Brain Pro · Handbuchvideo (hochkant, andere Musik)",
+      "beschreibung": "Das Handbuchvideo im Handy-Hochformat mit der Musik Corporate Uplifting.",
+      "dateiname": "private-brain-pro-handbuch-hoch-uplifting.mp4",
+      "groesse": 33786503,
+      "sha256": "7d234c455efda77dda4bced760f9caa57f266b952a91846865c121577c4bb420",
+      "vorschau": "videos/private-brain-pro-handbuch-hoch-uplifting/vorschau.jpg",
+      "vorschauFilm": {
+        "pfad": "videos/private-brain-pro-handbuch-hoch-uplifting/vorschau.mp4",
+        "groesse": 10383397,
+        "sha256": "e4d7f2cf056b8971bf23e05e82920f3074dd5299f3905474b58ccb6cb316bbef"
+      },
+      "breite": 1080,
+      "hoehe": 1920,
+      "dauer": 172.467,
+      "fps": 30,
+      "video": "H.264",
+      "videoBitrate": 1363273,
+      "ton": "AAC",
+      "tonHz": 48000,
+      "tonKanaele": 2,
+      "aufgenommen": "2026-10-23T14:05:48.435Z",
+      "teile": [
+        {
+          "groesse": 14000000,
+          "sha256": "09eaf18b8657f57ebabf6983ba6d2483cf83dd1069cac82eed4bac1f9384b8d6"
+        },
+        {
+          "groesse": 14000000,
+          "sha256": "917caa458e6ab15efd7e988fd25de7b817f2fdef0c1e3157e19aec6459acbd17"
+        },
+        {
+          "groesse": 5786503,
+          "sha256": "f0598c0c31f9d630151675512181c90b5e75c808f38a534763ac10a358499276"
+        }
+      ]
+    },
+    {
+      "id": "private-brain-pro-handbuch-hoch",
+      "titel": "Private Brain Pro · Handbuchvideo (hochkant)",
+      "beschreibung": "Das Handbuchvideo im Handy-Hochformat. Musik: Inspiring und City Travel.",
+      "dateiname": "private-brain-pro-handbuch-hoch.mp4",
+      "groesse": 33820719,
+      "sha256": "52b5260f8ad4475fcca1e65341015093f882be99b6e55db1c9f6de50026a360b",
+      "vorschau": "videos/private-brain-pro-handbuch-hoch/vorschau.jpg",
+      "vorschauFilm": {
+        "pfad": "videos/private-brain-pro-handbuch-hoch/vorschau.mp4",
+        "groesse": 10389689,
+        "sha256": "cf3573d37449c13b79627cded09f8ae3d5e5d4c968062527c2adc5890457a797"
+      },
+      "breite": 1080,
+      "hoehe": 1920,
+      "dauer": 172.467,
+      "fps": 30,
+      "video": "H.264",
+      "videoBitrate": 1363273,
+      "ton": "AAC",
+      "tonHz": 48000,
+      "tonKanaele": 2,
+      "aufgenommen": "2026-10-23T14:04:57.523Z",
+      "teile": [
+        {
+          "groesse": 14000000,
+          "sha256": "aeab2bcff4105b56a8042d6847bc1c1337d3b3b1baf1bcd1292ea1374158446d"
+        },
+        {
+          "groesse": 14000000,
+          "sha256": "143f2862da0e330d05c17c60673fa38373f5f76c9df34e80ac9926ae6f158a1a"
+        },
+        {
+          "groesse": 5820719,
+          "sha256": "fe8c41221a71715b981d6c6f847c0d3030d4584f1327fe7222a6aa584234a380"
+        }
+      ]
+    },
+    {
       "id": "private-brain-pro-handbuch-uplifting",
       "titel": "Private Brain Pro · Handbuchvideo (andere Musik)",
       "beschreibung": "Dasselbe Handbuchvideo mit der Musik Corporate Uplifting.",
