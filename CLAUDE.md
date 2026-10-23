@@ -23,6 +23,7 @@ Adresse: https://lausiklauskn-png.github.io/Family-Projekt.de-Video/
 ```bash
 node tools/video-aufnehmen.mjs <datei.mp4> --id <kennung> --titel "<Titel>" [--beschreibung "…"] [--dateiname <name.mp4>] [--vorschau-bei <s>]
 node tools/video-aufnehmen.mjs <datei.mp4> --id werbevideo-60s --titel "…" --ersetzen
+node tools/video-aufnehmen.mjs <datei-720p.mp4> --id <kennung>-720p --titel "…" --ohne-film --anlauf   # Stream-Fassung: startet schnell
 ```
 
 Messwerte (Bild, Länge, fps, Ton) kommen aus `ffprobe`. Fehlt es, steht `null`
@@ -300,8 +301,15 @@ nichts; dort hilft nur das Anhalten.
 ⚠ **BENANNTE GRENZE, gelesen, nicht gemessen:** der Kern antwortet erst, wenn der **ganze**
 Teil (14 MB) da und geprüft ist. Bei 720p (27 MB, 2 Teile) heißt das: das erste Bild kommt
 erst, wenn die erste Hälfte der Datei geladen ist. Bei 10 Mbit/s sind das rund 11 s Punkte, bei 5 Mbit/s rund 22 s.
-Kleinere Teile für die Stream-Fassungen wären die eigentliche Abhilfe — nicht gebaut, eine
-Frage an Klaus. Am Tablet nicht gemessen.
+Kleinere Teile für die Stream-Fassungen wären die eigentliche Abhilfe.
+
+✅ **Gebaut am 2026-10-23: `--anlauf`** (Klaus: *„er lädt den ersten Teil, fängt an zu spielen und lädt im Hintergrund den
+zweiten“*). Die ersten Teile sind 2 · 4 · 8 MB, danach 14 MB (`ANLAUF`, `teilGroessen()` im Werkzeug). Der Kern kann
+verschieden große Teile schon immer (Größe je Teil aus der Liste) und holt den nächsten Teil vor — geändert ist nur
+das Zerlegen. Mit `--anlauf` aufgenommen: `private-brain-pro-film-720p` und die vier `private-brain-pro-handbuch*-720p`.
+Rechnung: 2 MB statt 14 MB vor dem ersten Bild, bei 5 Mbit/s rund 3 s statt 22 s. Proben `smoke` `ANLAUF:` (4).
+⚠ Am Tablet und auf github.io nicht gemessen. Die übrigen Videos sind unverändert (ein Neuzerlegen legt ihre volle
+Größe noch einmal in die Historie).
 
 Cache `fp-videos-v11`, `stil.css?v=4`, `abspielen.js?v=4`, `abspielen-kern.js?v=2`.
 

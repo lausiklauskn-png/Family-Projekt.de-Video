@@ -383,6 +383,16 @@ if (!hatFfmpeg) {
     const e9 = listeK().videos.find((v) => v.id === "probe-e");
     ok("--ohne-film: aufgenommen, vorschauFilm null und keine Datei", r9b.status === 0 && e9 && e9.vorschauFilm === null && !existsSync(join(kopie, "videos/probe-e/vorschau.mp4")), r9b.status + " " + r9b.stderr);
 
+    /* --anlauf: kleine erste Teile, danach wie bisher (Klaus 2026-10-23) */
+    const tg = werkzeug.teilGroessen;
+    const g30 = typeof tg === "function" ? tg(30000000, 14000000, true) : null;
+    ok("ANLAUF: 30 MB werden 2 · 4 · 8 · 14 · 2 MB", g30 && g30.join(",") === "2000000,4000000,8000000,14000000,2000000", g30 && g30.join(","));
+    ok("ANLAUF: ohne Schalter bleibt alles bei 14 MB", typeof tg === "function" && tg(30000000, 14000000, false).join(",") === "14000000,14000000,2000000");
+    ok("ANLAUF: eine kleine Datei bleibt ein Teil", typeof tg === "function" && tg(1500000, 14000000, true).join(",") === "1500000");
+    const r9c = lauf([film, "--id", "probe-f", "--titel", "Mit Anlauf", "--teil", "20000", "--anlauf", "--ohne-film"]);
+    const f9 = listeK().videos.find((v) => v.id === "probe-f");
+    ok("ANLAUF: --anlauf nimmt die Teilgrößen aus teilGroessen, Summe stimmt", r9c.status === 0 && f9 && f9.teile.reduce((x, t) => x + t.groesse, 0) === f9.groesse
+      && f9.teile.map((t) => t.groesse).join(",") === tg(f9.groesse, 20000, true).join(","), r9c.status + " " + r9c.stderr);
     const r10 = lauf(["--liste"]);
     ok("--liste nennt alle Videos und die Seitengröße", r10.status === 0 && /probe-a/.test(r10.stdout) && /probe-d/.test(r10.stdout) && /Seite:/.test(r10.stdout));
     const r11 = lauf(["--entfernen", "probe-a"]);

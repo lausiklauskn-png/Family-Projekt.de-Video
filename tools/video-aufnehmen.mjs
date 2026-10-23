@@ -3,13 +3,15 @@
  *
  *   node tools/video-aufnehmen.mjs <datei.mp4> --id <kennung> --titel "<Titel>"
  *        [--beschreibung "<ein, zwei Sätze>"] [--dateiname <name.mp4>]
- *        [--vorschau <bild.jpg> | --vorschau-bei <sekunden>] [--ersetzen] [--ohne-film]
+ *        [--vorschau <bild.jpg> | --vorschau-bei <sekunden>] [--ersetzen] [--ohne-film] [--anlauf]
  *   node tools/video-aufnehmen.mjs --entfernen <kennung>
  *   node tools/video-aufnehmen.mjs --film-nachtragen <kennung>
  *   node tools/video-aufnehmen.mjs --liste
  *
  * Was es tut:
- *   · zerlegt die Datei in Teile zu je 14 000 000 Bytes (videos/<kennung>/teil-NN.bin)
+ *   · zerlegt die Datei in Teile zu je 14 000 000 Bytes (videos/<kennung>/teil-NN.bin);
+ *     mit --anlauf sind die ersten Teile klein (2 · 4 · 8 MB), damit der Stream nach
+ *     wenigen Sekunden startet — der Spieler wartet nur auf den ERSTEN geprüften Teil
  *   · rechnet je Teil UND für die ganze Datei die SHA-256-Prüfsumme
  *   · liest Bild, Länge, Bildrate, Video- und Tonart mit ffprobe (fehlt ffprobe,
  *     steht „nicht gemessen“ da — nie eine geratene Zahl)
@@ -46,6 +48,14 @@ export const DATEI_MAX = 50000000;
 export const FILM_MAX = 14000000;
 export const FILM_BREITE = 960;
 export const FILM_HOEHE = 540;
+/* Anlauf (Klaus 2026-10-23: „er lädt den ersten Teil, fängt an zu spielen und lädt im Hintergrund den zweiten"):
+   der Kern spielt erst, wenn ein Teil ganz geladen und geprüft ist. Kleine erste Teile = schneller Start. */
+export const ANLAUF = [2000000, 4000000, 8000000];
+export function teilGroessen(groesse, teilBytes, anlauf) {
+  const out = []; let pos = 0, n = 0;
+  while (pos < groesse) { const soll = anlauf && n < ANLAUF.length ? Math.min(ANLAUF[n], teilBytes) : teilBytes; const l = Math.min(soll, groesse - pos); out.push(l); pos += l; n++; }
+  return out;
+}
 export const KENNUNG = /^[a-z0-9][a-z0-9-]{1,59}$/;
 
 const WURZEL = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -62,7 +72,7 @@ function argumente(argv) {
     const s = argv[i];
     if (!s.startsWith("--")) { a.frei.push(s); continue; }
     const name = s.slice(2);
-    if (name === "ersetzen" || name === "liste" || name === "ohne-film") { a[name] = true; continue; }
+    if (name === "ersetzen" || name === "liste" || name === "ohne-film" || name === "anlauf") { a[name] = true; continue; }
     const wert = argv[i + 1];
     /* Ein Schalter ohne Wert ist ein Fehler, kein stiller Rückfall auf die Vorgabe. */
     if (wert === undefined || wert.startsWith("--") || wert === "") fehler(`--${name} braucht einen Wert`, 2);
@@ -124,7 +134,7 @@ function messen(datei) {
   }
 }
 
-function zerlegen(datei, zielOrdner, teilBytes) {
+function zerlegen(datei, zielOrdner, laengen) {
   const groesse = statSync(datei).size;
   const ganz = createHash("sha256");
   const teile = [];
@@ -132,7 +142,7 @@ function zerlegen(datei, zielOrdner, teilBytes) {
   try {
     let pos = 0, n = 0;
     while (pos < groesse) {
-      const laenge = Math.min(teilBytes, groesse - pos);
+      const laenge = laengen[n];
       const buf = Buffer.alloc(laenge);
       let gelesen = 0;
       while (gelesen < laenge) gelesen += readSync(fd, buf, gelesen, laenge - gelesen, pos + gelesen);
@@ -255,7 +265,8 @@ function aufnehmen(a) {
 
   const neuGroesse = statSync(quelle).size;
   /* VOR dem Schreiben prüfen: ein Abbruch mittendrin ließe halbe Teile liegen */
-  if (Math.ceil(neuGroesse / teilBytes) > 100) fehler("mehr als 100 Teile — die Seite zählt zweistellig (teil-00 … teil-99). Größeres --teil wählen.");
+  const laengen = teilGroessen(neuGroesse, teilBytes, a.anlauf);
+  if (laengen.length > 100) fehler("mehr als 100 Teile — die Seite zählt zweistellig (teil-00 … teil-99). Größeres --teil wählen.");
   const altGroesse = existsSync(ordner) ? seitenGroesse(ordner) : 0;
   /* der Vorschaufilm zählt mit, höchstens FILM_MAX */
   const danach = seitenGroesse() - altGroesse + neuGroesse + FILM_MAX;
@@ -265,7 +276,7 @@ function aufnehmen(a) {
 
   if (existsSync(ordner)) rmSync(ordner, { recursive: true });
   mkdirSync(ordner, { recursive: true });
-  const z = zerlegen(quelle, ordner, teilBytes);
+  const z = zerlegen(quelle, ordner, laengen);
   const m = messen(quelle);
   const mitVorschau = vorschauAnlegen(quelle, ordner, a, m.dauer);
   /* --ohne-film: eine kleinere Fassung desselben Videos braucht keinen eigenen
