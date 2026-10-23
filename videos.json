@@ -2,6 +2,126 @@
   "fassung": 1,
   "videos": [
     {
+      "id": "private-brain-pro-handbuch-hoch-uplifting-720p",
+      "titel": "Private Brain Pro · Handbuchvideo (hochkant, andere Musik) · 720p",
+      "beschreibung": "Hochkant mit der Musik Corporate Uplifting, in 720p.",
+      "dateiname": "private-brain-pro-handbuch-hoch-uplifting-720p.mp4",
+      "groesse": 16547401,
+      "sha256": "af9d5a14fb06fe2cbed0ba21bc05e980cc8acbcb85cb7fcae3405d52532148bc",
+      "vorschau": "videos/private-brain-pro-handbuch-hoch-uplifting-720p/vorschau.jpg",
+      "vorschauFilm": null,
+      "breite": 720,
+      "hoehe": 1280,
+      "dauer": 172.467,
+      "fps": 30,
+      "video": "H.264",
+      "videoBitrate": 563615,
+      "ton": "AAC",
+      "tonHz": 48000,
+      "tonKanaele": 2,
+      "aufgenommen": "2026-10-23T14:35:39.316Z",
+      "teile": [
+        {
+          "groesse": 14000000,
+          "sha256": "b4e901e6b888a2a527ad78bd9065ceb65cd34f9564905420ea688ae48b094b27"
+        },
+        {
+          "groesse": 2547401,
+          "sha256": "0848832e9f5ccf8706aae57d3c16b3046a248aa5c2db303db8e1f162155b81d4"
+        }
+      ]
+    },
+    {
+      "id": "private-brain-pro-handbuch-hoch-720p",
+      "titel": "Private Brain Pro · Handbuchvideo (hochkant) · 720p",
+      "beschreibung": "Das Handbuchvideo hochkant in 720p, schneller zum Abspielen übers Netz.",
+      "dateiname": "private-brain-pro-handbuch-hoch-720p.mp4",
+      "groesse": 16581617,
+      "sha256": "f891be8416e6c00dfc02c3fa864863d4516c1ea7ff31bcf790365351568fc064",
+      "vorschau": "videos/private-brain-pro-handbuch-hoch-720p/vorschau.jpg",
+      "vorschauFilm": null,
+      "breite": 720,
+      "hoehe": 1280,
+      "dauer": 172.467,
+      "fps": 30,
+      "video": "H.264",
+      "videoBitrate": 563615,
+      "ton": "AAC",
+      "tonHz": 48000,
+      "tonKanaele": 2,
+      "aufgenommen": "2026-10-23T14:35:38.647Z",
+      "teile": [
+        {
+          "groesse": 14000000,
+          "sha256": "a7dcc7eee68f45316b8aecdd658a6aafa39eec53fb01c3497d44516c1c0174b8"
+        },
+        {
+          "groesse": 2581617,
+          "sha256": "e77c319696eb690b1eda981590707bb3cb97c91c445395275fdaf6d13f58d183"
+        }
+      ]
+    },
+    {
+      "id": "private-brain-pro-handbuch-uplifting-720p",
+      "titel": "Private Brain Pro · Handbuchvideo (andere Musik) · 720p",
+      "beschreibung": "Mit der Musik Corporate Uplifting, in 720p.",
+      "dateiname": "private-brain-pro-handbuch-uplifting-720p.mp4",
+      "groesse": 17706182,
+      "sha256": "6917e05c9dd96669373b2e99071344f49155281758e385c3009c815d5ef616f7",
+      "vorschau": "videos/private-brain-pro-handbuch-uplifting-720p/vorschau.jpg",
+      "vorschauFilm": null,
+      "breite": 1280,
+      "hoehe": 720,
+      "dauer": 193.733,
+      "fps": 30,
+      "video": "H.264",
+      "videoBitrate": 526951,
+      "ton": "AAC",
+      "tonHz": 48000,
+      "tonKanaele": 2,
+      "aufgenommen": "2026-10-23T14:35:38.049Z",
+      "teile": [
+        {
+          "groesse": 14000000,
+          "sha256": "cdf67a15a10426911b60e0752beb94f0c69316f92eeed3c751790c1125680c2f"
+        },
+        {
+          "groesse": 3706182,
+          "sha256": "7f8046f682547397db819e11ba02516aaee5c39cb997d47bbb744c3ff4bb7e6d"
+        }
+      ]
+    },
+    {
+      "id": "private-brain-pro-handbuch-720p",
+      "titel": "Private Brain Pro · Handbuchvideo · 720p",
+      "beschreibung": "Dasselbe Handbuchvideo in 720p, schneller zum Abspielen übers Netz.",
+      "dateiname": "private-brain-pro-handbuch-720p.mp4",
+      "groesse": 17721726,
+      "sha256": "edcf55c0dbd57f9f78b9b0f97069393282d7345be03587a07ca7f744a949a984",
+      "vorschau": "videos/private-brain-pro-handbuch-720p/vorschau.jpg",
+      "vorschauFilm": null,
+      "breite": 1280,
+      "hoehe": 720,
+      "dauer": 193.733,
+      "fps": 30,
+      "video": "H.264",
+      "videoBitrate": 526951,
+      "ton": "AAC",
+      "tonHz": 48000,
+      "tonKanaele": 2,
+      "aufgenommen": "2026-10-23T14:35:37.325Z",
+      "teile": [
+        {
+          "groesse": 14000000,
+          "sha256": "b8533f400ca78ff244c95ce81381081c2ee4137b095ac533ee3277fabf5500bf"
+        },
+        {
+          "groesse": 3721726,
+          "sha256": "da48fc2e3dbcb587804116b1a5852493b23239d381ea5c9a69b1ac855093dc81"
+        }
+      ]
+    },
+    {
       "id": "private-brain-pro-handbuch-hoch-uplifting",
       "titel": "Private Brain Pro · Handbuchvideo (hochkant, andere Musik)",
       "beschreibung": "Das Handbuchvideo im Handy-Hochformat mit der Musik Corporate Uplifting.",
