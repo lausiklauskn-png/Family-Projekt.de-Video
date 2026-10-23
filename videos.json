@@ -2,310 +2,102 @@
   "fassung": 1,
   "videos": [
     {
-      "id": "private-brain-pro-handbuch-hoch-uplifting-720p",
-      "titel": "Private Brain Pro · Handbuchvideo (hochkant, andere Musik) · 720p",
-      "beschreibung": "Hochkant mit der Musik Corporate Uplifting, in 720p.",
-      "dateiname": "private-brain-pro-handbuch-hoch-uplifting-720p.mp4",
-      "groesse": 16547401,
-      "sha256": "af9d5a14fb06fe2cbed0ba21bc05e980cc8acbcb85cb7fcae3405d52532148bc",
-      "vorschau": "videos/private-brain-pro-handbuch-hoch-uplifting-720p/vorschau.jpg",
-      "vorschauFilm": null,
-      "breite": 720,
-      "hoehe": 1280,
-      "dauer": 172.467,
-      "fps": 30,
-      "video": "H.264",
-      "videoBitrate": 563615,
-      "ton": "AAC",
-      "tonHz": 48000,
-      "tonKanaele": 2,
-      "aufgenommen": "2026-10-23T14:56:11.991Z",
-      "teile": [
-        {
-          "groesse": 2000000,
-          "sha256": "b122cc0d28342e4a2a7b5a329c6c6fc23856c3de21fe0be1e588febe88793f5d"
-        },
-        {
-          "groesse": 4000000,
-          "sha256": "3ffa77fad7fdee7992b64c5a121f75a174a98d447be5d3ca81c934e316354856"
-        },
-        {
-          "groesse": 8000000,
-          "sha256": "03b7332484b9f5852cd9c680398e10dde1c22e016ba7b50c051285f80776b588"
-        },
-        {
-          "groesse": 2547401,
-          "sha256": "0848832e9f5ccf8706aae57d3c16b3046a248aa5c2db303db8e1f162155b81d4"
-        }
-      ]
-    },
-    {
-      "id": "private-brain-pro-handbuch-hoch-720p",
-      "titel": "Private Brain Pro · Handbuchvideo (hochkant) · 720p",
-      "beschreibung": "Das Handbuchvideo hochkant in 720p, schneller zum Abspielen übers Netz.",
-      "dateiname": "private-brain-pro-handbuch-hoch-720p.mp4",
-      "groesse": 16581617,
-      "sha256": "f891be8416e6c00dfc02c3fa864863d4516c1ea7ff31bcf790365351568fc064",
-      "vorschau": "videos/private-brain-pro-handbuch-hoch-720p/vorschau.jpg",
-      "vorschauFilm": null,
-      "breite": 720,
-      "hoehe": 1280,
-      "dauer": 172.467,
-      "fps": 30,
-      "video": "H.264",
-      "videoBitrate": 563615,
-      "ton": "AAC",
-      "tonHz": 48000,
-      "tonKanaele": 2,
-      "aufgenommen": "2026-10-23T14:56:10.521Z",
-      "teile": [
-        {
-          "groesse": 2000000,
-          "sha256": "bc5452a3fb9653f94ece7108dc7cc6abeb50ae220b950b6a46fb14a66d195e5a"
-        },
-        {
-          "groesse": 4000000,
-          "sha256": "ceb774f1dd9072a06ffe8d33686bf028b6a92d5daa58845e52d7d12ca6454837"
-        },
-        {
-          "groesse": 8000000,
-          "sha256": "59633ee5a74fe408d7cc4a832a011528289af5c666ebc09889bff5b3b176222c"
-        },
-        {
-          "groesse": 2581617,
-          "sha256": "e77c319696eb690b1eda981590707bb3cb97c91c445395275fdaf6d13f58d183"
-        }
-      ]
-    },
-    {
-      "id": "private-brain-pro-handbuch-uplifting-720p",
-      "titel": "Private Brain Pro · Handbuchvideo (andere Musik) · 720p",
-      "beschreibung": "Mit der Musik Corporate Uplifting, in 720p.",
-      "dateiname": "private-brain-pro-handbuch-uplifting-720p.mp4",
-      "groesse": 17706182,
-      "sha256": "6917e05c9dd96669373b2e99071344f49155281758e385c3009c815d5ef616f7",
-      "vorschau": "videos/private-brain-pro-handbuch-uplifting-720p/vorschau.jpg",
-      "vorschauFilm": null,
-      "breite": 1280,
-      "hoehe": 720,
-      "dauer": 193.733,
-      "fps": 30,
-      "video": "H.264",
-      "videoBitrate": 526951,
-      "ton": "AAC",
-      "tonHz": 48000,
-      "tonKanaele": 2,
-      "aufgenommen": "2026-10-23T14:56:08.864Z",
-      "teile": [
-        {
-          "groesse": 2000000,
-          "sha256": "5239df85f7649687129e8fb603168f7a5f098ad414781d0bc9f4460015f8053e"
-        },
-        {
-          "groesse": 4000000,
-          "sha256": "35d54286108d0c72ae74672c02e7077b0be5060d863cbe57fd793b09f1e0c7aa"
-        },
-        {
-          "groesse": 8000000,
-          "sha256": "437ef79bea5d6d7c8a575616225cd56d56acf5f49a53355f429c2f0ad5ecffde"
-        },
-        {
-          "groesse": 3706182,
-          "sha256": "7f8046f682547397db819e11ba02516aaee5c39cb997d47bbb744c3ff4bb7e6d"
-        }
-      ]
-    },
-    {
-      "id": "private-brain-pro-handbuch-720p",
-      "titel": "Private Brain Pro · Handbuchvideo · 720p",
-      "beschreibung": "Dasselbe Handbuchvideo in 720p, schneller zum Abspielen übers Netz.",
-      "dateiname": "private-brain-pro-handbuch-720p.mp4",
-      "groesse": 17721726,
-      "sha256": "edcf55c0dbd57f9f78b9b0f97069393282d7345be03587a07ca7f744a949a984",
-      "vorschau": "videos/private-brain-pro-handbuch-720p/vorschau.jpg",
-      "vorschauFilm": null,
-      "breite": 1280,
-      "hoehe": 720,
-      "dauer": 193.733,
-      "fps": 30,
-      "video": "H.264",
-      "videoBitrate": 526951,
-      "ton": "AAC",
-      "tonHz": 48000,
-      "tonKanaele": 2,
-      "aufgenommen": "2026-10-23T14:56:07.057Z",
-      "teile": [
-        {
-          "groesse": 2000000,
-          "sha256": "6d93c8ffcc8b7a47d9766f5155102441e42e36117b94c6b50f90b44a7feb42c5"
-        },
-        {
-          "groesse": 4000000,
-          "sha256": "f096098f803c99283239cd16e11821854bf3f7da0de71ce8e8595fdce0543400"
-        },
-        {
-          "groesse": 8000000,
-          "sha256": "2581fdba07bab3d41c475c96b42e47c611f9c7213c443dd16f4962a1306210cf"
-        },
-        {
-          "groesse": 3721726,
-          "sha256": "da48fc2e3dbcb587804116b1a5852493b23239d381ea5c9a69b1ac855093dc81"
-        }
-      ]
-    },
-    {
-      "id": "private-brain-pro-film-720p",
-      "titel": "Private Brain Pro · Werbefilm · 720p",
-      "beschreibung": "Derselbe Film in 720p, schneller zum Abspielen übers Netz.",
-      "dateiname": "private-brain-pro-film-720p.mp4",
-      "groesse": 24066093,
-      "sha256": "9566d5cdeb9972bb77367cc9888156d86ddbbbaf9bf25af59e4ff89b2ae1bbee",
-      "vorschau": "videos/private-brain-pro-film-720p/vorschau.jpg",
+      "id": "private-brain-pro-film",
+      "titel": "Private Brain Pro · Werbefilm",
+      "beschreibung": "Private Brain Pro in 1:45: alles an einem Ort, Suche nach Bedeutung, alle Postfächer in einer App, alles geprüft.",
+      "dateiname": "private-brain-pro-film.mp4",
+      "groesse": 78023678,
+      "sha256": "d1b37044484d4b1c0e14ee9d3f30b35167ac0a9776f1f421c7b1d4ae3682ffd6",
+      "vorschau": "videos/private-brain-pro-film/vorschau.jpg",
       "vorschauFilm": {
-        "pfad": "videos/private-brain-pro-film-720p/vorschau.mp4",
-        "groesse": 12002126,
-        "sha256": "06d3a8ac2fd7fe0311192802d39fafcdbd7706d95d3fc819548fa56e7bb7ab16"
-      },
-      "breite": 1280,
-      "hoehe": 720,
-      "dauer": 105.002,
-      "fps": 30,
-      "video": "H.264",
-      "videoBitrate": 1661554,
-      "ton": "AAC",
-      "tonHz": 48000,
-      "tonKanaele": 2,
-      "aufgenommen": "2026-10-23T14:56:04.314Z",
-      "teile": [
-        {
-          "groesse": 2000000,
-          "sha256": "ce67d9bcc247b6f2b5903dd0b146da94cad92f8b8a204932bc33d6074221265d"
-        },
-        {
-          "groesse": 4000000,
-          "sha256": "ddff29f971ff998d714fe4fba461358a3753ffa20ea1551bf20a162c97c0470c"
-        },
-        {
-          "groesse": 8000000,
-          "sha256": "f9dcd643b7d488766ff2cca639347c60ad778c30e7fdfb0b8662364500b5fc43"
-        },
-        {
-          "groesse": 10066093,
-          "sha256": "4e7b8a92b5cba1b5d7f2b7464eb9beab13fd66209b59a7f6aed4c5ca161bc734"
-        }
-      ]
-    },
-    {
-      "id": "private-brain-pro-handbuch-hoch-uplifting",
-      "titel": "Private Brain Pro · Handbuchvideo (hochkant, andere Musik)",
-      "beschreibung": "Das Handbuchvideo im Handy-Hochformat mit der Musik Corporate Uplifting.",
-      "dateiname": "private-brain-pro-handbuch-hoch-uplifting.mp4",
-      "groesse": 33786503,
-      "sha256": "7d234c455efda77dda4bced760f9caa57f266b952a91846865c121577c4bb420",
-      "vorschau": "videos/private-brain-pro-handbuch-hoch-uplifting/vorschau.jpg",
-      "vorschauFilm": {
-        "pfad": "videos/private-brain-pro-handbuch-hoch-uplifting/vorschau.mp4",
-        "groesse": 10383397,
-        "sha256": "e4d7f2cf056b8971bf23e05e82920f3074dd5299f3905474b58ccb6cb316bbef"
-      },
-      "breite": 1080,
-      "hoehe": 1920,
-      "dauer": 172.467,
-      "fps": 30,
-      "video": "H.264",
-      "videoBitrate": 1363273,
-      "ton": "AAC",
-      "tonHz": 48000,
-      "tonKanaele": 2,
-      "aufgenommen": "2026-10-23T14:05:48.435Z",
-      "teile": [
-        {
-          "groesse": 14000000,
-          "sha256": "09eaf18b8657f57ebabf6983ba6d2483cf83dd1069cac82eed4bac1f9384b8d6"
-        },
-        {
-          "groesse": 14000000,
-          "sha256": "917caa458e6ab15efd7e988fd25de7b817f2fdef0c1e3157e19aec6459acbd17"
-        },
-        {
-          "groesse": 5786503,
-          "sha256": "f0598c0c31f9d630151675512181c90b5e75c808f38a534763ac10a358499276"
-        }
-      ]
-    },
-    {
-      "id": "private-brain-pro-handbuch-hoch",
-      "titel": "Private Brain Pro · Handbuchvideo (hochkant)",
-      "beschreibung": "Das Handbuchvideo im Handy-Hochformat. Musik: Inspiring und City Travel.",
-      "dateiname": "private-brain-pro-handbuch-hoch.mp4",
-      "groesse": 33820719,
-      "sha256": "52b5260f8ad4475fcca1e65341015093f882be99b6e55db1c9f6de50026a360b",
-      "vorschau": "videos/private-brain-pro-handbuch-hoch/vorschau.jpg",
-      "vorschauFilm": {
-        "pfad": "videos/private-brain-pro-handbuch-hoch/vorschau.mp4",
-        "groesse": 10389689,
-        "sha256": "cf3573d37449c13b79627cded09f8ae3d5e5d4c968062527c2adc5890457a797"
-      },
-      "breite": 1080,
-      "hoehe": 1920,
-      "dauer": 172.467,
-      "fps": 30,
-      "video": "H.264",
-      "videoBitrate": 1363273,
-      "ton": "AAC",
-      "tonHz": 48000,
-      "tonKanaele": 2,
-      "aufgenommen": "2026-10-23T14:04:57.523Z",
-      "teile": [
-        {
-          "groesse": 14000000,
-          "sha256": "aeab2bcff4105b56a8042d6847bc1c1337d3b3b1baf1bcd1292ea1374158446d"
-        },
-        {
-          "groesse": 14000000,
-          "sha256": "143f2862da0e330d05c17c60673fa38373f5f76c9df34e80ac9926ae6f158a1a"
-        },
-        {
-          "groesse": 5820719,
-          "sha256": "fe8c41221a71715b981d6c6f847c0d3030d4584f1327fe7222a6aa584234a380"
-        }
-      ]
-    },
-    {
-      "id": "private-brain-pro-handbuch-uplifting",
-      "titel": "Private Brain Pro · Handbuchvideo (andere Musik)",
-      "beschreibung": "Dasselbe Handbuchvideo mit der Musik Corporate Uplifting.",
-      "dateiname": "private-brain-pro-handbuch-uplifting.mp4",
-      "groesse": 37706170,
-      "sha256": "29da8173aa6897a11fbfc331b32d2fa357b0ad947e4719ed09963479c6345624",
-      "vorschau": "videos/private-brain-pro-handbuch-uplifting/vorschau.jpg",
-      "vorschauFilm": {
-        "pfad": "videos/private-brain-pro-handbuch-uplifting/vorschau.mp4",
-        "groesse": 9848693,
-        "sha256": "f09e648ad292fc32bbe1d60773c4453535e7018d506d931b0aa546d2253279e3"
+        "pfad": "videos/private-brain-pro-film/vorschau.mp4",
+        "groesse": 12004568,
+        "sha256": "1d5550f87cf0f624f870c86ace7bd8628124b7a0f0a04ab166b8e66d2721cf36"
       },
       "breite": 1920,
       "hoehe": 1080,
-      "dauer": 193.733,
+      "dauer": 105,
       "fps": 30,
       "video": "H.264",
-      "videoBitrate": 1352827,
+      "videoBitrate": 5738728,
       "ton": "AAC",
       "tonHz": 48000,
       "tonKanaele": 2,
-      "aufgenommen": "2026-10-23T13:38:11.021Z",
+      "aufgenommen": "2026-10-23T17:09:38.220Z",
       "teile": [
         {
-          "groesse": 14000000,
-          "sha256": "ba2c89a344c157d953a3fadf85efd9033477168afbbaf4f50d3de1d3c79634ac"
+          "groesse": 2000000,
+          "sha256": "74098fd445ac2641a209dea533dae2d91ee8f38b2e4b7c2ae4bea5dd37c12cd2"
+        },
+        {
+          "groesse": 4000000,
+          "sha256": "076061a2800975518652674b4f31050c909151d1218532d75adc92d96464acea"
+        },
+        {
+          "groesse": 8000000,
+          "sha256": "53e18284152818250a4d624ad5d4a28692299e4e2166ca9dca8529ae728e064e"
         },
         {
           "groesse": 14000000,
-          "sha256": "9baf3b5a3095a776fc927b052999374711ba75dafc5bc4a92c1e4c8bc1bdbfff"
+          "sha256": "401d09e2dd79657f69ed6d745f1de41db00877cf748dcda700918a1a8fe1c70b"
         },
         {
-          "groesse": 9706170,
-          "sha256": "dcaf2f2a687c22e91cddfbe44946f7cc82bec240549eddb2db2f77edb21e4ed8"
+          "groesse": 14000000,
+          "sha256": "41e4e6b49d5e13ae7eba7c365c200319c4cbaa35d2e84fd53e91fcb8fde56dbc"
+        },
+        {
+          "groesse": 14000000,
+          "sha256": "0c1c8ddc09a7453d41870b239bc9d899d94251302e2d422fb6a7453d8efbb246"
+        },
+        {
+          "groesse": 14000000,
+          "sha256": "ebf2ae9f22fb2126e72f5226ce98d3be0b90a0857874db71cd173798698a7ec1"
+        },
+        {
+          "groesse": 8023678,
+          "sha256": "07e35ebba3481406dc944cfd8fcd2d29820e5cee519419d7e98c9ee77cc2f48e"
+        }
+      ]
+    },
+    {
+      "id": "private-brain-pro-film-hoch",
+      "titel": "Private Brain Pro · Werbefilm · hochkant",
+      "beschreibung": "Der Werbefilm fürs Handy, hochkant.",
+      "dateiname": "private-brain-pro-film-hochkant.mp4",
+      "groesse": 36588868,
+      "sha256": "fe3255258665c3ea0638fc94167f8613d8ed479d83f25c0f0c5b34c3aee29750",
+      "vorschau": "videos/private-brain-pro-film-hoch/vorschau.jpg",
+      "vorschauFilm": null,
+      "breite": 1080,
+      "hoehe": 1920,
+      "dauer": 105,
+      "fps": 30,
+      "video": "H.264",
+      "videoBitrate": 2581786,
+      "ton": "AAC",
+      "tonHz": 48000,
+      "tonKanaele": 2,
+      "aufgenommen": "2026-10-23T17:08:32.844Z",
+      "teile": [
+        {
+          "groesse": 2000000,
+          "sha256": "f77a86eb37a0d62710700e95d075686ccf8ced6e112bf08794d1edbbfa8dce36"
+        },
+        {
+          "groesse": 4000000,
+          "sha256": "3610562c1159312a5866b85d5cc5614f8085a794427170db4d126e979cec3fee"
+        },
+        {
+          "groesse": 8000000,
+          "sha256": "9a20dbc0423abaed817d17fe28c3157918376a0bea5e120ec3ff8438abab5b26"
+        },
+        {
+          "groesse": 14000000,
+          "sha256": "c5d26d8561af848aec395975cdb33866081b75e6e63fa9f5937ddfae92b55b54"
+        },
+        {
+          "groesse": 8588868,
+          "sha256": "b22d16cf64e2d93d77672173d3fd29cc89aa3fb5df3c32997fa5fa1cfa193c37"
         }
       ]
     },
@@ -314,86 +106,136 @@
       "titel": "Private Brain Pro · Handbuchvideo",
       "beschreibung": "So funktioniert Private Brain Pro, Schritt für Schritt: Dateien hinzufügen, suchen, Explorer, prüfen, Postfach, Speicherort und Werkzeuge. Musik: Inspiring und City Travel.",
       "dateiname": "private-brain-pro-handbuch.mp4",
-      "groesse": 37721714,
-      "sha256": "902e3b18028e1dd22d94ffca5c1ff5bd94b1d9e200cc0455e3930e85a488b015",
+      "groesse": 38170358,
+      "sha256": "4c16530b6be27684e397db9aaac0a43e5a67cbee2e063cd2b29d036022974223",
       "vorschau": "videos/private-brain-pro-handbuch/vorschau.jpg",
       "vorschauFilm": {
         "pfad": "videos/private-brain-pro-handbuch/vorschau.mp4",
-        "groesse": 9838442,
-        "sha256": "4d5a504039ebeaff7a8283ffdf4cc5ad37a16c997a77185a0b40f512506da742"
+        "groesse": 9843364,
+        "sha256": "d28bf81b2d4bce5ea527285a9946ec8a4dde0dae3d801c2cd8857df1d18e2532"
       },
       "breite": 1920,
       "hoehe": 1080,
-      "dauer": 193.733,
+      "dauer": 194.633,
       "fps": 30,
       "video": "H.264",
-      "videoBitrate": 1352827,
+      "videoBitrate": 1363997,
       "ton": "AAC",
       "tonHz": 48000,
       "tonKanaele": 2,
-      "aufgenommen": "2026-10-23T13:37:00.862Z",
+      "aufgenommen": "2026-10-23T17:08:31.861Z",
       "teile": [
         {
-          "groesse": 14000000,
-          "sha256": "0377811dfca37380e4ecba43bd3b95b5af2fea42239c1337e2a580a869fd4e8a"
+          "groesse": 2000000,
+          "sha256": "9e9b440686271ba349b5da66156f069322e58669b92ec1b0dca96d0e98f7869b"
+        },
+        {
+          "groesse": 4000000,
+          "sha256": "bdc42fa688f8987764a2c922e024096fe0bd27f820a751b93a43fa10f03f1c95"
+        },
+        {
+          "groesse": 8000000,
+          "sha256": "f9c387504e3e5daf792a2cdf56aab1ec695303e45f5b457e25431371c60092d7"
         },
         {
           "groesse": 14000000,
-          "sha256": "da592a9632205a2bc1d9c250083b79812c29cdaf7fa22733c6819d832e316207"
+          "sha256": "edf4679706f887b94e21e58b76e32a377d61dad4058b8e392a3db29cf96f6c08"
         },
         {
-          "groesse": 9721714,
-          "sha256": "8cc941eddb72bc028821536978bb53337bf628624b19dba45a23e7a4cf6cbce8"
+          "groesse": 10170358,
+          "sha256": "b3cd96eeb6ff05fa8dd1e849965726ad48b2c20b66473913129ca97e023c0669"
         }
       ]
     },
     {
-      "id": "private-brain-pro-film",
-      "titel": "Private Brain Pro · Werbefilm",
-      "beschreibung": "Private Brain Pro in 1:45: alles an einem Ort, Suche nach Bedeutung, alle Postfächer in einer App, alles geprüft.",
-      "dateiname": "private-brain-pro-film.mp4",
-      "groesse": 78020199,
-      "sha256": "036e0744df19809b3c5615696140afa7e3c048d2cba95ca09343165f02d14add",
-      "vorschau": "videos/private-brain-pro-film/vorschau.jpg",
+      "id": "private-brain-pro-handbuch-uplifting",
+      "titel": "Private Brain Pro · Handbuchvideo (andere Musik)",
+      "beschreibung": "Dasselbe Handbuchvideo mit der Musik Corporate Uplifting.",
+      "dateiname": "private-brain-pro-handbuch-uplifting.mp4",
+      "groesse": 38154337,
+      "sha256": "2059a1f65bb1fe6d259d0252cc765bfbd97e999713fcdbbd54cf4b74a30924ad",
+      "vorschau": "videos/private-brain-pro-handbuch-uplifting/vorschau.jpg",
       "vorschauFilm": {
-        "pfad": "videos/private-brain-pro-film/vorschau.mp4",
-        "groesse": 11998843,
-        "sha256": "b9b02916cad5299d0d0f16df9c158aa2cefe59a32e053379bbd74123401e43eb"
+        "pfad": "videos/private-brain-pro-handbuch-uplifting/vorschau.mp4",
+        "groesse": 9839927,
+        "sha256": "1fbeed33ab30a60f59f100b4d84c58767a4326351eb3136540bbe2f63e840678"
       },
       "breite": 1920,
       "hoehe": 1080,
-      "dauer": 105,
+      "dauer": 194.633,
       "fps": 30,
       "video": "H.264",
-      "videoBitrate": 5738498,
+      "videoBitrate": 1363997,
       "ton": "AAC",
       "tonHz": 48000,
       "tonKanaele": 2,
-      "aufgenommen": "2026-10-23T13:34:47.307Z",
+      "aufgenommen": "2026-10-23T17:07:28.604Z",
       "teile": [
         {
-          "groesse": 14000000,
-          "sha256": "a3dfba3c59d5c30ee79d1945ad8b27615488859b66983d10bf5117fac1cd762c"
+          "groesse": 2000000,
+          "sha256": "3de6d9516fa3f8e4afcb13eda52fe6bbf43d8480718a9c25a2763ef1e75bcec2"
+        },
+        {
+          "groesse": 4000000,
+          "sha256": "91a46e5427724e7c3801e3139a827d3cd6b483fe7399feb1c5c2992429ba591f"
+        },
+        {
+          "groesse": 8000000,
+          "sha256": "3e9da65ac3d19af6703d5aca034e839820614d3f27e280ff7324fde2a5c09a1b"
         },
         {
           "groesse": 14000000,
-          "sha256": "bd0f323b27afb73eae9a34e6472a642270d61fd10bd51f862a1ece86b968aa2a"
+          "sha256": "faf8b0ad7b9554f9fd2525f44b04d2366c331223225993514adfccfaddd03710"
+        },
+        {
+          "groesse": 10154337,
+          "sha256": "a9b130c55c15c31e19313740ce36d4a1e94626401df793e7117ef090bc03b83a"
+        }
+      ]
+    },
+    {
+      "id": "private-brain-pro-handbuch-hoch-uplifting",
+      "titel": "Private Brain Pro · Handbuchvideo (hochkant, andere Musik)",
+      "beschreibung": "Das Handbuchvideo im Handy-Hochformat mit der Musik Corporate Uplifting.",
+      "dateiname": "private-brain-pro-handbuch-hoch-uplifting.mp4",
+      "groesse": 34567733,
+      "sha256": "a9498fdb59831a9af047f755fcc6012cb7c92be9d9ad8256f52ccff4f0f16ac2",
+      "vorschau": "videos/private-brain-pro-handbuch-hoch-uplifting/vorschau.jpg",
+      "vorschauFilm": {
+        "pfad": "videos/private-brain-pro-handbuch-hoch-uplifting/vorschau.mp4",
+        "groesse": 10577022,
+        "sha256": "2bc347a9cddca2d629ec4893d155944ddc13b0a80d6ecf515a169c920b37c9ab"
+      },
+      "breite": 1080,
+      "hoehe": 1920,
+      "dauer": 170.833,
+      "fps": 30,
+      "video": "H.264",
+      "videoBitrate": 1415008,
+      "ton": "AAC",
+      "tonHz": 48000,
+      "tonKanaele": 2,
+      "aufgenommen": "2026-10-23T17:06:27.220Z",
+      "teile": [
+        {
+          "groesse": 2000000,
+          "sha256": "46824738a03b42f5f72ddfb74751eac26392e148cd7146688af8774eb1fcf38f"
+        },
+        {
+          "groesse": 4000000,
+          "sha256": "ff3205d28d0e855ae4dcd94685174d6ffb8dea7d048531ea820f17da1d807398"
+        },
+        {
+          "groesse": 8000000,
+          "sha256": "71119bf3bfc06f78b2874c39834572134a202fec005e603853c5a27b149d6f9d"
         },
         {
           "groesse": 14000000,
-          "sha256": "132fb8386b94dbd3f94876666e8df766c06793aed241b8e12f340f9313e5bb9f"
+          "sha256": "ef72f32fed001d95136ab7478a46fd2cf2760c7d0cb99ec71b830a8eb907fdb0"
         },
         {
-          "groesse": 14000000,
-          "sha256": "fac6c57d76ab585df3cf5a9c2f93081199540300e6e9156a8c7056a2c47a3cb0"
-        },
-        {
-          "groesse": 14000000,
-          "sha256": "e96f7c84e17c55a970f393947a2bd11b1c334273e96ec30920d018331db92378"
-        },
-        {
-          "groesse": 8020199,
-          "sha256": "e58bafebe33bb0f5d4effee5473e69d29299b621fe2cfda52b11b54624841ae7"
+          "groesse": 6567733,
+          "sha256": "336fbbc35ea66696db3907db972d0704ff29c172a1b753b6944161c2051c072f"
         }
       ]
     },
@@ -415,11 +257,57 @@
       "ton": "AAC",
       "tonHz": 44100,
       "tonKanaele": 2,
-      "aufgenommen": "2026-10-07T00:02:49.425Z",
+      "aufgenommen": "2026-10-23T16:10:44.617Z",
       "teile": [
         {
-          "groesse": 13822146,
-          "sha256": "6c84b31f85dced595ff28cffba164ef1c0fd6641f85dc562bdd5c900c000ae0a"
+          "groesse": 2000000,
+          "sha256": "f88f3f1783d006ed3071dd5e7c9c6ecefcf5a8dd737c9c4bd4a2ea6a37a042c4"
+        },
+        {
+          "groesse": 4000000,
+          "sha256": "e5b4cdd5f00aaa83f2b300edc7c64c3e263beb2b23a2e8ebfd84d7d90c1e8b28"
+        },
+        {
+          "groesse": 7822146,
+          "sha256": "1fcc16cd1989259802f50398519826ee90b0c5539eecd8abe47ffee9899a56e7"
+        }
+      ]
+    },
+    {
+      "id": "workfloh-pdf-erklaervideo-quer",
+      "titel": "Workfloh PDF · Erklärvideo (quer)",
+      "beschreibung": "So geht Workfloh PDF: scannen, Felder erkennen, ausfüllen, ausgeben, übersetzen, suchen und ordnen.",
+      "dateiname": "workfloh-pdf-erklaervideo-quer.mp4",
+      "groesse": 25839204,
+      "sha256": "fdbc905faf8d542f92485e621e71564b7a90b18f473732de61c610b2b4ded256",
+      "vorschau": "videos/workfloh-pdf-erklaervideo-quer/vorschau.jpg",
+      "vorschauFilm": null,
+      "breite": 1920,
+      "hoehe": 1080,
+      "dauer": 219.202,
+      "fps": 30,
+      "video": "H.264",
+      "videoBitrate": 758162,
+      "ton": "AAC",
+      "tonHz": 44100,
+      "tonKanaele": 1,
+      "aufgenommen": "2026-10-23T16:10:40.884Z",
+      "teile": [
+        {
+          "groesse": 2000000,
+          "sha256": "2c1d0fcf5c9cf5b0c2f66ca14db07059480d45d359819578c152e30fbcdf5614"
+        },
+        {
+          "groesse": 4000000,
+          "sha256": "1760653df5cdfb96b926a6ab8cbf4cac4592611f16edfbaccdfeb481bb5da146"
+        },
+        {
+          "groesse": 8000000,
+          "sha256": "f01ad1b859af792e32fd7889b2cc61c28719e5616d59f07ec4044c2ebd092488"
+        },
+        {
+          "groesse": 11839204,
+          "sha256": "0ab16612eec47a37c21ceb05b95573913527d4762661e12ec9492b9b4f908be9"
         }
       ]
     },
@@ -454,36 +342,6 @@
         {
           "groesse": 1896814,
           "sha256": "150e2ef6cb2038778de63e614d0807a23b14b48ae25b8085d1a099570f9df283"
-        }
-      ]
-    },
-    {
-      "id": "workfloh-pdf-erklaervideo-quer",
-      "titel": "Workfloh PDF · Erklärvideo (quer)",
-      "beschreibung": "So geht Workfloh PDF: scannen, Felder erkennen, ausfüllen, ausgeben, übersetzen, suchen und ordnen.",
-      "dateiname": "workfloh-pdf-erklaervideo-quer.mp4",
-      "groesse": 25839204,
-      "sha256": "fdbc905faf8d542f92485e621e71564b7a90b18f473732de61c610b2b4ded256",
-      "vorschau": "videos/workfloh-pdf-erklaervideo-quer/vorschau.jpg",
-      "vorschauFilm": null,
-      "breite": 1920,
-      "hoehe": 1080,
-      "dauer": 219.202,
-      "fps": 30,
-      "video": "H.264",
-      "videoBitrate": 758162,
-      "ton": "AAC",
-      "tonHz": 44100,
-      "tonKanaele": 1,
-      "aufgenommen": "2026-10-07T00:02:43.979Z",
-      "teile": [
-        {
-          "groesse": 14000000,
-          "sha256": "4328f4642e8205803b0d53f52bf82229f89ebff6d5112029f11dcce494605efe"
-        },
-        {
-          "groesse": 11839204,
-          "sha256": "0ab16612eec47a37c21ceb05b95573913527d4762661e12ec9492b9b4f908be9"
         }
       ]
     },

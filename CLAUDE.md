@@ -333,6 +333,16 @@ nichts mehr kommt — der Stand sprang nur am Ende eines Teils.
 
 Cache `fp-videos-v13`, `laden.js?v=9`, `abspielen-kern.js?v=3`.
 
+## 🎞 Private Brain Pro: nur die besten Fassungen (Klaus 2026-10-23)
+
+Klaus: *„nur die besten Varianten … nicht alle anbieten“*, *„jeweils immer zwei Formate“*. Neu aufgenommen nach dem
+Siegel-Fehler (Privat-Brain-Pro #73), alle Full HD und mit `--anlauf`:
+`private-brain-pro-film` (quer) · `private-brain-pro-film-hoch` (neu, der Querfilm mittig auf dunklem Grund mit Logo) ·
+`private-brain-pro-handbuch` (♪1 Mix) · `private-brain-pro-handbuch-uplifting` (♪2) · `private-brain-pro-handbuch-hoch-uplifting`.
+Mit `--entfernen` von der Seite genommen (in der Historie): alle fünf `…-720p` und `private-brain-pro-handbuch-hoch` (Mix).
+Dazu `workfloh-pdf-erklaervideo-quer` und `workfloh-pdf-versteckte-befehle` mit `--anlauf` neu zerlegt (Bild unverändert).
+Seite danach 800,9 MB von 1 000 MB. ⚠ Am Tablet nicht gemessen.
+
 ## 🛡 Workfloh-PDF-Videos zum Herunterladen (Klaus 2026-10-07)
 
 Klaus: *„damit ich von da aus die Downloads starten kann … Vielleicht ist es besser, wenn es doppelt gespeichert
