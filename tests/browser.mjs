@@ -71,7 +71,8 @@ async function starteBrowser(pw) {
 }
 
 /* ── ein kleiner Server, der Störungen stellen kann ──
- *   stoerung: Pfad → { art: "kaputt" | "404" | "kurz" | "warte", mal: n | Infinity, ms }
+ *   stoerung: Pfad → { art: "kaputt" | "404" | "kurz" | "warte" | "haengt", mal: n | Infinity, ms }
+ *   haengt:   die erste Hälfte kommt, dann steht die Leitung still (Klaus 2026-10-23)
  *   aus:      jede Anfrage wird abgerissen (wie ein Netz, das weg ist) */
 const TYPEN = {
   ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".css": "text/css; charset=utf-8",
@@ -100,6 +101,11 @@ function starteServer(root) {
       if (s.art === "kaputt") { body = Buffer.from(body); for (let i = 0; i < Math.min(64, body.length); i++) body[i] ^= 0xff; }
       if (s.art === "kurz") body = body.subarray(0, body.length - 1);
       if (s.art === "warte") await new Promise((r) => setTimeout(r, s.ms || 1500));
+      if (s.art === "haengt") {
+        res.writeHead(200, { "Content-Type": "application/octet-stream", "Content-Length": body.length });
+        res.write(body.subarray(0, Math.floor(body.length / 2)));
+        return;   /* nie beendet — wie eine Leitung, die stehen bleibt */
+      }
     }
     res.writeHead(200, { "Content-Type": TYPEN[extname(datei)] || "application/octet-stream", "Content-Length": body.length });
     res.end(body);
@@ -348,11 +354,20 @@ try {
     kopf("2c · Probe B: ein Teil einmal kaputt, einer langsam — die anderen warten");
     s2.stoerung.set(teil("probe-b", 1), { art: "kaputt", mal: 1 });
     s2.stoerung.set(teil("probe-b", 3), { art: "warte", mal: 1, ms: 1500 });
+    s2.stoerung.set(teil("probe-b", 2), { art: "haengt", mal: 1 });
+    await q.evaluate(() => window.__videos.stilleMs(3000));
     await klick(q, "probe-b", "laden");
+    /* Wartet die Seite auf den hängenden Teil für immer, kommt Teil 4 nie dran: dann eine rote
+       Zeile mit Namen und Stopp, statt am Zeitablauf zu stolpern (Gegenprobe HAENGT:). */
+    let kamDran = true;
     await q.waitForFunction((sel) => {
       const f = document.querySelectorAll(sel + " .streifen .feld");
       return f[3] && f[3].getAttribute("data-lage") === "laedt";
-    }, karteSel("probe-b"), { timeout: 30000 });
+    }, karteSel("probe-b"), { timeout: 20000 }).catch(() => { kamDran = false; });
+    if (!kamDran) {
+      ok("HAENGT: ein Teil, bei dem die Leitung stehen bleibt, wird neu geholt (statt ewig zu warten)", false, "nach 20 s noch bei Teil 3");
+      await klick(q, "probe-b", "stopp").catch(() => {});
+    }
     const waehrend = await q.evaluate(() => [...document.querySelectorAll("article.video")].map((el) => ({ id: el.getAttribute("data-id"), aus: el.querySelector('[data-knopf="laden"]').disabled })));
     ok("B lädt: alle anderen Laden-Knöpfe sind aus", waehrend.filter((x) => x.id !== "probe-b").every((x) => x.aus), JSON.stringify(waehrend));
     const aFrei = await karteLage(q, "probe-a");
@@ -360,10 +375,13 @@ try {
       aFrei.lage === null && !aFrei.hatBlob && aFrei.speichernAus && aFrei.meldungArt === "warn" && /^Freigegeben/.test(aFrei.meldung) && aFrei.ladenText === "Schlicht laden",
       JSON.stringify(aFrei));
     ok("B lädt: A's Streifen ist wieder leer", aFrei.streifen.every((s) => s === null), JSON.stringify(aFrei.streifen));
-    await warteLage(q, "probe-b", ["fertig", "fehler"]);
+    await warteLage(q, "probe-b", ["fertig", "fehler", "angehalten"]);
     const b1 = await karteLage(q, "probe-b");
     ok("B: fertig, obwohl Teil 2 einmal kaputt kam", b1.lage === "fertig", JSON.stringify({ lage: b1.lage, meldung: b1.meldung }));
     ok("B: Teil 2 im zweiten Versuch", b1.holZaehler[1] === 2, JSON.stringify(b1.holZaehler));
+    if (kamDran) ok("HAENGT: ein Teil, bei dem die Leitung stehen bleibt, wird neu geholt (statt ewig zu warten)",
+      b1.lage === "fertig" && b1.holZaehler[2] === 2 && s2.anzahl(teil("probe-b", 2)) === 2,
+      JSON.stringify({ lage: b1.lage, zaehler: b1.holZaehler, server: s2.anzahl(teil("probe-b", 2)) }));
     const danach = await q.evaluate(() => [...document.querySelectorAll("article.video")].map((el) => ({ id: el.getAttribute("data-id"), aus: el.querySelector('[data-knopf="laden"]').disabled })));
     ok("B fertig: die anderen Laden-Knöpfe sind wieder an", danach.filter((x) => x.id !== "probe-b").every((x) => !x.aus), JSON.stringify(danach));
 
