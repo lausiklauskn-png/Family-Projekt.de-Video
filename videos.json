@@ -2,82 +2,162 @@
   "fassung": 1,
   "videos": [
     {
-      "id": "private-brain-pro-film-720p",
-      "titel": "Private Brain Pro: die App baut sich zusammen · 720p",
-      "beschreibung": "Derselbe Film in 720p, schneller zum Abspielen übers Netz.",
-      "dateiname": "Private-Brain-Pro-Film-720p.mp4",
-      "groesse": 27158944,
-      "sha256": "ef4dd85edd6e5677daad1adfca160f5c4386288a4098c05255e96ad3c181f5f6",
-      "vorschau": "videos/private-brain-pro-film-720p/vorschau.jpg",
-      "vorschauFilm": null,
-      "breite": 1280,
-      "hoehe": 720,
-      "dauer": 105,
+      "id": "private-brain-pro-handbuch-uplifting",
+      "titel": "Private Brain Pro · Handbuchvideo (andere Musik)",
+      "beschreibung": "Dasselbe Handbuchvideo mit der Musik Corporate Uplifting.",
+      "dateiname": "private-brain-pro-handbuch-uplifting.mp4",
+      "groesse": 37459980,
+      "sha256": "80054fccc462e19a53785eea0603f6ca907b3c197950338aca9cd74f888079fa",
+      "vorschau": "videos/private-brain-pro-handbuch-uplifting/vorschau.jpg",
+      "vorschauFilm": {
+        "pfad": "videos/private-brain-pro-handbuch-uplifting/vorschau.mp4",
+        "groesse": 9507746,
+        "sha256": "aacc6abce9dd20ce661a4c147209fe7ad08b88d6d985047aedb6859822305af5"
+      },
+      "breite": 1920,
+      "hoehe": 1080,
+      "dauer": 195.133,
       "fps": 30,
       "video": "H.264",
-      "videoBitrate": 1863343,
+      "videoBitrate": 1331525,
       "ton": "AAC",
       "tonHz": 48000,
       "tonKanaele": 2,
-      "aufgenommen": "2026-10-23T08:10:59.746Z",
+      "aufgenommen": "2026-10-23T12:32:47.720Z",
       "teile": [
         {
           "groesse": 14000000,
-          "sha256": "2c02b0d124408824545bf3dc98848f56b5d0923d4fac666ba02c78945fbe4f3a"
+          "sha256": "ea1def2d2b96cafb4338d7ae05d5cd2dd6eda146449a2e15b906992d8ce92f34"
         },
         {
-          "groesse": 13158944,
-          "sha256": "dedd64a0f88716267bf394599b405cfd36a6e058b46d741c12458f4fe3c78141"
+          "groesse": 14000000,
+          "sha256": "429c65ed83202fca65e038d74a38a733145b11b7f42cc61cc252a45fb08f55e1"
+        },
+        {
+          "groesse": 9459980,
+          "sha256": "6534a57c1810eb8830b42ffb7cf8975cfe5be4336d01ab584f8e4859ba524370"
+        }
+      ]
+    },
+    {
+      "id": "private-brain-pro-handbuch",
+      "titel": "Private Brain Pro · Handbuchvideo",
+      "beschreibung": "So funktioniert Private Brain Pro, Schritt für Schritt: Dateien hinzufügen, suchen, Explorer, prüfen, Postfach, Speicherort und Werkzeuge. Musik: Inspiring und City Travel.",
+      "dateiname": "private-brain-pro-handbuch.mp4",
+      "groesse": 37473659,
+      "sha256": "4ce13009199cc93d1c554928c738eea5195b60995906e01b236c14c769c91bf4",
+      "vorschau": "videos/private-brain-pro-handbuch/vorschau.jpg",
+      "vorschauFilm": {
+        "pfad": "videos/private-brain-pro-handbuch/vorschau.mp4",
+        "groesse": 9493341,
+        "sha256": "cd5fd1d36094ce2fad45e5ac9186cf8817e77d22343285ce71903b2c3f2eb64a"
+      },
+      "breite": 1920,
+      "hoehe": 1080,
+      "dauer": 195.133,
+      "fps": 30,
+      "video": "H.264",
+      "videoBitrate": 1331525,
+      "ton": "AAC",
+      "tonHz": 48000,
+      "tonKanaele": 2,
+      "aufgenommen": "2026-10-23T12:31:38.887Z",
+      "teile": [
+        {
+          "groesse": 14000000,
+          "sha256": "7877af3eea23fd14c8bca987b19017b8e837c9f4a5a19aaac2aa5d13ecd7b30e"
+        },
+        {
+          "groesse": 14000000,
+          "sha256": "646186bf1a69fdb418f2e1dc58a6bbccc7adff979381441c89fe5a0bc00445ea"
+        },
+        {
+          "groesse": 9473659,
+          "sha256": "a9afd3884d82337485cb0c9eff83c8637e5da490eba23578f86086a783e6d9aa"
+        }
+      ]
+    },
+    {
+      "id": "private-brain-pro-film-720p",
+      "titel": "Private Brain Pro · Werbefilm · 720p",
+      "beschreibung": "Derselbe Film in 720p, schneller zum Abspielen übers Netz.",
+      "dateiname": "private-brain-pro-film-720p.mp4",
+      "groesse": 24104486,
+      "sha256": "2ebcce578eb10a97f5e8e46deda9a25ddee7bb32578ec281e4ba87516452375a",
+      "vorschau": "videos/private-brain-pro-film-720p/vorschau.jpg",
+      "vorschauFilm": {
+        "pfad": "videos/private-brain-pro-film-720p/vorschau.mp4",
+        "groesse": 12013530,
+        "sha256": "0ed8e343e85d72b1b5f20a21890637644cff4c58c3284e073da2011e132de69f"
+      },
+      "breite": 1280,
+      "hoehe": 720,
+      "dauer": 105.002,
+      "fps": 30,
+      "video": "H.264",
+      "videoBitrate": 1664479,
+      "ton": "AAC",
+      "tonHz": 48000,
+      "tonKanaele": 2,
+      "aufgenommen": "2026-10-23T12:30:31.451Z",
+      "teile": [
+        {
+          "groesse": 14000000,
+          "sha256": "4ccf9d4c15a290c31345fee0f55dce0fdf0449aa80b2060f9eefcb8d04d083ce"
+        },
+        {
+          "groesse": 10104486,
+          "sha256": "68feed031093e49a1ae9b97d492caadf7a9baa3cfb513bd835a098a11f356dca"
         }
       ]
     },
     {
       "id": "private-brain-pro-film",
-      "titel": "Private Brain Pro: die App baut sich zusammen",
-      "beschreibung": "Aus bunten 3D-Puzzleteilen setzt sich die App zusammen und erklärt sich dabei: Suche nach Bedeutung, Explorer, Postfach, Schutz. Mit Musik von Family Projekt, Workflow PDF und dem Sicherheitsfilm.",
-      "dateiname": "Private-Brain-Pro-Film.mp4",
-      "groesse": 78866905,
-      "sha256": "c2cf0be7b1d87be5d1c9c84f4c3eeca9ce01f5f7ed30d325afb772a0677cea50",
+      "titel": "Private Brain Pro · Werbefilm",
+      "beschreibung": "Private Brain Pro in 1:45: alles an einem Ort, Suche nach Bedeutung, alle Postfächer in einer App, alles geprüft.",
+      "dateiname": "private-brain-pro-film.mp4",
+      "groesse": 78073017,
+      "sha256": "594f8ba59ed68a540c0a1ae2ac1fa8f330438088e43a3f0efe29dbda79daf43a",
       "vorschau": "videos/private-brain-pro-film/vorschau.jpg",
       "vorschauFilm": {
         "pfad": "videos/private-brain-pro-film/vorschau.mp4",
-        "groesse": 12052213,
-        "sha256": "0eb970c3e904606a0812a09c5133d8b9120719aed74b68137f07e494a0fc3d03"
+        "groesse": 12008748,
+        "sha256": "b778d04b9c5af1f379a3a966d10d244590da2d5bb22627805a9519bdec4a6fd1"
       },
       "breite": 1920,
       "hoehe": 1080,
       "dauer": 105,
       "fps": 30,
       "video": "H.264",
-      "videoBitrate": 5803002,
+      "videoBitrate": 5742522,
       "ton": "AAC",
       "tonHz": 48000,
       "tonKanaele": 2,
-      "aufgenommen": "2026-10-23T08:10:51.913Z",
+      "aufgenommen": "2026-10-23T12:29:26.751Z",
       "teile": [
         {
           "groesse": 14000000,
-          "sha256": "4e54f22525a746516217f6df5c04fe2025e00a973569a6bab505ae4bccb48cc4"
+          "sha256": "32ccfba07c874ea81e7a55cc67b2d4e0cff5a8fd3a9e6581614255b7bbd9bd05"
         },
         {
           "groesse": 14000000,
-          "sha256": "d2b1a69ca4ecbcf955a8803a1fdc4ff1f52eb51102eb01b09d632462e7354d2a"
+          "sha256": "bd0f323b27afb73eae9a34e6472a642270d61fd10bd51f862a1ece86b968aa2a"
         },
         {
           "groesse": 14000000,
-          "sha256": "c1d6a702480d4f21639acbac184a2eeef35f97e4e5770fe7f09a2000ab791f0b"
+          "sha256": "132fb8386b94dbd3f94876666e8df766c06793aed241b8e12f340f9313e5bb9f"
         },
         {
           "groesse": 14000000,
-          "sha256": "eb9e4360721bb945935fdf14761ab6f5d3870bd5332de3f5b97afad82ebb938f"
+          "sha256": "fac6c57d76ab585df3cf5a9c2f93081199540300e6e9156a8c7056a2c47a3cb0"
         },
         {
           "groesse": 14000000,
-          "sha256": "90124fb0fca3be19cfdef1be32233e8d164e2a9b5af50688f13f4bcd5660d76d"
+          "sha256": "eb4e4276cf51d2069d8d6470a80fac7625e15ef5a173cd5d4809e020f2197fdb"
         },
         {
-          "groesse": 8866905,
-          "sha256": "7d52fc9c5d08f3ded9073b755012fbaba87d46c94a57ed43e1ba331788eaa690"
+          "groesse": 8073017,
+          "sha256": "0addda99b07b023eee4230055955efab565ea0884c12f617aa75fbcd89c044cc"
         }
       ]
     },
