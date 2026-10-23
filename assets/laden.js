@@ -11,6 +11,10 @@
   var KENNUNG = /^[a-z0-9][a-z0-9-]{1,59}$/;
   var EIGEN = /^fp-videos-/;            /* nur die eigenen Vorräte — github.io teilen sich viele Apps */
   var VERSUCHE = 3;
+  /* Klaus 2026-10-23: „lädt seit einer halben Stunde und ist immer noch bei Teil 2 von 6".
+     Ein fetch hat keine eigene Frist — steht die Leitung still, wartet er für immer.
+     Kommt so lange kein einziges Byte, wird der Versuch abgebrochen und neu begonnen. */
+  var STILLE_MS = 25000;
 
   var listeEl = document.getElementById("liste");
   var listeMeldung = document.getElementById("liste-meldung");
@@ -19,7 +23,7 @@
   var laeuft = null;                     /* die Karte, die gerade lädt */
 
   /* Für die Proben: was zuletzt gespeichert wurde, und wie oft jeder Teil geholt wurde. */
-  var probe = window.__videos = { letzterDownload: null, karten: karten };
+  var probe = window.__videos = { letzterDownload: null, karten: karten, stilleMs: function (ms) { STILLE_MS = ms; } };
 
   function zahl(n, stellen) {
     return n.toLocaleString("de-DE", { minimumFractionDigits: stellen, maximumFractionDigits: stellen });
@@ -204,17 +208,57 @@
       (da ? "Sie bleiben im Speicher — „Weiter laden“ macht an dieser Stelle weiter." : "Es wurde noch kein Teil geladen."), "warn");
   }
 
+  /* Liest eine Antwort Stück für Stück: so sieht man den Fortschritt auch INNERHALB
+     eines Teils, und der Wächter merkt, ob noch etwas kommt. */
+  async function lesen(antwort, groesse, jeStueck) {
+    if (!antwort.body || !antwort.body.getReader) return antwort.arrayBuffer();
+    var leser = antwort.body.getReader(), ziel = new Uint8Array(groesse), da = 0;
+    for (;;) {
+      var r = await leser.read();
+      if (r.done) break;
+      if (da + r.value.byteLength > groesse) {
+        try { leser.cancel(); } catch (e) {}
+        throw new Error("falsche Größe: mehr als " + groesse + " Bytes");
+      }
+      ziel.set(r.value, da); da += r.value.byteLength;
+      jeStueck(da);
+    }
+    if (da !== groesse) throw new Error("falsche Größe: " + da + " statt " + groesse + " Bytes");
+    return ziel.buffer;
+  }
+
+  function teilStand(k, i, imTeil) {
+    var jetzt = Date.now();
+    if (k.standUm && jetzt - k.standUm < 250) return;   /* höchstens viermal je Sekunde */
+    k.standUm = jetzt;
+    var vorher = 0;
+    for (var j = 0; j < k.v.teile.length; j++) if (k.puffer[j]) vorher += k.v.teile[j].groesse;
+    k.felder.stand.textContent = "Teil " + (i + 1) + " von " + k.v.teile.length + " · " + mb(vorher + imTeil) + " von " + mb(k.v.groesse);
+  }
+
   async function holeTeil(k, i) {
     var t = k.v.teile[i];
     var letzter = null;
     for (var versuch = 1; versuch <= VERSUCHE; versuch++) {
+      var signal = k.abbruch ? k.abbruch.signal : undefined;
+      var eigen = typeof AbortController === "function" ? new AbortController() : null;
+      var weiterreichen = function () { if (eigen) eigen.abort(); };
+      if (signal && eigen) signal.addEventListener("abort", weiterreichen);
+      var still = false, uhr = null;
+      var wecken = function () {
+        if (!eigen) return;
+        clearTimeout(uhr);
+        uhr = setTimeout(function () { still = true; eigen.abort(); }, STILLE_MS);
+      };
       try {
         k.holZaehler[i]++;
-        var signal = k.abbruch ? k.abbruch.signal : undefined;
-        var antwort = await fetch(teilAdresse(k.v, i), { cache: "no-store", signal: signal });
+        if (versuch > 1 && letzter) melde(k, "Teil " + (i + 1) + ": " + letzter.message + " — neuer Versuch (" + versuch + " von " + VERSUCHE + ") …");
+        wecken();
+        var antwort = await fetch(teilAdresse(k.v, i), { cache: "no-store", signal: eigen ? eigen.signal : signal });
         if (!antwort.ok) throw new Error("Antwort " + antwort.status);
-        var buf = await antwort.arrayBuffer();
-        if (buf.byteLength !== t.groesse) throw new Error("falsche Größe: " + buf.byteLength + " statt " + t.groesse + " Bytes");
+        wecken();
+        var buf = await lesen(antwort, t.groesse, function (da) { wecken(); teilStand(k, i, da); });
+        clearTimeout(uhr);
         var summe = hex(await crypto.subtle.digest("SHA-256", buf));
         if (signal && signal.aborted) throw abgebrochen();
         if (summe !== t.sha256) throw new Error("Prüfsumme stimmt nicht");
@@ -222,7 +266,10 @@
       } catch (e) {
         /* Angehalten heißt angehalten: kein zweiter Versuch */
         if (signal && signal.aborted) throw abgebrochen();
-        letzter = e;
+        letzter = still ? new Error("die Leitung stand " + (STILLE_MS / 1000) + " s still") : e;
+      } finally {
+        clearTimeout(uhr);
+        if (signal && eigen) signal.removeEventListener("abort", weiterreichen);
       }
     }
     throw letzter;

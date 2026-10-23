@@ -14,15 +14,15 @@
  * in dem die Stelle liegt, prüft dessen SHA-256 und hält höchstens drei Teile im
  * Arbeitsspeicher — nie in der Cache Storage.
  * Wer eine Datei aus SCHALE ändert, erhöht CACHE_VERSION (und die ?v= in der Seite). */
-const CACHE_VERSION = "fp-videos-v12";
+const CACHE_VERSION = "fp-videos-v13";
 const SCHALE = [
   "./",
   "index.html",
   "assets/stil.css?v=4",
-  "assets/laden.js?v=8",
+  "assets/laden.js?v=9",
   "abspielen.html",
   "assets/abspielen.js?v=4",
-  "assets/abspielen-kern.js?v=2",
+  "assets/abspielen-kern.js?v=3",
   "manifest.webmanifest",
   "icons/icon-192.png?v=1",
   "icons/icon-512.png?v=1",
@@ -52,7 +52,7 @@ function istSchale(url) {
 
 
 /* ── Abspielen: das Zusammensetzen steht in assets/abspielen-kern.js (auch für family-projekt.de) ── */
-importScripts("assets/abspielen-kern.js?v=2");
+importScripts("assets/abspielen-kern.js?v=3");
 const ABSPIEL = /^videos\/([a-z0-9][a-z0-9-]{1,59})\/abspielen\.mp4$/;
 const TEIL = /^videos\/([a-z0-9][a-z0-9-]{1,59})\/teil-(\d{2})\.bin$/;
 

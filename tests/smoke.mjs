@@ -272,6 +272,10 @@ ok("abspielen-rahmen.js: die Leiste trägt keinen Hintergrund und keinen Schatte
 /* Klaus 2026-10-06: „lädt viel länger als 67 s und ruckelt", „die Punkte sind nicht zu sehen". */
 ok("LADENPAUSE: abspielen-rahmen.js: ein Tipp auf Herunterladen hält das laufende Video an",
   /a\.addEventListener\("click", function \(\) \{ if \(zustand !== "ruhe" && !vid\.paused\) \{ vid\.pause\(\); merke\(\);/.test(raQ));
+ok("HAENGT: die Seite bricht einen Teil ab, wenn die Leitung stillsteht, und zeigt den Stand im Teil",
+  /var STILLE_MS = \d+;/.test(ladenQuelle) && /uhr = setTimeout\(function \(\) \{ still = true; eigen\.abort\(\); \}, STILLE_MS\)/.test(ladenQuelle) && /lesen\(antwort, t\.groesse, function \(da\) \{ wecken\(\); teilStand\(k, i, da\); \}\)/.test(ladenQuelle));
+ok("HAENGT: der Kern bricht ebenso ab und lässt die Seite nicht auf einen hängenden Teil warten",
+  /var b = await mitWaechter\(adr, t\.groesse, i\);/.test(kernQ) && /still = true; ctrl\.abort\(\);/.test(kernQ) && /Promise\.race\(\[p, spaet\]\)/.test(kernQ));
 ok("TEILVORRAT: sw.js gibt einen Teil, den der Kern schon hält, aus dem Kern",
   /self\.FPAbspielKern\.ausVorrat\(req, tl\[1\], Number\(tl\[2\]\)/.test(swQ) && /function ausVorrat\(req, id, i, basis\) \{\s*var s = basis \+ "\|" \+ id \+ "#" \+ i;\s*if \(!teile\.has\(s\)\) return null;/.test(kernQ));
 ok("PUNKTE: abspielen-rahmen.js: 24-px-Kreis, Punkte 5 px",
