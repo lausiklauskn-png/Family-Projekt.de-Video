@@ -343,6 +343,14 @@ Mit `--entfernen` von der Seite genommen (in der Historie): alle fünf `…-720p
 Dazu `workfloh-pdf-erklaervideo-quer` und `workfloh-pdf-versteckte-befehle` mit `--anlauf` neu zerlegt (Bild unverändert).
 Seite danach 800,9 MB von 1 000 MB. ⚠ Am Tablet nicht gemessen.
 
+## 🎞 Private Brain Pro: je Film EINE Fassung im neuen Design (Klaus 2026-10-25)
+
+Klaus: *„nur noch eine gute Fassung“*, gestreamt und herunterladbar wie das Werbevideo. Neu aufgenommen mit Private Brain
+Pro (Stand .35, Privat-Brain-Pro #83), mit `--ersetzen --anlauf`: `private-brain-pro-film` (1:45, 92,5 MB) und
+`private-brain-pro-handbuch` (3:43, 42,1 MB). Entfernt (in der Historie): `private-brain-pro-film-hoch`,
+`private-brain-pro-handbuch-uplifting`, `private-brain-pro-handbuch-hoch-uplifting`. Seite danach 689,6 MB von 1 000 MB.
+Die Kennungen bleiben, Links im Geschenk und in den Anleitungen gelten weiter. ⚠ Am Tablet nicht gemessen.
+
 ## 🛡 Workfloh-PDF-Videos zum Herunterladen (Klaus 2026-10-07)
 
 Klaus: *„damit ich von da aus die Downloads starten kann … Vielleicht ist es besser, wenn es doppelt gespeichert
